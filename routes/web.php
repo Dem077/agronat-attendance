@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Livewire\AttendanceComponent;
+use App\Http\Livewire\TimeSheetComponent;
 use App\Http\Livewire\Users as UsersComponent;
 use Illuminate\Support\Facades\Route;
 
@@ -19,3 +21,5 @@ Route::get('/', function () {
 })->name('employee.dashboard');
 
 Route::get('employees',UsersComponent::class)->name('employees');
+Route::get('attendances',AttendanceComponent::class)->name('attendances');
+Route::get('timesheets',TimeSheetComponent::class)->name('timesheets');

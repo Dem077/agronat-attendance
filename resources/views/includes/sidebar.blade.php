@@ -27,6 +27,16 @@
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Employee</span></a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('attendances')}}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Attendance</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('timesheets')}}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Attendance logs</span></a>
+    </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
