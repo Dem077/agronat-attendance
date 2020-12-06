@@ -19,6 +19,7 @@ class CreateAttendancesTable extends Migration
             $table->date('ck_date');
             $table->time('in')->nullable();
             $table->time('out')->nullable();
+            $table->unsignedInteger('late_fine')->default(0);
             $table->timestamps();
         });
     }
