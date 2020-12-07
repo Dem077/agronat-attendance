@@ -19,6 +19,7 @@ class Attendance extends Model
         'ck_date',
         'in',
         'out',
+        'late_fine'
     ];
 
     public function user(){

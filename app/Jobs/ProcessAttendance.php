@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Attendance;
+use App\Models\Overtime;
 use App\Models\TimeSheet;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -17,14 +18,15 @@ class ProcessAttendance implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $punch_log;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($punch_log)
     {
-        //
+        $this->punch_log=$punch_log;
     }
 
     /**
@@ -35,60 +37,75 @@ class ProcessAttendance implements ShouldQueue
     public function handle()
     {
 
-        $logs=TimeSheet::where('status',0)->orderBy('punch','asc')->get();
-        
         $schedule=[
             "in"=>date('H:i',strtotime('08:00')),
             "out"=>date('H:i',strtotime('16:00'))
         ];
 
-        $user_statuses=[];
+        $dt=strtotime($this->punch_log->punch);
+        $date=date('Y-m-d',$dt);
+        $time=date('H:i',$dt);
+        $user_id=$this->punch_log->user_id;
 
-        foreach(TimeSheet::where('status',0)->cursor() as $log){
-            $dt=strtotime($log->punch);
-            $date=date('Y-m-d',$dt);
-            $time=date('H:i',$dt);
-            $user_id=$log->user_id;
+        $attendance=Attendance::where(['user_id'=>$user_id])->where('ck_date',$date)->first();
 
-            if(!isset($user_statuses[$date])){
-                $user_statuses[$date]=[];
-                $nxt=date('Y-m-d',strtotime($date.' +1 day'));
-                $user_statuses[$date][$user_id]=TimeSheet::where('status',0)->where(['user_id'=>$user_id])->whereBetween('punch',[$date,$nxt])->count();
-            }
-
-            if(!isset($user_statuses[$date][$user_id])){
-                $user_statuses[$date][$user_id]=TimeSheet::where('status',0)->where(['user_id'=>$user_id])->whereBetween('punch',[$date,$nxt])->count();
-            }
-
-            $attendance=Attendance::where(['user_id'=>$user_id])->where('ck_date',$date)->first();
-
-            if($attendance){
-                if($attendance->in < $time && $time <= $schedule['in']){
-                    $attendance->in = $time;
+        
+        if($attendance){
+            if($this->punch_log->status==0){
+                if($time <= $schedule['in'] && $attendance->in < $time){
+                    $attendance->in=$time;
+                    $attendance->late_fine=$this->lateFine($time,$schedule['in']);
                     $attendance->save();
-                }elseif(!$attendance->out && $time >= $schedule['out']){
+                }
+
+            }else{
+                if($time<=$schedule['in']){
+                    $attendance->delete();
+                }elseif($attendance->out){
+                    if($attendance->out < $schedule['out'] && $time >= $schedule['out']){
+                        $attendance->out = $time;
+                        $attendance->save();
+                    }
+                }elseif($time > $schedule['in']){
                     $attendance->out = $time;
                     $attendance->save();
                 }
-            }else{
-                Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time]);
+
             }
 
-            $log->status=1;
-            $log->save();
+        }else{
+            $latefine=$this->lateFine($time,$schedule['in']);
+            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time,'late_fine'=>$latefine]);
         }
-        Log::info('test');
-        //log get user schedule
-        //if time <= schedule->in: 
-            //if attendance->in: 
-                //if attendance->in > time:
-                    //attendance->in=time 
-        //elseif(not attendance->in): 
-            //attendance->in = time
-        //elseif not attendance->out: 
-            //if time >= schedule->out: 
-                //attendance->out=time
 
+        //process OT
+
+        // if($this->punch_log->status==0){
+        //     if($time < $schedule['in'] || $time >= $schedule['out']){
+        //         //OT In
+        //     }
+        // }else{
+        //     $last_ot=new Overtime(); //find last OT
+        //     if($last_ot->in < $schedule['in']){
+        //         if($time >= $schedule['in']){
+        //             $last_ot->out=$schedule['in'];
+        //         }else{
+        //             $last_ot->out=$time;
+        //         }
+        //     }elseif($last_ot->in >= $schedule['out']){
+        //         $last_ot->out=$time;
+        //     }
+        // }
         
+        Log::info('test');
+
     }
+
+    public function lateFine($ck_in,$sc_in){
+        $sc_in=strtotime($sc_in);
+        $ck_in=strtotime($ck_in);
+        $latefine=floor(($ck_in-$sc_in)/60);
+        return $latefine>0?$latefine:0;
+    }
+    
 }

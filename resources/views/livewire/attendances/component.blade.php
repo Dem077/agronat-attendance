@@ -46,7 +46,7 @@
                                 <td>16:00</td>
                                 <td>{{ $attendance->in }}</td>
                                 <td>{{ $attendance->out }}</td>
-                                <td>0</td>
+                                <td>{{ $attendance->late_fine }}</td>
                                 <td>
                                     <button data-toggle="modal" data-target="#updateModal" wire:click="edit({{ $attendance->id }})" class="btn btn-primary btn-sm">Edit</button>
                                     <button wire:click="delete({{ $attendance->id }})" class="btn btn-danger btn-sm">Delete</button>

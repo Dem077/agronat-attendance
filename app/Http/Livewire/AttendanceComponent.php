@@ -32,7 +32,6 @@ class AttendanceComponent extends Component
     )
     ->addSelect(\DB::raw("'08:00' as duty_start"))
     ->addSelect(\DB::raw("'16:00' as duty_end"))
-    ->addSelect(\DB::raw("'0' as late_fine"))
     ->orderBy('ck_date','asc')->get();
     }
 

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\TimeSheet;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -24,9 +25,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $user->timesheet()->create(['punch'=>'2020-12-05 07:55']);
-        $user->timesheet()->create(['punch'=>'2020-12-05 16:15']);
-        $user->timesheet()->create(['punch'=>'2020-12-05 18:55']);
-        $user->timesheet()->create(['punch'=>'2020-12-05 20:55']);
+        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 07:55']);
+        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 16:15']);
+        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 18:55']);
+        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 20:55']);
     }
 }
