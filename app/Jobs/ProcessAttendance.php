@@ -78,27 +78,6 @@ class ProcessAttendance implements ShouldQueue
             Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time,'late_fine'=>$latefine]);
         }
 
-        //process OT
-
-        // if($this->punch_log->status==0){
-        //     if($time < $schedule['in'] || $time >= $schedule['out']){
-        //         //OT In
-        //     }
-        // }else{
-        //     $last_ot=new Overtime(); //find last OT
-        //     if($last_ot->in < $schedule['in']){
-        //         if($time >= $schedule['in']){
-        //             $last_ot->out=$schedule['in'];
-        //         }else{
-        //             $last_ot->out=$time;
-        //         }
-        //     }elseif($last_ot->in >= $schedule['out']){
-        //         $last_ot->out=$time;
-        //     }
-        // }
-        
-        Log::info('test');
-
     }
 
     public function lateFine($ck_in,$sc_in){
