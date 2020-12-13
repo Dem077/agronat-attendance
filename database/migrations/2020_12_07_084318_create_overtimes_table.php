@@ -19,6 +19,7 @@ class CreateOvertimesTable extends Migration
             $table->date('ck_date');
             $table->time('in')->nullable();
             $table->time('out')->nullable();
+            $table->unsignedInteger('ot')->nullable();
             $table->timestamps();
         });
     }

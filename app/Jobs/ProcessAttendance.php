@@ -38,13 +38,13 @@ class ProcessAttendance implements ShouldQueue
     {
 
         $schedule=[
-            "in"=>date('H:i',strtotime('08:00')),
-            "out"=>date('H:i',strtotime('16:00'))
+            "in"=>date('H:i:s',strtotime('08:00')),
+            "out"=>date('H:i:s',strtotime('16:00'))
         ];
 
         $dt=strtotime($this->punch_log->punch);
         $date=date('Y-m-d',$dt);
-        $time=date('H:i',$dt);
+        $time=date('H:i:s',$dt);
         $user_id=$this->punch_log->user_id;
 
         $attendance=Attendance::where(['user_id'=>$user_id])->where('ck_date',$date)->first();

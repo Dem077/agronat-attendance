@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\TimeSheet;
+use App\Observers\TimeSheetObserver;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +26,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
+        TimeSheet::observe(TimeSheetObserver::class);
     }
 }

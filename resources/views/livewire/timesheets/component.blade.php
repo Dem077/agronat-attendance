@@ -16,11 +16,46 @@
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">
                         Add
                     </button>
-                    <button type="button" class="btn btn-secondary" wire:click="exportRecord()">
-                        Export
-                    </button>
-                    {{-- @include('livewire.users.update')
-                    @include('livewire.users.create') --}}
+                    <div class="row">
+                        <div class="col">
+                            <form>
+                                <div class="form-row align-items-center">
+                                  <div class="col-sm-3 my-1">
+                                    <label class="sr-only" for="inlineFormInputName">Employee</label>
+                                    <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
+                                        <option>Select Employee</option>
+                                        @foreach($employees as $employee)
+                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->fullname}}</option>
+                                        @endforeach
+                                     </select>
+                                  </div>
+                                  <div class="col-sm-3 my-1">
+                                    <label class="sr-only" for="inlineFormInputGroupStartDate">Start Date</label>
+                                    <div class="input-group">
+                                      <div class="input-group-prepend">
+                                        <div class="input-group-text">Start</div>
+                                      </div>
+                                        <input type="text" class="form-control" id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-3 my-1">
+                                    <label class="sr-only" for="inlineFormInputGroupEndDate">End Date</label>
+                                    <div class="input-group">
+                                      <div class="input-group-prepend">
+                                        <div class="input-group-text">End</div>
+                                      </div>
+                                      <input type="text" class="form-control" id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
+                                    </div>
+                                  </div>
+                                  <div class="col-auto my-1">
+                                    <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+                                  </div>
+                                </div>
+                              </form>
+                        </div>
+                    </div>
+
+                    @include('livewire.timesheets.create')
                   <div class="table-responsive">
                     <table class="table table-bordered mt-5">
                         <thead>
@@ -38,9 +73,8 @@
                                 <td>{{ $log->id }}</td>
                                 <td>{{ $log->user->fullname }}</td>
                                 <td>{{ $log->punch }}</td>
-                                <td>{{ $log->status }}</td>
+                                <td>{{ $log->IN_OUT }}</td>
                                 <td>
-                                    <button data-toggle="modal" data-target="#updateModal" wire:click="edit({{ $log->id }})" class="btn btn-primary btn-sm">Edit</button>
                                     <button wire:click="delete({{ $log->id }})" class="btn btn-danger btn-sm">Delete</button>
                                 </td>
                             </tr>
@@ -58,8 +92,27 @@
 
 @push('js-bottom')
 <script type="text/javascript">
-    window.livewire.on('userStore', () => {
+    window.livewire.on('.Store', () => {
         $('#createModal').modal('hide');
+    });
+
+    var options={
+        format: 'yyyy-mm-dd',
+        todayHighlight: true,
+        autoclose: true,
+      };
+    $('#inlineFormInputGroupStartDate').datepicker(options);
+    $('#inlineFormInputGroupEndDate').datepicker(options);
+    $('#inlineFormInputName').select2();
+
+    $('#inlineFormInputGroupStartDate').on('change', function (e) {
+       @this.set('start_date', e.target.value);
+    });
+    $('#inlineFormInputGroupEndDate').on('change', function (e) {
+       @this.set('end_date', e.target.value);
+    });
+    $('#inlineFormInputName').on('change', function (e) {
+       @this.set('user_id', e.target.value);
     });
 </script>
 @endpush

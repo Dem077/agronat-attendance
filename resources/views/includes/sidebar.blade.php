@@ -33,6 +33,11 @@
                 <span>Attendance</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{{route('overtime')}}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Overtime</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{{route('timesheets')}}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Attendance logs</span></a>

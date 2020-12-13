@@ -19,6 +19,7 @@ class Overtime extends Model
         'ck_date',
         'in',
         'out',
+        'ot'
     ];
 
     public function user(){

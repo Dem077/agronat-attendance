@@ -40,13 +40,13 @@ class ProcessOvertime implements ShouldQueue
     {
 
         $schedule=[
-            "in"=>date('H:i',strtotime('08:00')),
-            "out"=>date('H:i',strtotime('16:00'))
+            "in"=>date('H:i:s',strtotime('08:00')),
+            "out"=>date('H:i:s',strtotime('16:00'))
         ];
 
         $dt=strtotime($this->punch_log->punch);
         $date=date('Y-m-d',$dt);
-        $time=date('H:i',$dt);
+        $time=date('H:i:s',$dt);
         $user_id=$this->punch_log->user_id;
 
         //process OT
@@ -62,7 +62,8 @@ class ProcessOvertime implements ShouldQueue
                         ->whereNull('out')->first();
             if(!$last_ot){
                 if($time > $schedule['out']){
-                    Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$schedule['out'],'out'=>$time]);
+                    $ot=$this->calculateOT($schedule['out'],$time);
+                    Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$schedule['out'],'out'=>$time,'ot'=>$ot]);
                 }
             }else{
                 if($last_ot->in < $schedule['in']){
@@ -71,18 +72,28 @@ class ProcessOvertime implements ShouldQueue
                     }else{
                         $last_ot->out=$time;
                     }
+                    $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
                     $last_ot->save();
     
                     if($time > $schedule['out']){
-                        Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$schedule['out'],'out'=>$time]);
+                        $ot=$this->calculateOT($schedule['out'],$time);
+                        Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$schedule['out'],'out'=>$time,'ot'=>$ot]);
                     }
                 }elseif($last_ot->in >= $schedule['out']){
                     $last_ot->out=$time;
+                    $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
                     $last_ot->save();
                 }
             }
 
         }
         
+    }
+
+    public function calculateOT($in,$out){
+        $in=strtotime($in);
+        $out=strtotime($out);
+        $ot=round(($out-$in)/60,2);
+        return $ot;
     }
 }

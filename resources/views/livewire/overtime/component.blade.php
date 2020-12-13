@@ -3,7 +3,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h2>Attendance</h2>
+                <h2>Overtime</h2>
             </div>
 
             <div class="card-body">
@@ -13,6 +13,7 @@
                             {{ session('message') }}
                         </div>
                     @endif
+
                     <div class="row">
                         <div class="col">
                             <form>
@@ -51,6 +52,7 @@
                               </form>
                         </div>
                     </div>
+                    
                     {{-- @include('livewire.users.update')
                     @include('livewire.users.create') --}}
                   <div class="table-responsive">
@@ -60,29 +62,25 @@
                                 <th>No.</th>
                                 <th>User</th>
                                 <th>Date</th>
-                                <th>Duty Start</th>
-                                <th>Duty End</th>
                                 <th>Checkin</th>
                                 <th>Checkout</th>
-                                <th>Latefine</th>
+                                <th>OT Minutes</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($attendances as $attendance)
+                            @foreach($ots as $ot)
                             <tr>
-                                <td>{{ $attendance->id }}</td>
-                                <td>{{ $attendance->user->fullname }}</td>
-                                <td>{{ $attendance->ck_date }}</td>
-                                <td>08:00</td>
-                                <td>16:00</td>
-                                <td>{{ $attendance->in }}</td>
-                                <td>{{ $attendance->out }}</td>
-                                <td>{{ $attendance->late_fine }}</td>
+                                <td>{{ $ot->id }}</td>
+                                <td>{{ $ot->user->fullname }}</td>
+                                <td>{{ $ot->ck_date }}</td>
+                                <td>{{ $ot->in }}</td>
+                                <td>{{ $ot->out }}</td>
+                                <td>{{ $ot->ot }}</td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    {{$attendances->links()}}
+                    {{$ots->links()}}
                 </div>
                 </div>
                 
@@ -93,6 +91,9 @@
 
 @push('js-bottom')
 <script type="text/javascript">
+    window.livewire.on('.Store', () => {
+        $('#createModal').modal('hide');
+    });
 
     var options={
         format: 'yyyy-mm-dd',

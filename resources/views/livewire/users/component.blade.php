@@ -53,7 +53,7 @@
 
 @push('js-bottom')
 <script type="text/javascript">
-    window.livewire.on('userStore', () => {
+    window.livewire.on('.Store', () => {
         $('#exampleModal').modal('hide');
     });
 </script>

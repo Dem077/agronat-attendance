@@ -50,7 +50,7 @@ class Users extends Component
   
         User::create($validatedDate);
   
-        $this->emit('userStore'); // Close model to using to jquery
+        $this->emit('.Store'); // Close model to using to jquery
 
         session()->flash('message', 'user Created Successfully.');
   
