@@ -25,3 +25,6 @@ Route::get('employees',UsersComponent::class)->name('employees');
 Route::get('attendances',AttendanceComponent::class)->name('attendances');
 Route::get('overtime',OvertimeComponent::class)->name('overtime');
 Route::get('timesheets',TimeSheetComponent::class)->name('timesheets');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
