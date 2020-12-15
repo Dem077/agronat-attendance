@@ -11,12 +11,13 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ZKTSync implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $from,$to,$user_id;
+    protected $from,$to,$user_id,$db;
     /**
      * Create a new job instance.
      *
@@ -31,6 +32,7 @@ class ZKTSync implements ShouldQueue
         }
         $this->to=isset($data['to'])?$data['to']:null;
         $this->user_id=isset($data['user_id'])?$data['user_id']:null;
+        $this->db=DB::connection('sqlsrv')->table('CHECKINOUT');
     }
 
     /**
@@ -58,7 +60,21 @@ class ZKTSync implements ShouldQueue
         }
     }
 
-    public function getAttendance($from=null,$to=null){
+    public function getAttendance($from=null,$to=null,$user_id=null){
+        $logs=$this->db->where('CHECKTIME','>',$from);
+        if($to){
+            $logs=$logs->where('ChHECKTIME','<=',$to);
+        }
+        if($user_id){
+            $logs=$logs->where('USERID',$user_id);
+        }
+        $logs=$logs->get();
+        foreach($logs as $row){
+            yield ["USERID"=>$row->USERID,"CHECKTIME"=>$row->CHECKTIME];
+        }
+    }
+
+    public function getAttendance1($from=null,$to=null){
         $connStr = 
         'odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)};' .
         'Dbq=C:\\Workplace\\att.mdb;';

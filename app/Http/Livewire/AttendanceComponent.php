@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Attendance;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -29,8 +30,8 @@ class AttendanceComponent extends Component
 
     public function getAttendances(){
         $attendances=Attendance::addSelect(['employee' => User::select('fullname')->whereColumn('user_id', 'users.id')->limit(1)])
-        ->addSelect(\DB::raw("'08:00' as duty_start"))
-        ->addSelect(\DB::raw("'16:00' as duty_end"));
+        ->addSelect(DB::raw("'08:00' as scin"))
+        ->addSelect(DB::raw("'16:00' as scout"));
         if($this->start_date){
             $attendances=$attendances->where('ck_date','>=',$this->start_date);
         }

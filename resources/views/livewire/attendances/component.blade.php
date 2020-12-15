@@ -64,7 +64,7 @@
                                 <th>Duty End</th>
                                 <th>Checkin</th>
                                 <th>Checkout</th>
-                                <th>Latefine</th>
+                                <th>Late min</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,8 +73,8 @@
                                 <td>{{ $attendance->id }}</td>
                                 <td>{{ $attendance->user->fullname }}</td>
                                 <td>{{ $attendance->ck_date }}</td>
-                                <td>08:00</td>
-                                <td>16:00</td>
+                                <td>{{ $attendance->scin }}</td>
+                                <td>{{ $attendance->scout }}</td>
                                 <td>{{ $attendance->in }}</td>
                                 <td>{{ $attendance->out }}</td>
                                 <td>{{ $attendance->late_fine }}</td>

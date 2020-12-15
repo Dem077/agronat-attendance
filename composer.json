@@ -37,7 +37,11 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "TADPHP\\": "zkt/lib/",
+            "TADPHP\\Exceptions\\": "zkt/lib/Exceptions/",
+            "TADPHP\\Providers\\": "zkt/lib/Providers/",
+            "Test\\Helpers\\": "zkt/test/helpers/"
         },
         "files": [
             "app/Utils/helpers.php"

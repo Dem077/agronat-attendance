@@ -80,14 +80,13 @@ return [
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'host' => env('MDB_HOST', '192.168.100.71'),
+            'port' => env('MDB_PORT', '1433'),
+            'database' => env('MDB_DATABASE', 'attendance_log'),
+            'username' => env('MDB_USERNAME', 'sa'),
+            'password' => env('MDB_PASSWORD', 'm75QL@agro'),
             'charset' => 'utf8',
-            'prefix' => '',
+            'prefix' => env('MDB_PREFIX', ''),
             'prefix_indexes' => true,
         ],
 
