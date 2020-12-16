@@ -67,7 +67,6 @@ class ZKTSync implements ShouldQueue
             $logs=$logs->where('ChHECKTIME','<=',$to);
         }
         if($user_id){
-            $logs=$logs->where('USERID',$user_id);
             $logs=$logs->whereExists(function ($query) use($user_id){
                 $query->select(DB::raw(1))
                       ->from('USERINFO')

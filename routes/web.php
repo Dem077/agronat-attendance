@@ -32,4 +32,3 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     })->name('dashboard');
 });
 
-Route::get('todos', Todos::class);
