@@ -19,7 +19,7 @@ class Users extends Component
     {
         $employees=User::select(['id','name'])->get();
         $users=$this->getUsers()->paginate(5);
-
+        $this->resetPage();
         return view('livewire.users.component',['employees'=>$employees,'users'=>$users]);
     }
 

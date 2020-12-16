@@ -20,7 +20,7 @@
                                   <div class="col-sm-3 my-1">
                                     <label class="sr-only" for="inlineFormInputName">Employee</label>
                                     <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
-                                        <option>Select Employee</option>
+                                        <option value="">Select Employee</option>
                                         @foreach($employees as $employee)
                                             <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
                                         @endforeach

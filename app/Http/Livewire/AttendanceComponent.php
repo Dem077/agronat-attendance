@@ -21,6 +21,7 @@ class AttendanceComponent extends Component
     {
         $attendances=$this->getAttendances()->paginate(5);
         $employees=User::all();
+        $this->resetPage();
         return view('livewire.attendances.component',['employees'=>$employees,'attendances'=>$attendances]);
         // ->extends('layouts.app')
         // ->section('content');
@@ -29,8 +30,6 @@ class AttendanceComponent extends Component
         // $this->employees=User::all();
         // return view('livewire.attendances.component');
     }
-
-
 
     public function getAttendances(){
         $attendances=Attendance::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)])
@@ -43,7 +42,7 @@ class AttendanceComponent extends Component
             $attendances=$attendances->where('ck_date','<=',$this->end_date);
         }
         if($this->user_id){
-            $attendances=$attendances->where('user_id','>=',$this->user_id);
+            $attendances=$attendances->where('user_id',$this->user_id);
         }
 
         return $attendances->orderBy('ck_date','desc');

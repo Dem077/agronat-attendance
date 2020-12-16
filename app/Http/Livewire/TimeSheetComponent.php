@@ -22,6 +22,7 @@ class TimeSheetComponent extends Component
     {
         $employees=User::all();
         $logs=$this->getTimeSheet()->paginate(5);
+        $this->resetPage();
         return view('livewire.timesheets.component',['logs'=>$logs,'employees'=>$employees]);
     }
 
@@ -35,7 +36,7 @@ class TimeSheetComponent extends Component
             $timesheet=$timesheet->where('punch','<=',$this->end_date);
         }
         if($this->user_id){
-            $timesheet=$timesheet->where('user_id','>=',$this->user_id);
+            $timesheet=$timesheet->where('user_id',$this->user_id);
         }
 
         return $timesheet->orderBy('punch','desc');

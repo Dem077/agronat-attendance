@@ -19,6 +19,7 @@ class OvertimeComponent extends Component
     {
         $ots=$this->getOvertime()->paginate(5);
         $employees=User::all();
+        $this->resetPage();
         return view('livewire.overtime.component',['employees'=>$employees,'ots'=>$ots]);
     }
 
@@ -31,7 +32,7 @@ class OvertimeComponent extends Component
             $ots=$ots->where('ck_date','<=',$this->end_date);
         }
         if($this->user_id){
-            $ots=$ots->where('user_id','>=',$this->user_id);
+            $ots=$ots->where('user_id',$this->user_id);
         }
 
         return $ots->orderBy('ck_date','desc');
