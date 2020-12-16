@@ -45,7 +45,15 @@ class ZKTSync implements ShouldQueue
 
         Log::info('sync');
         $users=[];
-        foreach($this->getAttendance($this->from,$this->to,$this->user_id) as $d){
+        $external_id=null;
+        if($this->user_id){
+            $user=User::find($this->user_id);
+            if($user){
+                $external_id=$user->external_id;
+                $users[$external_id]=$this->user_id;
+            }
+        }
+        foreach($this->getAttendance($this->from,$this->to,$external_id) as $d){
             Log::info('sync1');
             if(!isset($users[$d['USERID']])){
                 
@@ -61,21 +69,21 @@ class ZKTSync implements ShouldQueue
         }
     }
 
-    public function getAttendance($from=null,$to=null,$user_id=null){
+    public function getAttendance($from=null,$to=null,$external_id=null){
         $logs=$this->db->table('CHECKINOUT')->where('CHECKTIME','>',$from)->addSelect(['USERID'=>$this->db->table('USERINFO')->select('BadgeNumber')->whereColumn('CHECKINOUT.USERID', 'USERINFO.USERID')->limit(1)]);
         if($to){
             $logs=$logs->where('ChHECKTIME','<=',$to);
         }
-        if($user_id){
-            $logs=$logs->whereExists(function ($query) use($user_id){
+        if($external_id){
+            $logs=$logs->whereExists(function ($query) use($external_id){
                 $query->select(DB::raw(1))
                       ->from('USERINFO')
                       ->whereColumn('USERINFO.USERID', 'CHECKINOUT.USERID')
-                      ->where('USERINFO.BadgeNumber',$user_id);
+                      ->where('USERINFO.BadgeNumber',$external_id);
             });
         }
-        $logs=$logs->get();
-        foreach($logs as $row){
+
+        foreach($logs->get() as $row){
             yield ["USERID"=>$row->USERID,"CHECKTIME"=>$row->CHECKTIME];
         }
     }

@@ -18,9 +18,9 @@
                     @error('name') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
-                    <label for="position">position:</label>
-                    <input type="text" class="form-control" id="position" wire:model="position" placeholder="position"/>
-                    @error('position') <span class="text-danger">{{ $message }}</span>@enderror
+                    <label for="designation">designation:</label>
+                    <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation"/>
+                    @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
                     <label for="email">email:</label>
