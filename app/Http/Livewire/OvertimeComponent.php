@@ -19,13 +19,11 @@ class OvertimeComponent extends Component
     {
         $ots=$this->getOvertime()->paginate(5);
         $employees=User::all();
-        return view('livewire.overtime.component',['employees'=>$employees,'ots'=>$ots])
-        ->extends('layouts.app')
-        ->section('content');
+        return view('livewire.overtime.component',['employees'=>$employees,'ots'=>$ots]);
     }
 
     public function getOvertime(){
-        $ots=Overtime::addSelect(['employee' => User::select('fullname')->whereColumn('user_id', 'users.id')->limit(1)]);
+        $ots=Overtime::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
         if($this->start_date){
             $ots=$ots->where('ck_date','>=',$this->start_date);
         }

@@ -23,7 +23,7 @@
                                     <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
                                         <option>Select Employee</option>
                                         @foreach($employees as $employee)
-                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->fullname}}</option>
+                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
                                         @endforeach
                                      </select>
                                   </div>
@@ -71,7 +71,7 @@
                             @foreach($ots as $ot)
                             <tr>
                                 <td>{{ $ot->id }}</td>
-                                <td>{{ $ot->user->fullname }}</td>
+                                <td>{{ $ot->user->name }}</td>
                                 <td>{{ $ot->ck_date }}</td>
                                 <td>{{ $ot->in }}</td>
                                 <td>{{ $ot->out }}</td>

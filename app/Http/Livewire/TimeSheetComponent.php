@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\TimeSheet;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,21 +15,19 @@ class TimeSheetComponent extends Component
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
 
-    public $user_id,$punch,$start_date,$end_date;
+    public $user_id,$punchdate,$punchtime,$start_date,$end_date;
 
 
     public function render()
     {
         $employees=User::all();
         $logs=$this->getTimeSheet()->paginate(5);
-        return view('livewire.timesheets.component',['logs'=>$logs,'employees'=>$employees])
-        ->extends('layouts.app')
-        ->section('content');
+        return view('livewire.timesheets.component',['logs'=>$logs,'employees'=>$employees]);
     }
 
     public function getTimeSheet(){
-        $timesheet=TimeSheet::addSelect(['employee' => User::select('fullname')->whereColumn('user_id', 'users.id')->limit(1)])
-                        ->addSelect(\DB::raw("(CASE when status=0 Then 'IN' ELSE 'OUT' END) AS IN_OUT"));
+        $timesheet=TimeSheet::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)])
+                        ->addSelect(DB::raw("(CASE when status=0 Then 'IN' ELSE 'OUT' END) AS IN_OUT"));
         if($this->start_date){
             $timesheet=$timesheet->where('punch','>=',$this->start_date);
         }
@@ -65,7 +64,8 @@ class TimeSheetComponent extends Component
      */
     private function resetInputFields(){
         $this->user_id = '';
-        $this->punch = '';
+        $this->punchdate = '';
+        $this->punchtime = '';
     }
 
     /**
@@ -77,9 +77,13 @@ class TimeSheetComponent extends Component
     {
         $validatedDate = $this->validate([
             'user_id' => 'required',
-            'punch' => 'required'
+            'punchdate' => 'required',
+            'punchtime' => 'required'
         ]);
-  
+
+        $validatedDate['punch']="{$validatedDate['punchdate']} {$validatedDate['punchtime']}";
+        unset($validatedDate['punchdate']);
+        unset($validatedDate['punchtime']);
         TimeSheet::add($validatedDate);
   
         $this->emit('.Store'); // Close model to using to jquery

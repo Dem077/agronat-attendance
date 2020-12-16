@@ -3,7 +3,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h2>Attendance</h2>
+                <h2>Attendance Logs</h2>
             </div>
 
             <div class="card-body">
@@ -25,7 +25,7 @@
                                     <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
                                         <option>Select Employee</option>
                                         @foreach($employees as $employee)
-                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->fullname}}</option>
+                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
                                         @endforeach
                                      </select>
                                   </div>
@@ -71,7 +71,7 @@
                             @foreach($logs as $log)
                             <tr>
                                 <td>{{ $log->id }}</td>
-                                <td>{{ $log->user->fullname }}</td>
+                                <td>{{ $log->user->name }}</td>
                                 <td>{{ $log->punch }}</td>
                                 <td>{{ $log->IN_OUT }}</td>
                                 <td>

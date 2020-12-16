@@ -12,7 +12,7 @@ class AttendanceComponent extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $updateMode = false;
+    public $isOpen = false;
     
     public $user_id, $ck_date, $in, $out, $start_date, $end_date;
 
@@ -21,15 +21,19 @@ class AttendanceComponent extends Component
     {
         $attendances=$this->getAttendances()->paginate(5);
         $employees=User::all();
-        return view('livewire.attendances.component',['employees'=>$employees,'attendances'=>$attendances])
-        ->extends('layouts.app')
-        ->section('content');
+        return view('livewire.attendances.component',['employees'=>$employees,'attendances'=>$attendances]);
+        // ->extends('layouts.app')
+        // ->section('content');
+        // $this->timesheets = TimeSheet::all();
+        // $this->attendances=$this->getAttendances()->get();
+        // $this->employees=User::all();
+        // return view('livewire.attendances.component');
     }
 
 
 
     public function getAttendances(){
-        $attendances=Attendance::addSelect(['employee' => User::select('fullname')->whereColumn('user_id', 'users.id')->limit(1)])
+        $attendances=Attendance::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)])
         ->addSelect(DB::raw("'08:00' as scin"))
         ->addSelect(DB::raw("'16:00' as scout"));
         if($this->start_date){
@@ -54,11 +58,11 @@ class AttendanceComponent extends Component
         $header = array(
             'Employee'=>'employee',
             'Date'=>'ck_date',
-            'Duty Start'=>'duty_start',
-            'Duty End'=>'duty_end',
+            'Duty Start'=>'scin',
+            'Duty End'=>'scout',
             'Checkin'=>'in',
             'Chckout'=>'out',
-            'Latefine'=>'late_fine'
+            'Latefine'=>'late_min'
         );
     
         return export_csv($header, $entries, $filename);

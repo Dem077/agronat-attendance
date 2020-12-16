@@ -17,14 +17,15 @@
                     <select type="text" class="form-control" id="user_id" placeholder="Employee" wire:bind="user_id" >
                         <option>Select Employee</option>
                         @foreach($employees as $employee)
-                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->fullname}}</option>
+                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
                         @endforeach
                      </select>
                     @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
-                <div class="form-group">
-                    <label for="punch">Punch DateTime</label>
-                    <input type="text" class="form-control" placeholder="YYYY-MM-DD HH:mm" wire:model="punch">
+                <div class="form-inline">
+                    <label for="punch">DateTime</label>
+                    <input type="text" class="form-control mx-1" id="punchdate" placeholder="YYYY-MM-DD" wire:model="punchdate">
+                    <input type="time" class="form-control" placeholder="YYYY-MM-DD" wire:model="punchtime">
                     @error('start_date') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
             </form>
@@ -43,12 +44,12 @@
         todayHighlight: true,
         autoclose: true,
       };
-    $('#punch').datepicker(options);
+    $('#punchdate').datepicker(options);
 
     $('#user_id').select2();
 
-    $('#punchTime').on('change', function (e) {
-       @this.set('punch', e.target.value);
+    $('#punchdate').on('change', function (e) {
+       @this.set('punchdate', e.target.value);
     });
     $('#user_id').on('change', function (e) {
        @this.set('user_id', e.target.value);

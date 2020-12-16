@@ -22,7 +22,7 @@
                                     <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
                                         <option>Select Employee</option>
                                         @foreach($employees as $employee)
-                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->fullname}}</option>
+                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
                                         @endforeach
                                      </select>
                                   </div>
@@ -69,15 +69,15 @@
                         </thead>
                         <tbody>
                             @foreach($attendances as $attendance)
-                            <tr>
+                            <tr class="{{$attendance->late_min>0?'text-danger':''}}">
                                 <td>{{ $attendance->id }}</td>
-                                <td>{{ $attendance->user->fullname }}</td>
+                                <td>{{ $attendance->user->name }}</td>
                                 <td>{{ $attendance->ck_date }}</td>
                                 <td>{{ $attendance->scin }}</td>
                                 <td>{{ $attendance->scout }}</td>
                                 <td>{{ $attendance->in }}</td>
                                 <td>{{ $attendance->out }}</td>
-                                <td>{{ $attendance->late_fine }}</td>
+                                <td>{{ $attendance->late_min }}</td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -54,7 +54,7 @@ class ProcessAttendance implements ShouldQueue
             if($this->punch_log->status==0){
                 if($time <= $schedule['in'] && $attendance->in < $time){
                     $attendance->in=$time;
-                    $attendance->late_fine=$this->lateFine($time,$schedule['in']);
+                    $attendance->late_min=$this->lateFine($time,$schedule['in']);
                     $attendance->save();
                 }
 
@@ -74,8 +74,8 @@ class ProcessAttendance implements ShouldQueue
             }
 
         }else{
-            $latefine=$this->lateFine($time,$schedule['in']);
-            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time,'late_fine'=>$latefine]);
+            $late_min=$this->lateFine($time,$schedule['in']);
+            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time,'late_min'=>$late_min]);
         }
 
     }
@@ -83,8 +83,8 @@ class ProcessAttendance implements ShouldQueue
     public function lateFine($ck_in,$sc_in){
         $sc_in=strtotime($sc_in);
         $ck_in=strtotime($ck_in);
-        $latefine=floor(($ck_in-$sc_in)/60);
-        return $latefine>0?$latefine:0;
+        $late_min=floor(($ck_in-$sc_in)/60);
+        return $late_min>0?$late_min:0;
     }
     
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Livewire;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -10,15 +12,24 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $username, $fullname, $user_id, $email, $position,$password;
+    public $name, $user_id, $email, $designation,$password,$external_id;
     public $updateMode = false;
 
     public function render()
     {
-        //$this->users=User::all();
-        return view('livewire.users.component',['users'=>User::paginate(4)])
-            ->extends('layouts.app')
-            ->section('content');
+        $employees=User::select(['id','name'])->get();
+        $users=$this->getUsers()->paginate(5);
+
+        return view('livewire.users.component',['employees'=>$employees,'users'=>$users]);
+    }
+
+    public function getUsers(){
+        $users=User::select('*');
+        if($this->user_id){
+            $users=$users->where('id',$this->user_id);
+        }
+
+        return $users->orderBy('name','asc');
     }
 
     /**
@@ -27,10 +38,10 @@ class Users extends Component
      * @var array
      */
     private function resetInputFields(){
-        $this->username = '';
-        $this->fullname = '';
+        $this->name = '';
         $this->email = '';
-        $this->position = '';
+        $this->external_id = '';
+        $this->designation = '';
     }
 
     /**
@@ -41,13 +52,14 @@ class Users extends Component
     public function store()
     {
         $validatedDate = $this->validate([
-            'username' => 'required',
-            'fullname' => 'required',
+            'name' => 'required',
             'email' => 'required',
-            'position' => 'required',
-            'password' => 'required',
+            'external_id' => 'required',
+            'designation' => 'required',
+            // 'password' => 'required',
         ]);
   
+        $validatedDate['password']=Hash::make('agro2020');
         User::create($validatedDate);
   
         $this->emit('.Store'); // Close model to using to jquery
@@ -68,10 +80,10 @@ class Users extends Component
     {
         $user = User::findOrFail($id);
         $this->user_id = $id;
-        $this->username = $user->username;
-        $this->fullname = $user->fullname;
+        $this->name = $user->name;
         $this->email = $user->email;
-        $this->position = $user->position;
+        $this->designation = $user->designation;
+        $this->external_id = $user->external_id;
         $this->updateMode = true;
     }
   
@@ -93,20 +105,20 @@ class Users extends Component
     public function update()
     {
         $validatedDate = $this->validate([
-            'username' => 'required',
-            'fullname' => 'required',
+            'name' => 'required',
             'email' => 'required',
-            'position' => 'required',
-            'password' => 'sometimes',
+            'designation' => 'required',
+            'external_id' => 'required',
+            // 'password' => 'sometimes',
         ]);
   
         $user = User::find($this->user_id);
 
         $user->update([
-            "username"=>$this->username,
-            "fullname"=>$this->fullname,
+            "name"=>$this->name,
             "email"=>$this->email,
-            "position"=>$this->position
+            "designation"=>$this->designation,
+            "external_id"=>$this->external_id
         ]);
   
         $this->updateMode = false;

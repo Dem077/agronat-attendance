@@ -16,6 +16,26 @@
                         {{ __('Dashboard') }}
                     </x-jet-nav-link>
                 </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-jet-nav-link href="{{ route('employees') }}" :active="request()->routeIs('employees')">
+                        {{ __('Employees') }}
+                    </x-jet-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-jet-nav-link href="{{ route('attendances') }}" :active="request()->routeIs('attendances')">
+                        {{ __('Attendances') }}
+                    </x-jet-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-jet-nav-link href="{{ route('overtime') }}" :active="request()->routeIs('overtime')">
+                        {{ __('Overtime') }}
+                    </x-jet-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-jet-nav-link href="{{ route('timesheets') }}" :active="request()->routeIs('timesheets')">
+                        {{ __('TimeSheet') }}
+                    </x-jet-nav-link>
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
@@ -121,6 +141,27 @@
                 {{ __('Dashboard') }}
             </x-jet-responsive-nav-link>
         </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-jet-responsive-nav-link href="{{ route('employees') }}" :active="request()->routeIs('employees')">
+                {{ __('Employees') }}
+            </x-jet-responsive-nav-link>
+        </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-jet-responsive-nav-link href="{{ route('attendances') }}" :active="request()->routeIs('attendances')">
+                {{ __('Attendances') }}
+            </x-jet-responsive-nav-link>
+        </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-jet-responsive-nav-link href="{{ route('overtime') }}" :active="request()->routeIs('overtime')">
+                {{ __('Overtime') }}
+            </x-jet-responsive-nav-link>
+        </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-jet-responsive-nav-link href="{{ route('timesheets') }}" :active="request()->routeIs('timesheets')">
+                {{ __('Timesheet') }}
+            </x-jet-responsive-nav-link>
+        </div>
+
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">

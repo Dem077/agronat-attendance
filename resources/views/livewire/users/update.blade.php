@@ -14,19 +14,14 @@
                 <form>
                     <input type="hidden" wire:model="post_id">
                     <div class="form-group">
-                        <label for="username">username</label>
-                        <input type="text" class="form-control" id="username" placeholder="username" wire:model="username">
-                        @error('username') <span class="text-danger">{{ $message }}</span>@enderror
+                        <label for="name">fullname:</label>
+                        <input type="text" class="form-control" id="fullname" wire:model="name" placeholder="fullanme"/>
+                        @error('name') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
-                        <label for="fullname">fullname:</label>
-                        <input type="text" class="form-control" id="fullname" wire:model="fullname" placeholder="fullanme"/>
-                        @error('fullname') <span class="text-danger">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group">
-                        <label for="position">position:</label>
-                        <input type="text" class="form-control" id="position" wire:model="position" placeholder="position"/>
-                        @error('position') <span class="text-danger">{{ $message }}</span>@enderror
+                        <label for="designation">designation:</label>
+                        <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation"/>
+                        @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label for="email">email:</label>
@@ -34,10 +29,15 @@
                         @error('email') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
+                        <label for="emp_no">emp no:</label>
+                        <input type="text" class="form-control" id="emp_no" wire:model="external_id" placeholder="emp no"/>
+                        @error('external_id') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    {{-- <div class="form-group">
                         <label for="password">password:</label>
                         <input type="password" class="form-control" id="password" wire:model="password" placeholder="password"/>
                         @error('password') <span class="text-danger">{{ $message }}</span>@enderror
-                    </div>
+                    </div> --}}
 
                 </form>
             </div>
