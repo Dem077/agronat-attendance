@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Attendance;
+use App\Models\Holiday;
 use App\Models\Overtime;
 use App\Models\TimeSheet;
 use App\Models\User;
@@ -37,30 +38,45 @@ class ProcessAttendance implements ShouldQueue
     public function handle()
     {
 
-        $schedule=[
-            "in"=>date('H:i:s',strtotime('08:00')),
-            "out"=>date('H:i:s',strtotime('16:00'))
-        ];
-
         $dt=strtotime($this->punch_log->punch);
         $date=date('Y-m-d',$dt);
         $time=date('H:i:s',$dt);
         $user_id=$this->punch_log->user_id;
 
+        $is_holiday=Holiday::where('h_date',$date)->exists();
+        if($is_holiday){
+            return true;
+        }
         $attendance=Attendance::where(['user_id'=>$user_id])->where('ck_date',$date)->first();
 
         
         if($attendance){
+            $schedule=[
+                "in"=>$attendance->sc_in,
+                "out"=>$attendance->sc_out
+            ];
             if($this->punch_log->status==0){
-                if($time <= $schedule['in'] && $attendance->in < $time){
+                if($attendance->in){
+                    if($time <= $schedule['in'] && $attendance->in < $time){
+                        $attendance->in=$time;
+                        $attendance->late_min=$this->lateFine($time,$schedule['in']);
+                        $attendance->status=$attendance->late_min>0?'Late':'Normal';
+                        $attendance->save();
+                    }
+                }else{
                     $attendance->in=$time;
                     $attendance->late_min=$this->lateFine($time,$schedule['in']);
+                    $attendance->status=$attendance->late_min>0?'Late':'Normal';
                     $attendance->save();
                 }
 
             }else{
                 if($time<=$schedule['in']){
-                    $attendance->delete();
+                    $attendance->in="";
+                    $attendance->out="";
+                    $attendance->late_min=0;
+                    $attendance->status=Null;
+                    $attendance->save();
                 }elseif($attendance->out){
                     if($attendance->out < $schedule['out'] && $time >= $schedule['out']){
                         $attendance->out = $time;
@@ -74,13 +90,19 @@ class ProcessAttendance implements ShouldQueue
             }
 
         }else{
+            $schedule=[
+                "in"=>date('H:i:s',strtotime('08:00')),
+                "out"=>date('H:i:s',strtotime('16:00'))
+            ];
             $late_min=$this->lateFine($time,$schedule['in']);
-            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time,'late_min'=>$late_min]);
+            $status=$late_min>0?'Late':'Normal';
+            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
         }
 
     }
 
     public function lateFine($ck_in,$sc_in){
+        Log::info(['ck_in'=>$ck_in,'sc_in'=>$sc_in]);
         $sc_in=strtotime($sc_in);
         $ck_in=strtotime($ck_in);
         $late_min=floor(($ck_in-$sc_in)/60);

@@ -17,6 +17,8 @@ class CreateAttendancesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->date('ck_date');
+            $table->time('sc_in')->nullable();
+            $table->time('sc_out')->nullable();
             $table->time('in')->nullable();
             $table->time('out')->nullable();
             $table->unsignedInteger('late_min')->default(0);

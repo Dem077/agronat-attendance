@@ -65,6 +65,7 @@
                                 <th>Checkin</th>
                                 <th>Checkout</th>
                                 <th>Late min</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,6 +79,7 @@
                                 <td>{{ $attendance->in }}</td>
                                 <td>{{ $attendance->out }}</td>
                                 <td>{{ $attendance->late_min }}</td>
+                                <td>{{ $attendance->status }}</td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -39,7 +39,7 @@ class TimeSheet extends Model
         if($fix){
             $log=TimeSheet::create($data);
 
-            Attendance::where('ck_date',$date1)->where('user_id',$user_id)->delete();
+            // Attendance::where('ck_date',$date1)->where('user_id',$user_id)->delete();
             Overtime::where('ck_date',$date1)->where('user_id',$user_id)->delete();
 
             $records=TimeSheet::whereBetween('punch',[$date1,$date2])->where('user_id',$user_id)->orderBy('punch','asc')->get();

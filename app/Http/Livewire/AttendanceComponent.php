@@ -38,6 +38,7 @@ class AttendanceComponent extends Component
         if($this->start_date){
             $attendances=$attendances->where('ck_date','>=',$this->start_date);
         }
+        $this->end_date=$this->end_date?$this->end_date:(new \DateTime())->format('Y-m-d');
         if($this->end_date){
             $attendances=$attendances->where('ck_date','<=',$this->end_date);
         }
@@ -60,8 +61,9 @@ class AttendanceComponent extends Component
             'Duty Start'=>'scin',
             'Duty End'=>'scout',
             'Checkin'=>'in',
-            'Chckout'=>'out',
-            'Latefine'=>'late_min'
+            'Checkout'=>'out',
+            'Latefine'=>'late_min',
+            'Status'=>'status'
         );
     
         return export_csv($header, $entries, $filename);

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDutiesTable extends Migration
+class CreateHolidaysTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreateDutiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('duties', function (Blueprint $table) {
+        Schema::create('holidays', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->date('scdate');
-            $table->time('in');
-            $table->time('out');
+            $table->date('h_date');
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ class CreateDutiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('duties');
+        Schema::dropIfExists('holidays');
     }
 }
