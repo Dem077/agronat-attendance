@@ -41,16 +41,17 @@ class TimeSheetObserver
      */
     public function deleted(TimeSheet $timeSheet)
     {
-        Log::info('delete 1');
+        
         $date1=date('Y-m-d',strtotime($timeSheet->punch));
         $date2=date('Y-m-d',strtotime($timeSheet->punch." +1 day"));
         $user_id=$timeSheet->user_id;
         $log=null;
 
-        $fix=TimeSheet::where('punch','>',$timeSheet->punch)->where('punch','<',$date2)->where('user_id',$user_id)->count();
-        if($fix){
+        // $fix=TimeSheet::where('punch','>=',$timeSheet->punch)->where('punch','<',$date2)->where('user_id',$user_id)->exists();
+        // Log::info(['delete 1',$timeSheet->punch,$fix]);
+        if(true){
 
-            Attendance::where('ck_date',$date1)->where('user_id',$user_id)->delete();
+            Attendance::where('ck_date',$date1)->where('user_id',$user_id);
             Overtime::where('ck_date',$date1)->where('user_id',$user_id)->delete();
 
             $records=TimeSheet::whereBetween('punch',[$date1,$date2])->where('user_id',$user_id)->orderBy('punch','asc')->get();
