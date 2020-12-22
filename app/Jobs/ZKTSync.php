@@ -29,6 +29,9 @@ class ZKTSync implements ShouldQueue
             $this->from=$data['from'];
         }else{
             $this->from=TimeSheet::max('punch');
+            if(!$this->from){
+                $this->from='2020-01-01';
+            }
         }
         $this->to=isset($data['to'])?$data['to']:null;
         $this->user_id=isset($data['user_id'])?$data['user_id']:null;

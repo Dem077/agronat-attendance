@@ -29,8 +29,8 @@ class DatabaseSeeder extends Seeder
             ]);
         
 
-        $begin=new DateTime('first day of this month');
-        $end=new DateTime('last day of this month');
+        $begin=new DateTime('2020-12-01');
+        $end=new DateTime('2021-12-31');
 
         $this->addHolidays($begin,$end);
 
@@ -39,29 +39,29 @@ class DatabaseSeeder extends Seeder
 
         //create schedule
         
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 07:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 07:55']);
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 11:55']);
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 12:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 11:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 12:55']);
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 16:15']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 16:15']);
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 18:55']);
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 20:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 18:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-05 20:55']);
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 07:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 07:55']);
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 11:55']);
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 12:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 11:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 12:55']);
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 16:15']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 16:15']);
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 18:55']);
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 20:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 18:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-06 20:55']);
 
 
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-08 7:55']);
-        TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-08 16:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-08 7:55']);
+        // TimeSheet::add(['user_id'=>$user->id,'punch'=>'2020-12-08 16:55']);
 
         UpdateAttendanceStatus::dispatchNow(['from'=>$begin->format('Y-m-d'),'to'=>$end->format('Y-m-d')]);
     }

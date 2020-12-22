@@ -2,6 +2,7 @@
 
 use App\Http\Livewire\AttendanceComponent;
 use App\Http\Livewire\OvertimeComponent;
+use App\Http\Livewire\ResetPassword;
 use App\Http\Livewire\TimeSheetComponent;
 use App\Http\Livewire\Todos;
 use App\Http\Livewire\Users as UsersComponent;
@@ -30,5 +31,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/', function () {
         return view('dashboard');
     })->name('dashboard');
+    Route::get('/reset-password',ResetPassword::class)->name('reset-password');
 });
 
