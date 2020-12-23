@@ -57,7 +57,7 @@ class ProcessOvertime implements ShouldQueue
             }
         }else{
             $nxt=date('Y-m-d',strtotime($date." +1 day"));
-            $last_ot=Overtime::where('user_id',1)
+            $last_ot=Overtime::where('user_id',$user_id)
                         ->whereBetween('ck_date',[$date,$nxt])
                         ->whereNull('out')->first();
             if(!$last_ot){
