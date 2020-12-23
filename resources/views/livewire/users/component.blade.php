@@ -44,7 +44,7 @@
                         <tbody>
                             @foreach($users as $user)
                             <tr>
-                                <td>{{ $user->external_id }}</td>
+                                <td>{{ $user->emp_no }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->designation }}</td>
