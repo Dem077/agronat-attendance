@@ -85,31 +85,9 @@ class ZKTSync implements ShouldQueue
                       ->where('USERINFO.SSN',$external_id);
             });
         }
-
-        foreach($logs->get() as $row){
+        $logs=$logs->orderBy('CHECKTIME','asc')->get();
+        foreach($logs as $row){
             yield ["USERID"=>$row->USERID,"CHECKTIME"=>$row->CHECKTIME];
-        }
-    }
-
-    public function getAttendance1($from=null,$to=null){
-        $connStr = 
-        'odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)};' .
-        'Dbq=C:\\Workplace\\att.mdb;';
-
-        $dbh = new \PDO($connStr);
-        $dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-        $sql = 
-                "SELECT * FROM CHECKINOUT WHERE CHECKTIME > ?";
-        $sth = $dbh->prepare($sql);
-
-        // query parameter value(s)
-        $params = array($from);
-
-        $sth->execute($params);
-
-        while ($row = $sth->fetch()) {
-            yield ["USERID"=>$row['USERID'],"CHECKTIME"=>$row["CHECKTIME"]];
         }
     }
 }
