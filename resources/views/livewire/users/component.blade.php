@@ -37,6 +37,7 @@
                                 <th>Fullname</th>
                                 <th>Email</th>
                                 <th>Designation</th>
+                                <th>Mobile</th>
                                 <th width="150px">Action</th>
                             </tr>
                         </thead>
@@ -47,6 +48,7 @@
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->designation }}</td>
+                                <td>{{ $user->mobile }}</td>
                                 <td>
                                     <button data-toggle="modal" data-target="#updateModal" wire:click="edit({{ $user->id }})" class="btn btn-primary btn-sm">Edit</button>
                                     <button wire:click="delete({{ $user->id }})" class="btn btn-danger btn-sm">Delete</button>
