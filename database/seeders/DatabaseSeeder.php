@@ -21,14 +21,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $user=User::create([
-            'name'=>'Ibrahim Hassaan',
-            'designation'=>'Software',
-            'password'=>Hash::make('secret'),
-            'email'=>'hassaan@email.com',
-            'emp_no'=>'016',
-            'mobile'=>'7960296'
-            ]);
+        // $user=User::create([
+        //     'name'=>'Ibrahim Hassaan',
+        //     'designation'=>'Software',
+        //     'password'=>Hash::make('secret'),
+        //     'email'=>'hassaan@email.com',
+        //     'emp_no'=>'016',
+        //     'mobile'=>'7960296'
+        //     ]);
         
 
         $begin=new DateTime('2020-12-01');
