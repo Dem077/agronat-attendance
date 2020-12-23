@@ -18,6 +18,10 @@
                     @error('name') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
+                    {{-- <label for="department">department:</label>
+                    <input type="text" class="form-control" id="department" wire:model="department" placeholder="department"/>
+                    @error('department') <span class="text-danger">{{ $message }}</span>@enderror --}}
+
                     <label for="designation">designation:</label>
                     <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation"/>
                     @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
@@ -29,8 +33,20 @@
                 </div>
                 <div class="form-group">
                     <label for="emp_no">emp no:</label>
-                    <input type="text" class="form-control" id="emp_no" wire:model="external_id" placeholder="emp no"/>
-                    @error('external_id') <span class="text-danger">{{ $message }}</span>@enderror
+                    <input type="text" class="form-control" id="emp_no" wire:model="emp_no" placeholder="emp no"/>
+                    @error('emp_no') <span class="text-danger">{{ $message }}</span>@enderror
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="mobile">mobile:</label>
+                        <input type="text" class="form-control" id="mobile" wire:model="mobile" placeholder="mobile"/>
+                        @error('mobile') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">phone:</label>
+                        <input type="text" class="form-control" id="phone" wire:model="phone" placeholder="phone"/>
+                        @error('phone') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
                 </div>
                 {{-- <div class="form-group">
                     <label for="password">password:</label>

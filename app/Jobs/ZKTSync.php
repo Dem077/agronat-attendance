@@ -60,7 +60,7 @@ class ZKTSync implements ShouldQueue
             Log::info('sync1');
             if(!isset($users[$d['USERID']])){
                 
-                $u=User::where('external_id',$d['USERID'])->first();
+                $u=User::where('emp_no',$d['USERID'])->first();
                 if(!$u){
                     Log::info('user not found',$d);
                     continue;

@@ -27,7 +27,10 @@ class User extends Authenticatable
         'name',
         'email',
         'designation',
-        'external_id',
+        'department_id',
+        'mobile',
+        'phone',
+        'emp_no',
         'password',
     ];
 
@@ -60,4 +63,9 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+
+    public function department(){
+        return $this->belongsTo(Department::class);
+    }
 }

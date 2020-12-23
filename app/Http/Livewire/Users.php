@@ -12,12 +12,12 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $name, $user_id, $email, $designation,$password,$external_id;
+    public $name, $user_id, $email, $designation,$password,$emp_no,$department_id_id,$mobile,$phone;
     public $updateMode = false;
 
     public function render()
     {
-        $employees=User::select(['id','name'])->get();
+        $employees=User::select(['id','name'])->orderBy('name','asc')->get();
         $users=$this->getUsers()->paginate(5);
         $this->resetPage();
         return view('livewire.users.component',['employees'=>$employees,'users'=>$users]);
@@ -40,8 +40,11 @@ class Users extends Component
     private function resetInputFields(){
         $this->name = '';
         $this->email = '';
-        $this->external_id = '';
+        $this->emp_no = '';
         $this->designation = '';
+        $this->department_id = '';
+        $this->mobile = '';
+        $this->phone = '';
     }
 
     /**
@@ -54,8 +57,11 @@ class Users extends Component
         $validatedDate = $this->validate([
             'name' => 'required',
             'email' => 'required',
-            'external_id' => 'required',
+            'emp_no' => 'required',
             'designation' => 'required',
+            'department_id' => 'sometimes',
+            'mobile' => 'sometimes',
+            'phone' => 'sometimes',
             // 'password' => 'required',
         ]);
   
@@ -83,7 +89,10 @@ class Users extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->designation = $user->designation;
-        $this->external_id = $user->external_id;
+        $this->emp_no = $user->emp_no;
+        $this->department_id = $user->mobile;
+        $this->mobile = $user->mobile;
+        $this->phone = $user->phone;
         $this->updateMode = true;
     }
   
@@ -108,7 +117,10 @@ class Users extends Component
             'name' => 'required',
             'email' => 'required',
             'designation' => 'required',
-            'external_id' => 'required',
+            'emp_no' => 'required',
+            'department_id' => 'sometimes',
+            'mobile' => 'sometimes',
+            'phone' => 'sometimes',
             // 'password' => 'sometimes',
         ]);
   
@@ -118,7 +130,10 @@ class Users extends Component
             "name"=>$this->name,
             "email"=>$this->email,
             "designation"=>$this->designation,
-            "external_id"=>$this->external_id
+            "emp_no"=>$this->emp_no,
+            "department_id"=>$this->department_id,
+            "mobile"=>$this->mobile,
+            "phone"=>$this->phone
         ]);
   
         $this->updateMode = false;

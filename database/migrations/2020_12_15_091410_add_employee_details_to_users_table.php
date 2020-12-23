@@ -14,8 +14,11 @@ class AddEmployeeDetailsToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('external_id')->nullable();
+            $table->string('emp_no')->nullable();
             $table->string('designation')->nullable();
+            $table->string('mobile')->nullable();
+            $table->string('phone')->nullable();
+            $table->foreignId('department_id')->nullable();
         });
     }
 
@@ -27,8 +30,11 @@ class AddEmployeeDetailsToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('external_id');
+            $table->dropColumn('emp_no');
             $table->dropColumn('designation');
+            $table->dropColumn('mobile');
+            $table->dropColumn('phone');
+            $table->dropColumn('department');
         });
     }
 }

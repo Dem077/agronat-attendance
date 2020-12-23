@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Jobs\AddSchedule;
 use App\Jobs\UpdateAttendanceStatus;
+use App\Models\Department;
 use App\Models\Holiday;
 use App\Models\TimeSheet;
 use App\Models\User;
@@ -25,7 +26,8 @@ class DatabaseSeeder extends Seeder
             'designation'=>'Software',
             'password'=>Hash::make('secret'),
             'email'=>'hassaan@email.com',
-            'external_id'=>4
+            'emp_no'=>'016',
+            'mobile'=>'7960296'
             ]);
         
 
