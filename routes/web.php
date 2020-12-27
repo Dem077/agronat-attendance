@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Livewire\AttendanceComponent;
+use App\Http\Livewire\DashboardComponent;
 use App\Http\Livewire\OvertimeComponent;
 use App\Http\Livewire\ResetPassword;
 use App\Http\Livewire\TimeSheetComponent;
-use App\Http\Livewire\Todos;
 use App\Http\Livewire\Users as UsersComponent;
 use Illuminate\Support\Facades\Route;
 
@@ -28,9 +28,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('attendances',AttendanceComponent::class)->name('attendances');
     Route::get('overtime',OvertimeComponent::class)->name('overtime');
     Route::get('timesheets',TimeSheetComponent::class)->name('timesheets');
-    Route::get('/', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/', DashboardComponent::class)->name('dashboard');
     Route::get('/reset-password',ResetPassword::class)->name('reset-password');
 });
 
