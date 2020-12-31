@@ -42,6 +42,13 @@
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Attendance logs</span></a>
     </li>
+    @can('role-create')
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('roles')}}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Manage Roles</span></a>
+    </li>
+    @endcan
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 
