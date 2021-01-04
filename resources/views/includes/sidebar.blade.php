@@ -44,9 +44,17 @@
     </li>
     @can('role-create')
     <li class="nav-item">
-        <a class="nav-link" href="{{route('roles')}}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Manage Roles</span></a>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Role Management</span>
+        </a>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Role Management:</h6>
+                <a class="collapse-item" href="{{route('roles')}}">Roles</a>
+                <a class="collapse-item" href="{{route('assign-roles')}}">Assign Role</a>
+            </div>
+        </div>
     </li>
     @endcan
     <!-- Divider -->

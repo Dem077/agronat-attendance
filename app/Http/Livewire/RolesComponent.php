@@ -56,4 +56,15 @@ class RolesComponent extends Component
   
         $this->resetInputFields();
     }
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    public function delete($id)
+    {
+        Role::find($id)->delete();
+        session()->flash('message', 'Role Deleted Successfully.');
+    }
 }
