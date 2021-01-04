@@ -14,6 +14,7 @@ class AssignRole extends Component
     public $updateMode = false;
 
     public $user_id,$role=[],$user_name;
+
     public function render()
     {
         $users=User::with('roles')->paginate(5);
@@ -66,4 +67,5 @@ class AssignRole extends Component
         $this->resetInputFields();
         
     }
+
 }
