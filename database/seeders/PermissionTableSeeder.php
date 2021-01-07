@@ -18,7 +18,25 @@ class PermissionTableSeeder extends Seeder
             'role-list',
             'role-create',
             'role-edit',
-            'role-delete'
+            'role-delete',
+            'attendance-list',
+            'attendance-create',
+            'attendance-edit',
+            'attendance-delete',
+            'user-list',
+            'user-create',
+            'user-edit',
+            'user-delete',
+            'timelog-list',
+            'timelog-create',
+            'timelog-edit',
+            'timelog-delete',
+            'overtime-list',
+            'overtime-create',
+            'overtime-edit',
+            'overtime-delete',
+            'reporting-manager',
+            'reporting-supervisor'
          ];
  
  

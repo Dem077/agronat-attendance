@@ -22,26 +22,38 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
+    @can('user-list')
     <li class="nav-item">
     <a class="nav-link" href="{{route('employees')}}">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Employee</span></a>
     </li>
+    @endcan
+    
+    @can('attendance-list')
     <li class="nav-item">
         <a class="nav-link" href="{{route('attendances')}}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Attendance</span></a>
     </li>
+    @endcan
+
+    @can('overtime-list')
     <li class="nav-item">
         <a class="nav-link" href="{{route('overtime')}}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Overtime</span></a>
     </li>
+    @endcan
+
+    @can('timelog-list')
     <li class="nav-item">
         <a class="nav-link" href="{{route('timesheets')}}">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Attendance logs</span></a>
     </li>
+    @endcan
+
     @can('role-create')
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">

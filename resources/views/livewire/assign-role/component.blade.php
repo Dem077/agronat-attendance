@@ -30,10 +30,10 @@
                     <table class="table table-bordered mt-5">
                         <thead>
                             <tr>
-                                <th class="w-10">No</th>
-                                <th class="w-40">Employee Name</th>
+                                <th class="w-5">No</th>
+                                <th class="w-50">Employee Name</th>
                                 <th class="w-40">Roles</th>
-                                <th class="w-10">Action</th>
+                                <th class="w-5">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,7 +47,7 @@
                                     @endforeach
                                 </td>
                                 <td>
-                                    <a class="btn btn-sm btn-info mt-1" href="{{-- route('roles.show',$role->id) --}}">Show</a>
+                                    {{-- <a class="btn btn-sm btn-info mt-1" href="{{route('roles.show',$role->id)}}">Show</a> --}}
                                     @can('role-edit')
                                         <button data-toggle="modal" data-target="#updateModal" wire:click="edit({{ $user->id }})" class="btn btn-primary btn-sm mt-1">Edit</button>
                                     @endcan

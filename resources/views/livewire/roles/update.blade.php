@@ -45,24 +45,24 @@
            <div class="modal-body">
             <form>
                 <div class="form-group">
-                    <label for="name"><strong>Employee:</strong> {{$user_name}}</label>
-                    <input type="hidden" class="form-control" id="user_id" placeholder="Employee" wire:model="user_id" >
+                    <label for="name"><strong>Role:</strong> {{$name}}</label>
+                    <input type="hidden" class="form-control" id="role_id" placeholder="Employee" wire:model="role_id" >
                 </div>
                 <hr/>
                 <div class="form-group">
-                    <strong>Role:</strong>
+                    <strong>Permission:</strong>
                     <br/>
-                    @foreach($roles as $i=>$r)
+                    @foreach($permissions as $i=>$r)
                         <div class="col-sm-3 form-check form-check-inline">
                             <label for="Checkbox{{$r->id}}" class="btn btn-success btn-sm w-100 text-left">
-                                <input type="checkbox" id="Checkbox{{$r->id}}" wire:model="role.{{$r->id}}" class="badgebox" {{in_array($r->id,$role)?'checked':''}}>
+                                <input type="checkbox" id="Checkbox{{$r->id}}" wire:model="permission.{{$r->id}}" class="badgebox" {{in_array($r->id,$permission)?'checked':''}}>
                                 <span class="badge">&check;</span>
                                 {{ $r->name }}
                             </label>
                         </div>
                     @endforeach
 
-                    @error('role') <span class="text-danger">{{ $message }}</span>@enderror
+                    @error('permission') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
             </form>
             </div>

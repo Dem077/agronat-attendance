@@ -13,12 +13,14 @@
                             {{ session('message') }}
                         </div>
                     @endif
+                    @can('role-create')
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">
                         Create
                     </button>
-                    {{-- @include('livewire.users.update')
-                    @include('livewire.users.create') --}}
+                    @endcan
+
                     @include('livewire.roles.create')
+                    @include('livewire.roles.update')
 
                   <div class="table-responsive">
                     <table class="table table-bordered mt-5">
@@ -36,8 +38,10 @@
                                 <td>{{ $role->name }}</td>
                                 <td>
                                     <a class="btn btn-sm btn-info mt-1" href="{{-- route('roles.show',$role->id) --}}">Show</a>
+
                                     @can('role-edit')
-                                        <a class="btn btn-sm btn-primary mt-1" href="{{-- route('roles.edit',$role->id) --}}">Edit</a>
+                                    <button data-toggle="modal" data-target="#updateModal" wire:click="edit({{ $role->id }})" class="btn btn-primary btn-sm mt-1">Edit</button>
+
                                     @endcan
                                     @can('role-delete')
                                         <button wire:click="delete({{ $role->id }})" class="btn btn-danger btn-sm mt-1">Delete</button>
@@ -57,9 +61,5 @@
 </div>
 
 @push('js-bottom')
-<script type="text/javascript">
-    window.livewire.on('.Store', () => {
-        $('#createModal').modal('hide');
-    });
-</script>
+
 @endpush

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Permission;
@@ -14,7 +15,7 @@ class RolesComponent extends Component
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
 
-    public $permission,$name;
+    public $permission=[],$name,$role_id;
     public function render()
     {
         $roles=Role::paginate(5);
@@ -29,6 +30,7 @@ class RolesComponent extends Component
      */
     private function resetInputFields(){
         $this->name = '';
+        $this->role_id='';
         $this->permission=[];
     }
 
@@ -55,6 +57,36 @@ class RolesComponent extends Component
         session()->flash('message', 'Role Created Successfully.');
   
         $this->resetInputFields();
+    }
+
+    public function edit($id){
+        $role=Role::find($id);
+        $this->role_id=$id;
+        $this->name=$role->name;
+        $this->permission=$role->permissions()->select(DB::raw('id,true as checked'))->pluck('checked','id')->toArray();
+
+    }
+
+            /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    public function update()
+    {
+        $role = Role::find($this->role_id);
+        $permissions=[];
+        foreach($this->permission as $id=>$ck){
+            if($ck){
+                $permissions[]=$id;
+            }
+        }
+
+        $role->syncPermissions($permissions);
+  
+        session()->flash('message', 'Role Permission Updated Successfully.');
+        $this->resetInputFields();
+        
     }
 
     /**

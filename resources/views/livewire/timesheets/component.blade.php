@@ -13,9 +13,11 @@
                             {{ session('message') }}
                         </div>
                     @endif
+                    @can('timelog-create')
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">
                         Add
                     </button>
+                    @endcan
                     <div class="row">
                         <div class="col">
                             <form>
@@ -64,7 +66,9 @@
                                 <th>User</th>
                                 <th>Date</th>
                                 <th>Status</th>
+                                @can('timelog-delete')
                                 <th width="150px">Action</th>
+                                @endcan
                             </tr>
                         </thead>
                         <tbody>
@@ -74,9 +78,11 @@
                                 <td>{{ $log->user->name }}</td>
                                 <td>{{ $log->punch }}</td>
                                 <td>{{ $log->IN_OUT }}</td>
+                                @can('timelog-delete')
                                 <td>
                                     <button wire:click="delete({{ $log->id }})" class="btn btn-danger btn-sm">Delete</button>
                                 </td>
+                                @endcan
                             </tr>
                             @endforeach
                         </tbody>
