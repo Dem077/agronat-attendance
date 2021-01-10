@@ -25,7 +25,7 @@
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h6 class="h6 mb-0 text-gray-800">Attendance by period</h6>
+                        <h6 class="h6 mb-0 text-gray-800"><strong>Today</strong></h6>
                         <div class="dropdown no-arrow">
                             <a
                                 class="dropdown-toggle"

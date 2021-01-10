@@ -24,7 +24,6 @@ class DashboardComponent extends Component
             $this->from_date=(new DateTime($this->to_date))->modify('last month')->format('Y-m-d');
         }
 
-
         return $this->getAdminDashboard();
     }
 
