@@ -71,6 +71,8 @@ class UpdateAttendanceStatus implements ShouldQueue
                     }
                     elseif($att->in<=$att->sc_in){
                         $att->status='Normal';
+                    }else{
+                        $att->status='Absent';
                     }
                     $att->save();
                 }

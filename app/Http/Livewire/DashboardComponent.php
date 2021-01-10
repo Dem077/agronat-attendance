@@ -37,10 +37,15 @@ class DashboardComponent extends Component
 
     public function getAttendanceStats(){
         $dt=new DateTime();
-        $this->attendance=Attendance::where('ck_date',$dt->format('Y-m-d'))
-                                ->select(DB::raw("case when status='Late' or status='Normal' then 'Present' else status end as status,count(1) as count"))
-                                ->groupby('status')
-                                ->pluck('count','status');
+        $this->attendance=['Present'=>0,'Absent'=>0,'Holiday'=>0];
+        $att=Attendance::where('ck_date',$dt->format('Y-m-d'))
+                                ->select(DB::raw("case when status='Late' or status='Normal' then 'Present' when status='Absent' or status is Null then 'Absent' else status end as status,count(1) as count"))
+                                ->groupby('status')->get();
+        foreach($att as $st){
+            if(isset($this->attendance[$st->status])){
+                $this->attendance[$st->status]+=$st->count;
+            }
+        }
     }
     
     public function getDateRange($from,$to){
@@ -64,9 +69,9 @@ class DashboardComponent extends Component
         }
         foreach($att as $st){
             if(isset($this->period['data'][$st->status][$st->ck_date])){
-                $this->period['data'][$st->status][$st->ck_date]=$st->count;
-                if($this->period['max']<$st->count){
-                    $this->period['max']=$st->count;
+                $this->period['data'][$st->status][$st->ck_date]+=$st->count;
+                if($this->period['max']<$this->period['data'][$st->status][$st->ck_date]){
+                    $this->period['max']=$this->period['data'][$st->status][$st->ck_date];
                 }
             }
         }
