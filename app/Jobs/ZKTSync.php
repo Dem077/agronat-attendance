@@ -46,18 +46,16 @@ class ZKTSync implements ShouldQueue
     public function handle()
     {
 
-        Log::info('sync');
         $users=[];
         $external_id=null;
         if($this->user_id){
             $user=User::find($this->user_id);
             if($user){
-                $external_id=$user->external_id;
+                $external_id=$user->emp_no;
                 $users[$external_id]=$this->user_id;
             }
         }
         foreach($this->getAttendance($this->from,$this->to,$external_id) as $d){
-            Log::info('sync1');
             if(!isset($users[$d['USERID']])){
                 
                 $u=User::where('emp_no',$d['USERID'])->first();
@@ -75,7 +73,7 @@ class ZKTSync implements ShouldQueue
     public function getAttendance($from=null,$to=null,$external_id=null){
         $logs=$this->db->table('CHECKINOUT')->where('CHECKTIME','>',$from)->addSelect(['USERID'=>$this->db->table('USERINFO')->select('SSN')->whereColumn('CHECKINOUT.USERID', 'USERINFO.USERID')->limit(1)]);
         if($to){
-            $logs=$logs->where('ChHECKTIME','<=',$to);
+            $logs=$logs->where('CHECKTIME','<=',$to);
         }
         if($external_id){
             $logs=$logs->whereExists(function ($query) use($external_id){

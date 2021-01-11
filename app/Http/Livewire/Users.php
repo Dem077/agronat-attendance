@@ -12,7 +12,7 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $name, $user_id, $email, $designation,$password,$emp_no,$department_id_id,$mobile,$phone;
+    public $name, $user_id, $email, $designation,$password,$emp_no,$department_id,$mobile,$phone;
     public $updateMode = false;
 
     public function render()

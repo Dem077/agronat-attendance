@@ -50,7 +50,6 @@ class ProcessOvertime implements ShouldQueue
         $user_id=$this->punch_log->user_id;
 
         //process OT
-
         if($this->punch_log->status==0){
             if($time < $schedule['in'] || $time >= $schedule['out']){
                 Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time]);

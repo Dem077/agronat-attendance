@@ -18,9 +18,9 @@
                     @error('name') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
-                    {{-- <label for="department">department:</label>
-                    <input type="text" class="form-control" id="department" wire:model="department" placeholder="department"/>
-                    @error('department') <span class="text-danger">{{ $message }}</span>@enderror --}}
+                    {{-- <label for="department_id">department:</label>
+                    <input type="text" class="form-control" id="department_id" wire:model="department_id" placeholder="department_id"/>
+                    @error('department_id') <span class="text-danger">{{ $message }}</span>@enderror --}}
 
                     <label for="designation">designation:</label>
                     <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation"/>
