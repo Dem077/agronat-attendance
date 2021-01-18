@@ -38,3 +38,34 @@ function export_csv($header,$data,$filename)
 
     return response()->stream($callback, 200, $response_headers);
 }
+
+function export_csv2($header,$data,$filename)
+{
+    $response_headers = [
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0'
+        ,   'Content-type'        => 'text/csv'
+        ,   'Content-Disposition' => "attachment; filename={$filename}.csv"
+        ,   'Expires'             => '0'
+        ,   'Pragma'              => 'public'
+    ];
+
+    
+
+    $callback = function() use ($data,$header) 
+        {
+            $FH = fopen('php://output', 'w');
+
+            // CSV Header
+            if(is_array($header)){
+                fputcsv($FH, $header);
+            }
+        
+            // CSV Data
+            foreach ($data as $row) {
+                fputcsv($FH, $row);
+            }
+            fclose($FH);
+        };
+
+    return response()->stream($callback, 200, $response_headers);
+}

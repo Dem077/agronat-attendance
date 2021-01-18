@@ -69,6 +69,87 @@ class AttendanceComponent extends Component
         return export_csv($header, $entries, $filename);
         
     }
+
+
+    public function exportRecord2(){
+        $attendances=Attendance::select('user_id','ck_date','late_min','status')->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
+        if($this->start_date){
+            $attendances=$attendances->where('ck_date','>=',$this->start_date);
+        }
+        $this->end_date=$this->end_date?$this->end_date:(new \DateTime())->format('Y-m-d');
+        if($this->end_date){
+            $attendances=$attendances->where('ck_date','<=',$this->end_date);
+        }
+        if($this->user_id){
+            $attendances=$attendances->where('user_id',$this->user_id);
+        }
+
+        $attendances=$attendances->orderBy('ck_date','asc')->get();
+
+        $atts=[];
+        $dates=[];
+        $employees=[];
+        foreach($attendances as $att){
+            $status=['Present'=>0,'Absent'=>0,'Latemin'=>$att->late_min];
+            if(!in_array($att->ck_date,$dates)){
+                $dates[]=$att->ck_date;
+            }
+            if(!isset($employees[$att->employee])){
+                $employees[$att->employee]=['Present'=>0,'Absent'=>0,'Latemin'=>0];
+            }
+            switch($att->status){
+                case 'Normal':
+                    $status['Present']=1;
+                    break;
+                case 'Late':
+                    $status['Present']=1;
+                    
+                    break;
+                case 'Absent':
+                    $status['Absent']=1;
+                    break;
+                case '':
+                    $status['Absent']=1;
+                    break;
+
+            }
+
+            foreach($status as $k=>$v){
+                $employees[$att->employee][$k]+=$v;
+            }
+
+            $atts[$att->employee][$att->ck_date]=$status;
+        }
+        $report=[];
+        $header=['name'];
+        foreach($employees as $employee=>$stat){
+            $report[$employee]=[$employee];
+            foreach($dates as $dt){
+                if(!in_array($dt,$header)){
+                    $header[]=$dt;
+                    $header[]='';
+                    $header[]='';
+                }
+                if(isset($atts[$employee][$dt])){
+                    foreach($atts[$employee][$dt] as $k=>$v){
+                        $report[$employee][]=$v;
+                    }
+                }else{
+                    for($i=0;$i<3;$i++){
+                        $report[$employee][]=0;
+                    }
+                }
+            }
+            foreach($stat as $k=>$v){
+                $report[$employee][]=$v;
+            }
+        }
+        $filename = sprintf('%1$s-%2$s-%3$s', str_replace(' ', '', 'attendances'), date('Ymd'), date('His'));
+
+        return export_csv2($header, array_values($report), $filename);
+    }
+
+
     
     // private function export_csv1($header, $data, $filename) {
     //     // No point in creating the export file on the file-system. We'll stream
