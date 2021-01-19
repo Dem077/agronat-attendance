@@ -32,7 +32,7 @@
                                       <div class="input-group-prepend">
                                         <div class="input-group-text">Start</div>
                                       </div>
-                                        <input type="text" class="form-control" id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
+                                        <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
                                     </div>
                                   </div>
                                   <div class="col-sm-3 my-1">
@@ -41,11 +41,11 @@
                                       <div class="input-group-prepend">
                                         <div class="input-group-text">End</div>
                                       </div>
-                                      <input type="text" class="form-control" id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
+                                      <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
                                     </div>
                                   </div>
                                   <div class="col-auto my-1">
-                                    <button type="button" class="btn btn-success" wire:click.prevent="exportRecord2()"><i class="fas fa-file-download"></i></button>
+                                    <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
                                   </div>
                                 </div>
                               </form>

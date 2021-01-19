@@ -69,6 +69,23 @@
         </div>
     </li>
     @endcan
+
+
+    @can('role-create')
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAR" aria-expanded="false" aria-controls="collapseAR">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Reports</span>
+        </a>
+        <div id="collapseAR" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Reports:</h6>
+                <a class="collapse-item" href="{{route('reports.attendance')}}">Attendance</a>
+                <a class="collapse-item" href="{{route('assign-roles')}}">OT</a>
+            </div>
+        </div>
+    </li>
+    @endcan
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

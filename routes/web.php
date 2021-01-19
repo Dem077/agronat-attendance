@@ -2,6 +2,7 @@
 
 use App\Http\Livewire\AssignRole;
 use App\Http\Livewire\AttendanceComponent;
+use App\Http\Livewire\AttendanceReport;
 use App\Http\Livewire\DashboardComponent;
 use App\Http\Livewire\OvertimeComponent;
 use App\Http\Livewire\ResetPassword;
@@ -34,5 +35,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/reset-password',ResetPassword::class)->name('reset-password');
     Route::get('roles',RolesComponent::class)->name('roles');
     Route::get('assign-roles',AssignRole::class)->name('assign-roles');
+    Route::get('attendance-report',AttendanceReport::class)->name('reports.attendance');
 });
 
