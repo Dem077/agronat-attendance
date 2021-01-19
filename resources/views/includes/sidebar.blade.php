@@ -71,7 +71,7 @@
     @endcan
 
 
-    @can('role-create')
+    @can('reporting-manager')
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAR" aria-expanded="false" aria-controls="collapseAR">
             <i class="fas fa-fw fa-cog"></i>
@@ -81,9 +81,10 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Reports:</h6>
                 <a class="collapse-item" href="{{route('reports.attendance')}}">Attendance</a>
-                <a class="collapse-item" href="{{route('assign-roles')}}">OT</a>
+                <a class="collapse-item" href="{{route('reports.ot')}}">OT</a>
             </div>
         </div>
+        
     </li>
     @endcan
     <!-- Divider -->
