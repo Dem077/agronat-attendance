@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\TimeSheet;
 use App\Models\User;
+use App\Services\AttendanceService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -14,9 +15,16 @@ class TimeSheetComponent extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
+    private $attendanceService;
 
     public $user_id,$punchdate,$punchtime,$start_date,$end_date;
 
+
+    public function __construct()
+    {
+        $this->attendanceService=new AttendanceService();
+        parent::__construct();
+    }
 
     public function render()
     {
@@ -85,8 +93,10 @@ class TimeSheetComponent extends Component
         $validatedDate['punch']="{$validatedDate['punchdate']} {$validatedDate['punchtime']}";
         unset($validatedDate['punchdate']);
         unset($validatedDate['punchtime']);
-        TimeSheet::add($validatedDate);
-  
+        // TimeSheet::add($validatedDate);
+
+        $this->attendanceService->addLog($validatedDate);
+
         $this->emit('.Store'); // Close model to using to jquery
 
         session()->flash('message', 'Time Added Successfully.');

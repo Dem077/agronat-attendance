@@ -93,7 +93,7 @@ class AttendanceReport extends Component
             $atts[$att->employee][$att->ck_date]=$status;
         }
         $report=[];
-        $header=[''];
+        $header=['','Total','',''];
         $report['']=['Name','Present','Absent','Latemin'];
         foreach($dates as $dt){
             $report[''][]='Present';
@@ -103,6 +103,9 @@ class AttendanceReport extends Component
 
         foreach($employees as $employee=>$stat){
             $report[$employee]=[$employee];
+            foreach($stat as $k=>$v){
+                $report[$employee][]=$v;
+            }
             foreach($dates as $dt){
                 if(!in_array($dt,$header)){
                     $header[]=$dt;
@@ -119,12 +122,8 @@ class AttendanceReport extends Component
                     }
                 }
             }
-            foreach($stat as $k=>$v){
-                $report[$employee][]=$v;
-            }
-        }
 
-        $header[]='Total';
+        }
 
         $filename = sprintf('%1$s-%2$s-%3$s', str_replace(' ', '', 'attendances'), date('Ymd'), date('His'));
 

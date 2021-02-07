@@ -12,33 +12,47 @@
             </div>
             <div class="modal-body">
                 <form>
-                    <input type="hidden" wire:model="post_id">
+                    <input type="hidden" wire:model="attendance_id">
                     <div class="form-group">
-                        <label for="username">username</label>
-                        <input type="text" class="form-control" id="username" placeholder="username" wire:model="username">
-                        @error('username') <span class="text-danger">{{ $message }}</span>@enderror
+                        <label>name:</label>
+                        {{$user_name}}
                     </div>
                     <div class="form-group">
-                        <label for="fullname">fullname:</label>
-                        <input type="text" class="form-control" id="fullname" wire:model="fullname" placeholder="fullanme"/>
-                        @error('fullname') <span class="text-danger">{{ $message }}</span>@enderror
+                        <label>Date:</label>
+                        {{$ck_date}}
                     </div>
-                    <div class="form-group">
-                        <label for="position">position:</label>
-                        <input type="text" class="form-control" id="position" wire:model="position" placeholder="position"/>
-                        @error('position') <span class="text-danger">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group">
-                        <label for="email">email:</label>
-                        <input type="email" class="form-control" id="email" wire:model="email" placeholder="email"/>
-                        @error('email') <span class="text-danger">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-group">
-                        <label for="password">password:</label>
-                        <input type="password" class="form-control" id="password" wire:model="password" placeholder="password"/>
-                        @error('password') <span class="text-danger">{{ $message }}</span>@enderror
+                    <div class="form-inline">
+                        <div class="form-group mt-1">
+                            <label>Duty In:</label>
+
+                        </div>
+                        <div class="form-group mt-1">
+                            <label>Duty Out:</label>
+                        </div>
                     </div>
 
+                    <div class="form-inline">
+                        <div class="form-group mt-1">
+                            <label>Check In:</label>
+
+                        </div>
+                        <div class="form-group mt-1">
+                            <label>Check Out:</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Late min:</label>
+                        {{$late_min}}
+                    </div>
+                    <div class="form-group">
+                        <label class="sr-only" for="inlineFormInputName">Status</label>
+                        <select type="text" class="form-control" id="inlineFormInputName" placeholder="Status" wire:bind="attendance_status" >
+                            <option value=''>Select Status</option>
+                            @foreach($attendance_statuses as $status)
+                                <option value="{{$status}}" {{$attendance_status==$status?'SELECTED':''}}>{{$status}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

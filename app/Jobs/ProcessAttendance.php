@@ -72,8 +72,8 @@ class ProcessAttendance implements ShouldQueue
 
             }else{
                 if($time<=$schedule['in']){
-                    $attendance->in="";
-                    $attendance->out="";
+                    $attendance->in=NULL;
+                    $attendance->out=NULL;
                     $attendance->late_min=0;
                     $attendance->status=Null;
                     $attendance->save();

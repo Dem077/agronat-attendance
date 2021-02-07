@@ -15,6 +15,9 @@ class AttendanceComponent extends Component
     public $isOpen = false;
     
     public $user_id, $ck_date, $in, $out, $start_date, $end_date;
+    public $attendance_statuses=[
+        'Normal','Late','Absent','Duty Travel','Sick Leave','Family Leave','Annual Leave'
+    ];
 
 
     public function render()
@@ -23,12 +26,6 @@ class AttendanceComponent extends Component
         $employees=User::all();
         $this->resetPage();
         return view('livewire.attendances.component',['employees'=>$employees,'attendances'=>$attendances]);
-        // ->extends('layouts.app')
-        // ->section('content');
-        // $this->timesheets = TimeSheet::all();
-        // $this->attendances=$this->getAttendances()->get();
-        // $this->employees=User::all();
-        // return view('livewire.attendances.component');
     }
 
     public function getAttendances(){

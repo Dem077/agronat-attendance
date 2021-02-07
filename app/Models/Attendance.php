@@ -28,4 +28,8 @@ class Attendance extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function attend_status(){
+        return $this->hasOne(AttendStatus::class,'user_id','user_id')->where('ck_date','=',$this->ck_date);
+    }
 }

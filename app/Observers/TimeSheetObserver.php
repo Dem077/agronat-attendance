@@ -7,10 +7,16 @@ use App\Jobs\ProcessOvertime;
 use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\TimeSheet;
+use App\Services\AttendanceService;
 use Illuminate\Support\Facades\Log;
 
 class TimeSheetObserver
 {
+    private $attendanceService;
+    public function __construct()
+    {
+        $this->attendanceService=new AttendanceService();
+    }
     /**
      * Handle the TimeSheet "created" event.
      *
@@ -42,32 +48,11 @@ class TimeSheetObserver
     public function deleted(TimeSheet $timeSheet)
     {
         
-        $date1=date('Y-m-d',strtotime($timeSheet->punch));
-        $date2=date('Y-m-d',strtotime($timeSheet->punch." +1 day"));
-        $user_id=$timeSheet->user_id;
-        $log=null;
+        $from=date('Y-m-d',strtotime($timeSheet->punch));
+        $to=date('Y-m-d',strtotime($timeSheet->punch." +1 day"));
 
-        // $fix=TimeSheet::where('punch','>=',$timeSheet->punch)->where('punch','<',$date2)->where('user_id',$user_id)->exists();
-        // Log::info(['delete 1',$timeSheet->punch,$fix]);
-        if(true){
+        $this->attendanceService->recompute($from,$to,[$timeSheet->user_id]);
 
-            Attendance::where('ck_date',$date1)->where('user_id',$user_id);
-            Overtime::where('ck_date',$date1)->where('user_id',$user_id)->delete();
-
-            $records=TimeSheet::whereBetween('punch',[$date1,$date2])->where('user_id',$user_id)->orderBy('punch','asc')->get();
-
-            $status=1;
-            foreach($records as $record){
-                $status=($status+1)%2;
-                $record->status=$status;
-                $record->save();
-    
-                ProcessOvertime::dispatch($record);
-                ProcessAttendance::dispatch($record);
-            }
-        }
-
-        Log::info('delete 2');
     }
 
     /**

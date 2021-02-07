@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Attendance;
+use App\Models\AttendStatus;
 use App\Models\Holiday;
 use App\Models\User;
 use DateInterval;
@@ -57,11 +58,15 @@ class UpdateAttendanceStatus implements ShouldQueue
     private function updateAttendenceStatus($employees,$date){
         $is_holiday=Holiday::where('h_date',$date)->exists();
         foreach($employees as $employee){
-            $att=Attendance::where('user_id',$employee->id)->where('ck_date',$date)->first();
+            $att=Attendance::with('attend_status')->where('user_id',$employee->id)->where('ck_date',$date)->first();
+
             if($att){
-                if(!$att->status){
+                if(!$att->status){ 
                     if($is_holiday){
                         $att->status='Holiday';
+                    }
+                    elseif($att->attend_status){
+                        $att->status=$att->attend_status->status;
                     }
                     elseif(!$att->in){
                         $att->status='Absent';

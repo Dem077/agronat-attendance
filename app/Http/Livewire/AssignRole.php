@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
@@ -27,7 +28,7 @@ class AssignRole extends Component
         $user=User::find($id);
         $this->user_id=$id;
         $this->user_name=$user->name;
-        $this->role=$user->roles()->select(\DB::raw('id,true as checked'))->pluck('checked','id')->toArray();
+        $this->role=$user->roles()->select(DB::raw('id,true as checked'))->pluck('checked','id')->toArray();
 
     }
 

@@ -66,6 +66,11 @@
                                 <th>Checkout</th>
                                 <th>Late min</th>
                                 <th>Status</th>
+                                @can('attendance-update')
+                                <td>
+                                    Action
+                                </td>
+                                @endcan
                             </tr>
                         </thead>
                         <tbody>
@@ -80,6 +85,11 @@
                                 <td>{{ $attendance->out }}</td>
                                 <td>{{ $attendance->late_min }}</td>
                                 <td>{{ $attendance->status }}</td>
+                                @can('attendance-update')
+                                <td>
+                                    <button data-toggle="modal" data-target="#updateModal" wire:click="edit({{ $user->id }})" class="btn btn-primary btn-sm">Edit</button>
+                                </td>
+                                @endcan
                             </tr>
                             @endforeach
                         </tbody>

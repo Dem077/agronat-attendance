@@ -39,7 +39,13 @@ class TimeSheet extends Model
         if($fix){
             $log=TimeSheet::create($data);
 
-            // Attendance::where('ck_date',$date1)->where('user_id',$user_id)->delete();
+            $today=Attendance::where('ck_date',$date1)->where('user_id',$user_id)->first();
+            if($today){
+                $today->in=NULL;
+                $today->out=NULL;
+                $today->save();
+            }
+
             Overtime::where('ck_date',$date1)->where('user_id',$user_id)->delete();
 
             $records=TimeSheet::whereBetween('punch',[$date1,$date2])->where('user_id',$user_id)->orderBy('punch','asc')->get();
@@ -50,8 +56,8 @@ class TimeSheet extends Model
                 $record->status=$status;
                 $record->save();
     
-                ProcessOvertime::dispatch($record);
-                ProcessAttendance::dispatch($record);
+                //ProcessOvertime::dispatch($record);
+                //ProcessAttendance::dispatch($record);
             }
         }else{
             $count=TimeSheet::where('punch','>=',$date1)->where('punch','<=',$data['punch'])->where('user_id',$user_id)->count();
