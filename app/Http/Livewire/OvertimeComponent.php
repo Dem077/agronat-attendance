@@ -4,23 +4,24 @@ namespace App\Http\Livewire;
 
 use App\Models\Overtime;
 use App\Models\User;
+use App\Traits\UserTrait;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class OvertimeComponent extends Component
 {
-    use WithPagination;
+    use WithPagination, UserTrait;
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
 
-    public $user_id, $ck_date, $in, $out, $ot, $start_date, $end_date;
+    public $ck_date, $in, $out, $ot, $start_date, $end_date;
 
     public function render()
     {
+        $this->setUser();
         $ots=$this->getOvertime()->paginate(5);
-        $employees=User::all();
         $this->resetPage();
-        return view('livewire.overtime.component',['employees'=>$employees,'ots'=>$ots]);
+        return view('livewire.overtime.component',['ots'=>$ots]);
     }
 
     public function getOvertime(){

@@ -4,17 +4,26 @@ namespace App\Http\Livewire;
 
 use App\Models\Attendance;
 use App\Models\User;
+use App\Traits\UserTrait;
+use DateTime;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class AttendanceComponent extends Component
 {
-    use WithPagination;
+    use WithPagination, UserTrait;
     protected $paginationTheme = 'bootstrap';
+
+    protected $listeners = ['userSelected' => '$refresh'];
+
+
+
     public $isOpen = false;
     
-    public $user_id, $ck_date, $in, $out, $start_date, $end_date;
+    public $ck_date, $in, $out, $start_date, $end_date;
     public $attendance_statuses=[
         'Normal','Late','Absent','Duty Travel','Sick Leave','Family Leave','Annual Leave'
     ];
@@ -22,11 +31,36 @@ class AttendanceComponent extends Component
 
     public function render()
     {
+        $this->setUser();
+
         $attendances=$this->getAttendances()->paginate(5);
-        $employees=User::all();
+
+        /**
+         * manage all
+         * manage departments
+         * view personal
+         */
+        
         $this->resetPage();
-        return view('livewire.attendances.component',['employees'=>$employees,'attendances'=>$attendances]);
+        
+        /**
+         * 2020-12-25 - 2021-01-24
+         * 2021-01-25 - 2021-02-24
+         * 
+         */
+        $period=[
+            ["month","start","end"]
+        ];
+        return view('livewire.attendances.component',['attendances'=>$attendances]);
     }
+
+
+    public function userSelected($id)
+    {
+        $this->user_id=$id;
+    }
+
+
 
     public function getAttendances(){
         $attendances=Attendance::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)])

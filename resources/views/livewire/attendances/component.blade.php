@@ -18,16 +18,13 @@
                             <form>
                                 <div class="form-row align-items-center">
                                   <div class="col-sm-3 my-1">
-                                    <label class="sr-only" for="inlineFormInputName">Employee</label>
-                                    <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
-                                        <option value="">Select Employee</option>
-                                        @foreach($employees as $employee)
-                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
-                                        @endforeach
-                                     </select>
+                                      @livewire('partials.user-select')
                                   </div>
                                   <div class="col-sm-3 my-1">
-                                    <label class="sr-only" for="inlineFormInputGroupStartDate">Start Date</label>
+                                      @livewire('partials.attendance-period')
+                                  </div>
+                                  <div class="col-sm-3 my-1">
+                                    <label for="inlineFormInputGroupStartDate">Start Date</label>
                                     <div class="input-group">
                                       <div class="input-group-prepend">
                                         <div class="input-group-text">Start</div>
@@ -36,7 +33,7 @@
                                     </div>
                                   </div>
                                   <div class="col-sm-3 my-1">
-                                    <label class="sr-only" for="inlineFormInputGroupEndDate">End Date</label>
+                                    <label for="inlineFormInputGroupEndDate">End Date</label>
                                     <div class="input-group">
                                       <div class="input-group-prepend">
                                         <div class="input-group-text">End</div>
@@ -113,7 +110,6 @@
       };
     $('#inlineFormInputGroupStartDate').datepicker(options);
     $('#inlineFormInputGroupEndDate').datepicker(options);
-    $('#inlineFormInputName').select2();
 
     $('#inlineFormInputGroupStartDate').on('change', function (e) {
        @this.set('start_date', e.target.value);
@@ -121,8 +117,12 @@
     $('#inlineFormInputGroupEndDate').on('change', function (e) {
        @this.set('end_date', e.target.value);
     });
-    $('#inlineFormInputName').on('change', function (e) {
-       @this.set('user_id', e.target.value);
+    Livewire.on('userSelected', id => {
+        @this.set('user_id', id);
+    });
+    Livewire.on('periodSelected', period => {
+      @this.set('start_date', period['start']);
+      @this.set('end_date', period['end']);
     });
 </script>
 @endpush

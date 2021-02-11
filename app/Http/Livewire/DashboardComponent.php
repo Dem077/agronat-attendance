@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Attendance;
 use App\Models\User;
+use App\Traits\UserTrait;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -12,10 +13,12 @@ use Livewire\Component;
 
 class DashboardComponent extends Component
 {
-    public $attendance,$period,$from_date,$to_date,$user_id;
+    use UserTrait;
+    public $attendance,$period,$from_date,$to_date;
 
     public function render()
     {
+        $this->setUser();
         if(!$this->to_date){
             $this->to_date=(new DateTime())->modify('+1 day')->format('Y-m-d');
         }
@@ -29,10 +32,10 @@ class DashboardComponent extends Component
 
 
     public function getAdminDashboard(){
-        $employees=User::all();
+        
         $this->getAttendanceStats();
         $this->getAttendanceByPeriod();
-        return view('livewire.admin-dashboard',compact('employees'));
+        return view('livewire.admin-dashboard');
     }
 
     public function getAttendanceStats(){

@@ -19,44 +19,41 @@
                     </button>
                     @endcan
                     <div class="row">
-                        <div class="col">
-                            <form>
-                                <div class="form-row align-items-center">
-                                  <div class="col-sm-3 my-1">
-                                    <label class="sr-only" for="inlineFormInputName">Employee</label>
-                                    <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
-                                        <option value="">Select Employee</option>
-                                        @foreach($employees as $employee)
-                                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
-                                        @endforeach
-                                     </select>
-                                  </div>
-                                  <div class="col-sm-3 my-1">
-                                    <label class="sr-only" for="inlineFormInputGroupStartDate">Start Date</label>
-                                    <div class="input-group">
-                                      <div class="input-group-prepend">
-                                        <div class="input-group-text">Start</div>
-                                      </div>
-                                        <input type="text" class="form-control" id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
+                      <div class="col">
+                          <form>
+                              <div class="form-row align-items-center">
+                                <div class="col-sm-3 my-1">
+                                    @livewire('partials.user-select')
+                                </div>
+                                <div class="col-sm-3 my-1">
+                                    @livewire('partials.attendance-period')
+                                </div>
+                                <div class="col-sm-3 my-1">
+                                  <label for="inlineFormInputGroupStartDate">Start Date</label>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                      <div class="input-group-text">Start</div>
                                     </div>
-                                  </div>
-                                  <div class="col-sm-3 my-1">
-                                    <label class="sr-only" for="inlineFormInputGroupEndDate">End Date</label>
-                                    <div class="input-group">
-                                      <div class="input-group-prepend">
-                                        <div class="input-group-text">End</div>
-                                      </div>
-                                      <input type="text" class="form-control" id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
-                                    </div>
-                                  </div>
-                                  <div class="col-auto my-1">
-                                    <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+                                    <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
                                   </div>
                                 </div>
-                              </form>
-                        </div>
-                    </div>
-
+                                <div class="col-sm-3 my-1">
+                                  <label for="inlineFormInputGroupEndDate">End Date</label>
+                                  <div class="input-group">
+                                    <div class="input-group-prepend">
+                                      <div class="input-group-text">End</div>
+                                    </div>
+                                    <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
+                                  </div>
+                                </div>
+                                <div class="col-auto my-1">
+                                  <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+                                </div>
+                              </div>
+                            </form>
+                      </div>
+                  </div>
+                    
                     @include('livewire.timesheets.create')
                   <div class="table-responsive">
                     <table class="table table-bordered mt-5">
@@ -109,7 +106,6 @@
       };
     $('#inlineFormInputGroupStartDate').datepicker(options);
     $('#inlineFormInputGroupEndDate').datepicker(options);
-    $('#inlineFormInputName').select2();
 
     $('#inlineFormInputGroupStartDate').on('change', function (e) {
        @this.set('start_date', e.target.value);
@@ -117,8 +113,12 @@
     $('#inlineFormInputGroupEndDate').on('change', function (e) {
        @this.set('end_date', e.target.value);
     });
-    $('#inlineFormInputName').on('change', function (e) {
-       @this.set('user_id', e.target.value);
+    Livewire.on('userSelected', id => {
+        @this.set('user_id', id);
+    });
+    Livewire.on('periodSelected', period => {
+      @this.set('start_date', period['start']);
+      @this.set('end_date', period['end']);
     });
 </script>
 @endpush

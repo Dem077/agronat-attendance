@@ -11,7 +11,7 @@ use Livewire\Component;
 class AttendanceReport extends Component
 {
 
-    public $start_date, $end_date;
+    public $start_date, $end_date,$user_id;
 
 
     public function render()
@@ -49,6 +49,10 @@ class AttendanceReport extends Component
     }
     public function exportRecord(){
         $attendances=Attendance::select('user_id','ck_date','late_min','status')->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
+        if($this->user_id){
+            $attendances=$attendances->where('user_id','=',$this->user_id);
+        }
+
         if($this->start_date){
             $attendances=$attendances->where('ck_date','>=',$this->start_date);
         }

@@ -16,8 +16,8 @@
                     <label for="user_id">Employee</label>
                     <select type="text" class="form-control" id="user_id" placeholder="Employee" wire:bind="user_id" >
                         <option>Select Employee</option>
-                        @foreach($employees as $employee)
-                            <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
+                        @foreach($users as $id=>$name)
+                            <option value="{{$id}}" {{$user_id==$id?'SELECTED':''}}>{{$name}}</option>
                         @endforeach
                      </select>
                     @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror

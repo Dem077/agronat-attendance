@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
+use App\Traits\UserTrait;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,12 +13,12 @@ use Livewire\WithPagination;
 class TimeSheetComponent extends Component
 {
 
-    use WithPagination;
+    use WithPagination,UserTrait;
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
     private $attendanceService;
 
-    public $user_id,$punchdate,$punchtime,$start_date,$end_date;
+    public $punchdate,$punchtime,$start_date,$end_date;
 
 
     public function __construct()
@@ -28,10 +29,10 @@ class TimeSheetComponent extends Component
 
     public function render()
     {
-        $employees=User::all();
+        $this->setUser();
         $logs=$this->getTimeSheet()->paginate(5);
         $this->resetPage();
-        return view('livewire.timesheets.component',['logs'=>$logs,'employees'=>$employees]);
+        return view('livewire.timesheets.component',['logs'=>$logs]);
     }
 
     public function getTimeSheet(){

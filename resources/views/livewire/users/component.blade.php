@@ -22,14 +22,8 @@
                     @endcan
                     <div class="row">
                         <div class="col-sm-3 my-1">
-                            <label class="sr-only" for="inlineFormInputName">Employee</label>
-                            <select type="text" class="form-control" id="inlineFormInputName" placeholder="Employee" wire:bind="user_id" >
-                                <option value=''>Select Employee</option>
-                                @foreach($employees as $employee)
-                                    <option value="{{$employee->id}}" {{$user_id==$employee->id?'SELECTED':''}}>{{$employee->name}}</option>
-                                @endforeach
-                             </select>
-                          </div>
+                            @livewire('partials.user-select')
+                        </div>
                     </div>
                   <div class="table-responsive">
                     <table class="table table-bordered mt-5">
@@ -77,9 +71,8 @@
     window.livewire.on('.Store', () => {
         $('#exampleModal').modal('hide');
     });
-    $('#inlineFormInputName').select2();
-    $('#inlineFormInputName').on('change', function (e) {
-    @this.set('user_id', e.target.value);
-    });
+    Livewire.on('userSelected', id => {
+        @this.set('user_id', id);
+    })
 </script>
 @endpush
