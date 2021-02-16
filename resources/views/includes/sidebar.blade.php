@@ -54,6 +54,52 @@
     </li>
     @endcan
 
+    @can('report-list')
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAR" aria-expanded="false" aria-controls="collapseAR">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Reports</span>
+        </a>
+        <div id="collapseAR" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Reports:</h6>
+                <a class="collapse-item" href="{{route('reports.attendance')}}">Attendance</a>
+                <a class="collapse-item" href="{{route('reports.ot')}}">OT</a>
+            </div>
+        </div>
+        
+    </li>
+    @endcan
+    @can('schedule-list')
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSchedule" aria-expanded="false" aria-controls="collapseSchedule">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Schedule Management</span>
+        </a>
+        <div id="collapseSchedule" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Schedule Management:</h6>
+                <a class="collapse-item" href="#">Employee Schedule</a>
+                <a class="collapse-item" href="#">Holidays</a>
+            </div>
+        </div>
+    </li>
+    @endcan
+    @can('leave-list')
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLeave" aria-expanded="false" aria-controls="collapseLeave">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Leave Management</span>
+        </a>
+        <div id="collapseLeave" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Leave Management:</h6>
+                <a class="collapse-item" href="#">Employee Leaves</a>
+                <a class="collapse-item" href="#">Leave Types</a>
+            </div>
+        </div>
+    </li>
+    @endcan
     @can('role-create')
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -70,21 +116,18 @@
     </li>
     @endcan
 
-
-    @can('reporting-manager')
+    @can('setting-list')
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAR" aria-expanded="false" aria-controls="collapseAR">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSetting" aria-expanded="false" aria-controls="collapseSetting">
             <i class="fas fa-fw fa-cog"></i>
-            <span>Reports</span>
+            <span>Settings</span>
         </a>
-        <div id="collapseAR" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+        <div id="collapseSetting" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
             <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Reports:</h6>
-                <a class="collapse-item" href="{{route('reports.attendance')}}">Attendance</a>
-                <a class="collapse-item" href="{{route('reports.ot')}}">OT</a>
+                <h6 class="collapse-header">Settings:</h6>
+                <a class="collapse-item" href="{{route('recompute')}}">Recompute</a>
             </div>
         </div>
-        
     </li>
     @endcan
     <!-- Divider -->

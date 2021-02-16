@@ -17,6 +17,7 @@
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                         Add
                     </button>
+                    @include('livewire.users.view')
                     @include('livewire.users.update')
                     @include('livewire.users.create')
                     @endcan
@@ -35,7 +36,7 @@
                                 <th>Designation</th>
                                 <th>Mobile</th>
                                 @can('user-create')
-                                <th width="150px">Action</th>
+                                <th width="200px">Action</th>
                                 @endcan
                             </tr>
                         </thead>
@@ -49,6 +50,7 @@
                                 <td>{{ $user->mobile }}</td>
                                 @can('user-create')
                                 <td>
+                                    <button data-toggle="modal" data-target="#viewModal" wire:click="show({{ $user->id }})" class="btn btn-primary btn-sm">View</button>
                                     <button data-toggle="modal" data-target="#updateModal" wire:click="edit({{ $user->id }})" class="btn btn-primary btn-sm">Edit</button>
                                     <button wire:click="delete({{ $user->id }})" class="btn btn-danger btn-sm">Delete</button>
                                 </td>

@@ -69,3 +69,14 @@ function export_csv2($header,$data,$filename)
 
     return response()->stream($callback, 200, $response_headers);
 }
+
+function date_range($from,$to){
+    $interval = DateInterval::createFromDateString('1 day');
+    if(typeOf($from)=='String'){
+        $from=new DateTime($from);
+    }
+    if(typeOf($to)=='String'){
+        $to=new DateTime($to);
+    }
+    return new DatePeriod($from, $interval,$to->modify('+1 day'));
+}

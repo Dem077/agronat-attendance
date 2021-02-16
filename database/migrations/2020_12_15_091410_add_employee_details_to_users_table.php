@@ -34,7 +34,7 @@ class AddEmployeeDetailsToUsersTable extends Migration
             $table->dropColumn('designation');
             $table->dropColumn('mobile');
             $table->dropColumn('phone');
-            $table->dropColumn('department');
+            $table->dropColumn('department_id');
         });
     }
 }

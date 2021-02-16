@@ -18,31 +18,49 @@ class DashboardComponent extends Component
 
     public function render()
     {
-        $this->setUser();
         if(!$this->to_date){
-            $this->to_date=(new DateTime())->modify('+1 day')->format('Y-m-d');
+            $this->to_date=(new DateTime())->modify('+1 day')->format('Y-m-24');
         }
 
         if(!$this->from_date){
-            $this->from_date=(new DateTime($this->to_date))->modify('last month')->format('Y-m-d');
+            $this->from_date=(new DateTime($this->to_date))->modify('last month')->format('Y-m-25');
         }
 
-        return $this->getAdminDashboard();
+        return $this->getDashboard();
     }
 
 
     public function getAdminDashboard(){
         
-        $this->getAttendanceStats();
+        $this->getDailyAttendance();
         $this->getAttendanceByPeriod();
         return view('livewire.admin-dashboard');
     }
 
-    public function getAttendanceStats(){
-        $dt=new DateTime();
+    public function getDashboard(){
+        
+        $this->getMonthlyAttendance(auth()->id());
+        $this->getAttendanceByPeriod(auth()->id());
+        return view('livewire.dashboard');
+    }
+
+    public function getDailyAttendance(){
         $this->attendance=['Present'=>0,'Absent'=>0,'Holiday'=>0];
-        $att=Attendance::where('ck_date',$dt->format('Y-m-d'))
+        $att=Attendance::where('ck_date',(new DateTime()))
                                 ->select(DB::raw("case when status='Late' or status='Normal' then 'Present' when status='Absent' or status is Null then 'Absent' else status end as status,count(1) as count"))
+                                ->groupby('status')->get();
+        foreach($att as $st){
+            if(isset($this->attendance[$st->status])){
+                $this->attendance[$st->status]+=$st->count;
+            }
+        }
+    }
+    public function getMonthlyAttendance($user_id=null){
+        $this->attendance=['Present'=>0,'Absent'=>0,'Holiday'=>0];
+        $att=Attendance::where('ck_date','>=',$this->from_date)
+                                ->where('ck_date','<=',$this->to_date)
+                                ->select(DB::raw("case when status='Late' or status='Normal' then 'Present' when status='Absent' or status is Null then 'Absent' else status end as status,count(1) as count"))
+                                ->where('user_id',$user_id)
                                 ->groupby('status')->get();
         foreach($att as $st){
             if(isset($this->attendance[$st->status])){

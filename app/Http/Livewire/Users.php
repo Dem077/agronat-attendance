@@ -2,11 +2,13 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
+use phpDocumentor\Reflection\Types\Null_;
 
 class Users extends Component
 {
@@ -19,8 +21,9 @@ class Users extends Component
     {
         $employees=User::select(['id','name'])->orderBy('name','asc')->get();
         $users=$this->getUsers()->paginate(5);
+        $departments=Department::all();
         $this->resetPage();
-        return view('livewire.users.component',['employees'=>$employees,'users'=>$users]);
+        return view('livewire.users.component',['employees'=>$employees,'users'=>$users,'departments'=>$departments]);
     }
 
     public function getUsers(){
@@ -90,7 +93,26 @@ class Users extends Component
         $this->email = $user->email;
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
-        $this->department_id = $user->mobile;
+        $this->department_id = $user->department_id;
+        $this->mobile = $user->mobile;
+        $this->phone = $user->phone;
+        $this->updateMode = true;
+    }
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        $this->user_id = $id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->designation = $user->designation;
+        $this->emp_no = $user->emp_no;
+        $this->department_id = $user->department_id;
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->updateMode = true;
@@ -124,6 +146,7 @@ class Users extends Component
             // 'password' => 'sometimes',
         ]);
   
+
         $user = User::find($this->user_id);
 
         $user->update([

@@ -1,0 +1,75 @@
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h3>Attendance Report</h3>
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div>
+                    <div class="row">
+                        <div class="col-md-4 my-1">
+                            @livewire('partials.user-select')
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 my-1">
+                            @livewire('partials.attendance-period')
+                        </div>
+                        <div class="col-md-4 my-1">
+                            <label for="inlineFormInputGroupStartDate">Start Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Start</div>
+                                </div>
+                                <input type="text" class="form-control" autocomplete="off"
+                                    id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
+                            </div>
+                        </div>
+                        <div class="col-md-4 my-1">
+                            <label for="inlineFormInputGroupEndDate">End Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">End</div>
+                                </div>
+                                <input type="text" class="form-control" autocomplete="off"
+                                    id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col my-1">
+                        <button type="button" class="btn btn-success" wire:click.prevent="recompute()">Recompute</button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('js-bottom')
+<script type="text/javascript">
+
+  var options={
+      format: 'yyyy-mm-dd',
+      todayHighlight: true,
+      autoclose: true,
+    };
+    $('#inlineFormInputGroupStartDate').datepicker(options);
+  $('#inlineFormInputGroupEndDate').datepicker(options);
+
+  $('#inlineFormInputGroupStartDate').on('change', function (e) {
+     @this.set('start_date', e.target.value);
+  });
+  $('#inlineFormInputGroupEndDate').on('change', function (e) {
+     @this.set('end_date', e.target.value);
+  });
+  Livewire.on('userSelected', id => {
+      @this.set('user_id', id);
+  });
+  Livewire.on('periodSelected', period => {
+    @this.set('start_date', period['start']);
+    @this.set('end_date', period['end']);
+  });
+
+</script>
+@endpush

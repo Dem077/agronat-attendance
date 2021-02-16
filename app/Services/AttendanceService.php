@@ -6,6 +6,7 @@ use App\Jobs\ProcessAttendance;
 use App\Jobs\ProcessOvertime;
 use App\Models\Attendance;
 use App\Models\Holiday;
+use App\Models\Leave;
 use App\Models\Overtime;
 use App\Models\TimeSheet;
 use App\Models\User;
@@ -83,18 +84,16 @@ class AttendanceService{
     }
 
     public function recompute($from,$to,$users){
-        $this->resetAttendance($from,$to,$users);
+        $this->deleteAttendance($from,$to,$users);
         $this->deleteOT($from,$to,$users);
+        $this->addSchedule($from,$to,$users);
+        $this->processLogs($from,$to,$users);
+    }
 
-        $interval = DateInterval::createFromDateString('1 day');
-        $from=new DateTime($from);
-        $to=new DateTime($to);
-        $period = new DatePeriod($from, $interval,$to->modify('+1 day'));
-
-        foreach($period as $dt) {
-            $this->addSchedule($users,$dt->format('Y-m-d'));
+    public function processLogs($from,$to,$users){
+        foreach(date_range($from,$to) as $dt) {
             foreach($users as $user){
-                $this->fixTimeSheet($dt->format('Y-m-d'),$user);
+                //$this->fixTimeSheet($dt->format('Y-m-d'),$user);
                 $time_logs=TimeSheet::where('punch','>=',$dt->format('Y-m-d'))->where('punch','<=',$dt->format('Y-m-d 23:59:59'))->where('user_id',$user)->orderby('punch','asc')->get();
                 foreach($time_logs as $log){
                     ProcessOvertime::dispatchNow($log);
@@ -248,20 +247,36 @@ class AttendanceService{
 
     }
 
-    public function addSchedule($employees,$date){
-        $is_holiday=Holiday::where('h_date',$date)->exists();
-        if($is_holiday){
-            foreach($employees as $employee){
-                Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'status'=>'Holiday']);
-            }
-        }else{
-            $schedule=[
-                "in"=>date('H:i:s',strtotime('08:00')),
-                "out"=>date('H:i:s',strtotime('16:00'))
-            ];
-            foreach($employees as $employee){
-                if(!Attendance::where('user_id',$employee)->where('ck_date',$date)->exists()){
-                    Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out']]);
+    public function addSchedule($from,$to,$employees){
+        //store all holidays in the range for fast processing
+        $holidays=Holiday::where('h_date','>=',$from)
+                        ->where('h_date','<=',$to)
+                        ->pluck('h_date');
+        //loop range
+        foreach(date_range($from,$to) as $date){
+            if(in_array($date->modify('Y-m-d'),$holidays)){
+                //add holidays to each employee
+                foreach($employees as $employee){
+                    Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'status'=>'Holiday']);
+                }
+            }else{
+
+                foreach($employees as $employee){
+                    //check if employee is on leave
+                    $leave=Leave::where('user_id',$employee)
+                            ->where('from','<=',$date)
+                            ->where('to','>=',$date)
+                            ->first();
+                    if($leave){
+                        Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'status'=>$leave->type]);
+                    }else{
+                        //get schedule for each employee
+                        $schedule=[
+                            "in"=>date('H:i:s',strtotime('08:00')),
+                            "out"=>date('H:i:s',strtotime('16:00'))
+                        ];
+                        Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out']]);
+                    }
                 }
             }
         }
