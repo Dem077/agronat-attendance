@@ -8,23 +8,23 @@
         <canvas id="canvas" style="display: block; width: 1125px; height: 562px;" width="1125" height="562" class="chartjs-render-monitor"></canvas>
     </div>
     <script>
-
+        var period=@json($period);
         var config = {
             type: 'line',
             data: {
-                labels: @json($period['labels']),
+                labels: period.labels,
                 datasets: [{
                     label: 'Absent',
                     backgroundColor: window.chartColors.red,
                     borderColor: window.chartColors.red,
-                    data: @json(array_values($period['data']['Absent'])) ,
+                    data: Object.values(period.data.Absent),
                     fill: false,
                 }, {
                     label: 'Present',
                     fill: false,
                     backgroundColor: window.chartColors.blue,
                     borderColor: window.chartColors.blue,
-                    data: @json(array_values($period['data']['Present'])),
+                    data: Object.values(period.data.Present),
                 }]
             },
             options: {
@@ -56,8 +56,8 @@
                             labelString: 'Count'
                         },
                         ticks: {
-                            min: {{$period['min']}},
-                            max: {{$period['max']}},
+                            min: period.min,
+                            max: period.max,
         
                             // forces step size to be 5 units
                             stepSize: 2

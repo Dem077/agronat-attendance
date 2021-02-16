@@ -24,9 +24,8 @@
                     </div> --}}
                     <!-- Card Body -->
                     <div class="card-body">
-                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h6 class="h6 mb-0 text-gray-800 text-center">{{$from_date}} to {{$to_date}}</h6>
-                        </div>
+                        <h6 class="h6 mb-0 text-gray-800 text-center"><strong>{{$from_date}} to {{$to_date}}</strong></h6>
+
                         <div class="row">
                             <div class="col-xl-4 col-md-6 mb-4">
                                 <div class="card border-left-success shadow h-100 py-2">
@@ -77,7 +76,7 @@
                             </div>
                         </div>
     
-                        <livewire:line-chart key="{{ now() }}" :period="$period">
+                        <livewire:charts.monthly-attendance key="{{ now() }}" :period="$period">
     
                     </div>
                 </div>
