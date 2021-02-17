@@ -3,33 +3,59 @@
 namespace App\Http\Livewire\Charts;
 
 use App\Models\Attendance;
+use App\Models\Leave;
+use App\Models\LeaveType;
+use DateTime;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class MonthlyAttendance extends Component
 {
-    public $user_id,$period,$from,$to;
+    public $user_id,$period,$from_date,$to_date;
     public function render()
     {
+        $this->user_id=auth()->id();
+        $this->to_date=new DateTime();
+        $this->from_date=(clone $this->to_date)->modify('-6 months');
+        $this->getAttendanceByPeriod();
         return view('livewire.charts.monthly-attendance');
     }
 
     public function getAttendanceByPeriod(){
-        
-        $att=Attendance::whereBetween('ck_date',[$this->from_date,$this->to_date])->select(DB::raw("ck_date,case when status='Late' or status='Normal' then 'Present' when status='Absent' or status is Null then 'Absent' else status end as status,count(1) as count"))->groupby('ck_date','status')->get();
-        $this->period=['data'=>["Present"=>[],"Absent"=>[]],'labels'=>[],'min'=>0,'max'=>0];
 
-        foreach($this->getDateRange($this->from_date,$this->to_date) as $dt){
-            $dt=$dt->format('Y-m-d');
-            $this->period['labels'][]=$dt;
-            $this->period['data']["Present"][$dt]=0;
-            $this->period['data']["Absent"][$dt]=0;
+        $att=Attendance::where('ck_date','>=',$this->from_date)
+                            ->where('ck_date','<=',$this->to_date)
+                            ->where('user_id','=',$this->user_id)
+                            ->select(DB::raw("DATE_FORMAT(ck_date,'%Y-%m') as month,status,count(1) as count"))
+                            ->groupby(DB::raw("DATE_FORMAT(ck_date,'%Y-%m')"),'status')
+                            ->orderby('ck_date')
+                            ->get();
+        $this->period=['data'=>[],'min'=>0,'max'=>30];
+
+        $types=["Present"=>"Present","Late"=>"Present","Absent"=>"Absent","Duty Travel"=>"Present","Leave"=>"Leave"];
+        // foreach(LeaveType::all() as $leave){
+        //     if(!isset($types[$leave->name])){
+        //         $types[$leave->name]="Leave";
+        //     }
+        // }
+        foreach($types as $key=>$v){
+            $this->period["data"][$v]=[];
         }
+
+        foreach(date_range($this->from_date,$this->to_date,"1 month") as $dt){
+            $dt=$dt->format('Y-m');
+            $this->period['labels'][]=$dt;
+
+            foreach($types as $k=>$v){
+                $this->period['data'][$v][$dt]=0;
+            }
+
+        }
+
         foreach($att as $st){
-            if(isset($this->period['data'][$st->status][$st->ck_date])){
-                $this->period['data'][$st->status][$st->ck_date]+=$st->count;
-                if($this->period['max']<$this->period['data'][$st->status][$st->ck_date]){
-                    $this->period['max']=$this->period['data'][$st->status][$st->ck_date];
-                }
+            $dt=$st->month;
+            if(isset($types[$st->status])){
+                $this->period['data'][$types[$st->status]][$dt]+=$st->count;
             }
         }
 

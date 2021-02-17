@@ -14,49 +14,32 @@
 		var color = Chart.helpers.color;
 		var barChartData = {
 			labels: period.labels,
-			datasets: [{
-				label: 'Absent',
-				backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.red,
-				borderWidth: 1,
-				data: [
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor()
-				]
-			}, {
-				label: 'Present',
-				backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.blue,
-				borderWidth: 1,
-				data: [
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor()
-				]
-			}]
-
+			datasets: [
+					{
+						label: "Present",
+						backgroundColor: color(window.chartColors.green).alpha(0.5).rgbString(),
+						borderColor: window.chartColors.green,
+						borderWidth: 1,
+						data: Object.values(period.data["Present"])
+					},
+					{
+						label: "Absent",
+						backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+						borderColor: window.chartColors.red,
+						borderWidth: 1,
+						data: Object.values(period.data["Absent"])
+					},
+					{
+						label: "Leave",
+						backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+						borderColor: window.chartColors.blue,
+						borderWidth: 1,
+						data: Object.values(period.data["Leave"])
+					},
+			]
 		};
 
-		barChartData.datasets=period.map(function(label,datapoints){
-			return {
-				label: label,
-				backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
-				borderColor: window.chartColors.blue,
-				borderWidth: 1,
-				data: [
-					datapoints
-				]
-			}
-		});
+		
 
 		window.onload = function() {
 			var ctx = document.getElementById('bar-canvas').getContext('2d');
@@ -70,7 +53,7 @@
 					},
 					title: {
 						display: true,
-						text: 'Chart.js Bar Chart'
+						text: 'Monthly Attendance'
 					}
 				}
 			});
