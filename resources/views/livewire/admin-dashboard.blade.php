@@ -112,7 +112,7 @@
                         </div>
                     </div>
 
-                    <livewire:charts.monthly-attendance key="{{ now() }}" :period="$period">
+                    <livewire:charts.line-chart key="{{ now() }}" :period="$period">
 
                 </div>
             </div>

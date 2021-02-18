@@ -10,7 +10,6 @@
     <script>
         var period=@json($period);
 
-		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 		var color = Chart.helpers.color;
 		var barChartData = {
 			labels: period.labels,

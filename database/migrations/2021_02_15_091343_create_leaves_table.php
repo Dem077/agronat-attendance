@@ -15,6 +15,10 @@ class CreateLeavesTable extends Migration
     {
         Schema::create('leaves', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id');
+            $table->foreignId('leave_type_id');
+            $table->date("from");
+            $table->date("to");
             $table->timestamps();
         });
     }

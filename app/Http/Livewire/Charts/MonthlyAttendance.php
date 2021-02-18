@@ -32,7 +32,7 @@ class MonthlyAttendance extends Component
                             ->get();
         $this->period=['data'=>[],'min'=>0,'max'=>30];
 
-        $types=["Present"=>"Present","Late"=>"Present","Absent"=>"Absent","Duty Travel"=>"Present","Leave"=>"Leave"];
+        $types=["Normal"=>"Present","Late"=>"Present","Absent"=>"Absent","Duty Travel"=>"Present","Leave"=>"Leave"];
         // foreach(LeaveType::all() as $leave){
         //     if(!isset($types[$leave->name])){
         //         $types[$leave->name]="Leave";
