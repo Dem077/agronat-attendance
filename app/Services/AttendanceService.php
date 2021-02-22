@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Jobs\ProcessAttendance;
 use App\Jobs\ProcessOvertime;
+use App\Jobs\ZKTSync;
 use App\Models\Attendance;
 use App\Models\Holiday;
 use App\Models\Leave;
@@ -13,6 +14,7 @@ use App\Models\User;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use phpDocumentor\Reflection\Types\Null_;
 
@@ -35,13 +37,15 @@ class AttendanceService{
             $timeLog=TimeSheet::create($data);
             $this->fixTimeSheet($day_start,$user_id);
             $this->resetDailyAttendance($day_start,$user_id);
+            $this->resetDailyOT($day_start,$user_id);
         }else{
             $count=TimeSheet::where('punch','>=',$day_start)->where('punch','<=',$data['punch'])->where('user_id',$user_id)->count();
             $data['status']=$count%2;
             $timeLog=TimeSheet::create($data);
 
-            ProcessOvertime::dispatch($timeLog);
-            ProcessAttendance::dispatch($timeLog);  
+            $this->addAttendance($timeLog);
+            $this->addOT($timeLog);
+ 
         }
 
         return $timeLog;
@@ -62,11 +66,13 @@ class AttendanceService{
         }
     }
 
-    public function recompute($from,$to,$users){
-        $this->deleteAttendance($from,$to,$users);
-        $this->deleteOT($from,$to,$users);
-        $this->addSchedule($from,$to,$users);
-        //event(reprocessLogs($from,$to,$users))
+    public function recompute($from,$to,$user_id){
+        foreach(date_range($from,$to) as $date){
+            $this->deleteOT($date,$user_id);
+            $this->addSchedule($date,$user_id);
+            TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00:00'))->where('punch','<=',$date->format('Y-m-d 23:59:59'))->where('user_id',$user_id)->delete();
+            ZKTSync::dispatchNow(['from'=>$date->format('Y-m-d'),'to'=>$date->format('Y-m-d 23:59:59'),'user_id'=>$user_id]);
+        }
     }
 
     public function addAttendance($log){
@@ -79,6 +85,9 @@ class AttendanceService{
 
         $attendance=Attendance::where(['user_id'=>$user_id])->where('ck_date',$date)->first();
         
+        if(!$attendance){
+            throw new Exception("attendance entry not found at add Attendance {$date}");
+        }
         if(!in_array($attendance->status,$attendable)){
             return;
         }
@@ -144,6 +153,7 @@ class AttendanceService{
         $time_logs=TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00'))
                             ->where('punch','<=',$date->format('Y-m-d 23:59:59'))
                             ->where('user_id',$user_id)
+                            ->orderBy('punch','asc')
                             ->get();
 
         foreach($time_logs as $time_log){
@@ -151,55 +161,129 @@ class AttendanceService{
         }
     }
 
-    public function addSchedule($from,$to,$employees){
-        //store all holidays in the range for fast processing
-        $holidays=Holiday::where('h_date','>=',$from)
-                        ->where('h_date','<=',$to)
-                        ->pluck('h_date');
-        //loop range
-        foreach(date_range($from,$to) as $date){
-            if(in_array($date->modify('Y-m-d'),$holidays)){
-                //add holidays to each employee
-                foreach($employees as $employee){
-                    Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'status'=>'Holiday']);
-                }
-            }else{
+    private function resetDailyOT($date,$user_id){
+        Overtime::where('ck_date','=',$date)
+                                ->where('user_id',$user_id)
+                                ->delete();
+        
+        $time_logs=TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00'))
+                            ->where('punch','<=',$date->format('Y-m-d 23:59:59'))
+                            ->where('user_id',$user_id)
+                            ->get();
 
-                foreach($employees as $employee){
-                    //check if employee is on leave
-                    $leave=Leave::where('user_id',$employee)
-                            ->where('from','<=',$date)
-                            ->where('to','>=',$date)
-                            ->first();
-                    if($leave){
-                        Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'status'=>$leave->type]);
-                    }else{
-                        //get schedule for each employee
-                        $schedule=[
-                            "in"=>date('H:i:s',strtotime('08:00')),
-                            "out"=>date('H:i:s',strtotime('16:00'))
-                        ];
-                        Attendance::create(['user_id'=>$employee,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out']]);
-                    }
-                }
+        foreach($time_logs as $time_log){
+            ProcessOvertime::dispatchNow($time_log);
+            $this->addOT($time_log);
+        }
+    }
+
+    public function addSchedule($date,$user_id){
+        //store all holidays in the range for fast processing
+        Attendance::where('ck_date',$date)->where('user_id',$user_id)->delete();
+        $holidays=Holiday::where('h_date',$date)
+                        ->pluck('h_date')->toArray();
+        //loop range
+        if(in_array($date->format('Y-m-d'),$holidays)){
+            //add holidays to each employee
+            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'status'=>'Holiday']);
+        }else{
+            $leave=Leave::with('type')->where('user_id',$user_id)
+                        ->where('from','<=',$date)
+                        ->where('to','>=',$date)
+                        ->first();
+            if($leave){
+                Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'status'=>$leave->type->title]);
+            }else{
+                //get schedule for each employee
+                $schedule=[
+                    "in"=>date('H:i:s',strtotime('08:00')),
+                    "out"=>date('H:i:s',strtotime('16:00'))
+                ];
+                Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out']]);
             }
         }
     }
 
-    private function deleteOT($from,$to,$users){
-        $ots=Overtime::where('ck_date','>=',$from)->where('ck_date','<=',$to);
-        if($users){
-            $ots=$ots->whereIn('user_id',$users);
-        }
-        $ots->delete();
+    private function deleteOT($date,$user_id){
+        Overtime::where('ck_date',$date)->where('user_id',$user_id)->delete();
     }
 
-    private function deleteAttendance($from,$to,$users){
-        $attendances=Attendance::where('ck_date','>=',$from)->where('ck_date','<=',$to);
-        if($users){
-            $attendances=$attendances->whereIn('user_id',$users);
+    private function deleteAttendance($date,$user_id){
+        Attendance::where('ck_date',$date)->where('user_id',$user_id)->delete();
+    }
+
+
+    public function addOT($timelog)
+    {
+
+        $schedule=[
+            "in"=>date('H:i:s',strtotime('08:00')),
+            "out"=>date('H:i:s',strtotime('16:00'))
+        ];
+
+        $dt=strtotime($timelog->punch);
+        $date=date('Y-m-d',$dt);
+        $time=date('H:i:s',$dt);
+        $user_id=$timelog->user_id;
+        //process OT
+        $attendable=Attendance::where('ck_date',$date)->where('user_id',$user_id)->first();
+        if(!$attendable){
+            return;
         }
-        $attendances->delete();
+        if(in_array($attendable->status,['Normal','Late'])){
+            if($timelog->status==0){
+                if($time < $schedule['in'] || $time >= $schedule['out']){
+                    Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time]);
+                }
+            }else{
+                $last_ot=Overtime::where('user_id',$user_id)
+                            ->where('ck_date',$date)
+                            ->whereNull('out')->first();
+                if($last_ot){
+                    if($last_ot->in < $schedule['in']){
+                        if($time >= $schedule['in']){
+                            $last_ot->out=$schedule['in'];
+                        }else{
+                            $last_ot->out=$time;
+                        }
+                        $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                        $last_ot->save();
+        
+                        if($time > $schedule['out']){
+                            $ot=$this->calculateOT($schedule['out'],$time);
+                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$schedule['out'],'out'=>$time,'ot'=>$ot]);
+                        }
+                    }elseif($last_ot->in >= $schedule['out']){
+                        $last_ot->out=$time;
+                        $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                        $last_ot->save();
+                    }
+                }
+
+            }
+        }elseif(in_array($attendable->status,['Holiday'])){
+            if($timelog->status==0){
+                Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time]);
+            }else{
+                $last_ot=Overtime::where('user_id',$user_id)
+                            ->where('ck_date',$date)
+                            ->whereNull('out')->first();
+                if($last_ot){
+                    $last_ot->out=$time;
+                    $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                    $last_ot->save();
+                }
+
+            }
+        }
+        
+    }
+
+    public function calculateOT($in,$out){
+        $in=strtotime($in);
+        $out=strtotime($out);
+        $ot=round(($out-$in)/60,2);
+        return $ot;
     }
 
 }

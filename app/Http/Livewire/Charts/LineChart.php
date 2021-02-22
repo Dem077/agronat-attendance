@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Http\Livewire\Charts;
 
 use Livewire\Component;
 
@@ -14,6 +14,6 @@ class LineChart extends Component
     }
     public function render()
     {
-        return view('livewire.line-chart');
+        return view('livewire.charts.line-chart');
     }
 }

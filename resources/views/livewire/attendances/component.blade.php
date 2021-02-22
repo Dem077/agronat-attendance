@@ -16,6 +16,7 @@
                     <div class="row">
                         <div class="col">
                             <form>
+
                                 <div class="form-row align-items-center">
                                   <div class="col-sm-3 my-1">
                                       @livewire('partials.user-select')

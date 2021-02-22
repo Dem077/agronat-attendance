@@ -27,7 +27,12 @@ class DashboardComponent extends Component
             $this->from_date=(new DateTime($this->to_date))->modify('last month')->format('Y-m-25');
         }
 
-        return $this->getDashboard();
+        if(auth()->user()->can('admin_dashboard-view')){
+            return $this->getAdminDashboard();
+        }else{
+            return $this->getDashboard();
+        }
+
     }
 
 
@@ -41,18 +46,28 @@ class DashboardComponent extends Component
     public function getDashboard(){
         
         $this->getMonthlyAttendance(auth()->id());
-        $this->getAttendanceByPeriod(auth()->id());
         return view('livewire.dashboard');
     }
 
     public function getDailyAttendance(){
-        $this->attendance=['Present'=>0,'Absent'=>0,'Holiday'=>0];
+        $this->attendance=[];
+        $types=["Normal"=>"Present","Late"=>"Present","Absent"=>"Absent","Duty Travel"=>"Present","Leave"=>"Leave"];
+        // foreach(LeaveType::all() as $leave){
+        //     if(!isset($types[$leave->name])){
+        //         $types[$leave->name]="Leave";
+        //     }
+        // }
+        foreach($types as $k=>$v){
+            $this->attendance[$v]=0;
+        }
+
         $att=Attendance::where('ck_date',new DateTime())
-                                ->select(DB::raw("case when status='Late' or status='Normal' then 'Present' when status='Absent' or status is Null then 'Absent' else status end as status,count(1) as count"))
+                                ->select(DB::raw("status,count(1) as count"))
                                 ->groupby('status')->get();
+
         foreach($att as $st){
-            if(isset($this->attendance[$st->status])){
-                $this->attendance[$st->status]+=$st->count;
+            if(isset($types[$st->status])){
+                $this->attendance[$types[$st->status]]+=$st->count;
             }
         }
     }

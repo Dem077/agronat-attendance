@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\TimeSheet;
 use App\Models\User;
+use App\Services\AttendanceService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,6 +37,7 @@ class ZKTSync implements ShouldQueue
         $this->to=isset($data['to'])?$data['to']:null;
         $this->user_id=isset($data['user_id'])?$data['user_id']:null;
         $this->db=DB::connection('sqlsrv');
+        $this->attendanceService=new AttendanceService();
     }
 
     /**
@@ -66,7 +68,7 @@ class ZKTSync implements ShouldQueue
                 $users[$d['USERID']]=$u->id;
             }
             $data=["user_id"=>$users[$d['USERID']],"punch"=>$d['CHECKTIME']];
-            TimeSheet::add($data);
+            $this->attendanceService->addLog($data);
         }
     }
 

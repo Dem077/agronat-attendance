@@ -30,11 +30,12 @@
                     <table class="table table-bordered mt-5">
                         <thead>
                             <tr>
-                                <th>Emp No.</th>
+                                <th>#</th>
                                 <th>Fullname</th>
                                 <th>Email</th>
                                 <th>Designation</th>
                                 <th>Mobile</th>
+                                <th>Emp No.</th>
                                 @can('user-create')
                                 <th width="200px">Action</th>
                                 @endcan
@@ -43,11 +44,12 @@
                         <tbody>
                             @foreach($users as $user)
                             <tr>
-                                <td>{{ $user->emp_no }}</td>
+                                <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->designation }}</td>
                                 <td>{{ $user->mobile }}</td>
+                                <td>{{ $user->emp_no }}</td>
                                 @can('user-create')
                                 <td>
                                     <button data-toggle="modal" data-target="#viewModal" wire:click="show({{ $user->id }})" class="btn btn-primary btn-sm">View</button>

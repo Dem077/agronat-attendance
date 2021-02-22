@@ -14,7 +14,7 @@ trait UserTrait {
         if(auth()->user()->can('reporting-manager')){
             $this->users=User::pluck('name','id');
         }elseif(auth()->user()->can('reporting-supervisor')){
-            $this->users=User::pluck('name','id');
+            $this->users=User::where('department_id',$user->department_id)->pluck('name','id');
         }else{
             $this->users=[$user->id=>$user->name];
             $this->user_id=$user->id;
