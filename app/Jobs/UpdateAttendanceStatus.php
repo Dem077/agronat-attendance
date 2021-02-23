@@ -76,7 +76,7 @@ class UpdateAttendanceStatus implements ShouldQueue
                         if(!$att->in){
                             $att->status='Absent';
                         }
-                        elseif($att->in>$att->sc_in){
+                        elseif($att->late_min>0){
                             $att->status='Late';
                         }
                         elseif($att->in<=$att->sc_in){
