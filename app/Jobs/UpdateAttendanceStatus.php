@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Attendance;
 use App\Models\AttendStatus;
 use App\Models\Holiday;
+use App\Models\Leave;
 use App\Models\User;
 use DateInterval;
 use DatePeriod;
@@ -47,41 +48,50 @@ class UpdateAttendanceStatus implements ShouldQueue
             $employees=User::select('id')->get();
         }
 
-        $interval = DateInterval::createFromDateString('1 day');
-        $period = new DatePeriod($this->date_from, $interval, $this->date_to);
-
-        foreach ($period as $dt) {
-            $this->updateAttendenceStatus($employees,$dt->format('Y-m-d'));
+        foreach (date_range($this->date_from,$this->date_to) as $dt) {
+            $this->updateAttendenceStatus($employees,$dt);
         }
     }
 
     private function updateAttendenceStatus($employees,$date){
-        $is_holiday=Holiday::where('h_date',$date)->exists();
+        $holidays=Holiday::where('h_date',$date)
+                        ->pluck('h_date')->toArray();
         foreach($employees as $employee){
-            $att=Attendance::with('attend_status')->where('user_id',$employee->id)->where('ck_date',$date)->first();
+            $att=Attendance::where('user_id',$employee->id)->where('ck_date',$date)->first();
 
             if($att){
-                if(!$att->status){ 
-                    if($is_holiday){
-                        $att->status='Holiday';
-                    }
-                    elseif($att->attend_status){
-                        $att->status=$att->attend_status->status;
-                    }
-                    elseif(!$att->in){
-                        $att->status='Absent';
-                    }
-                    elseif($att->in>$att->sc_in){
-                        $att->status='Late';
-                    }
-                    elseif($att->in<=$att->sc_in){
-                        $att->status='Normal';
+                //loop range
+                if(in_array($date->format('Y-m-d'),$holidays)){
+                    //add holidays to each employee
+                    $att->status='Holiday';
+                }else{
+                    $leave=Leave::with('type')->where('user_id',$employee->id)
+                                ->where('from','<=',$date)
+                                ->where('to','>=',$date)
+                                ->first();
+                    if($leave){
+                        $att->status=$leave->title;
                     }else{
-                        $att->status='Absent';
+                        //get schedule for each employee
+                        if(!$att->in){
+                            $att->status='Absent';
+                        }
+                        elseif($att->in>$att->sc_in){
+                            $att->status='Late';
+                        }
+                        elseif($att->in<=$att->sc_in){
+                            $att->status='Normal';
+                        }else{
+                            $att->status='Absent';
+                        }
                     }
-                    $att->save();
                 }
+                $att->save();
             }
+
         }
+
+
+
     }
 }
