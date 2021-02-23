@@ -51,7 +51,7 @@ class TimeSheetObserver
         $from=date('Y-m-d',strtotime($timeSheet->punch));
         $to=date('Y-m-d',strtotime($timeSheet->punch." +1 day"));
 
-        $this->attendanceService->recompute($from,$to,[$timeSheet->user_id]);
+        $this->attendanceService->resetAttendance($from,$to,$timeSheet->user_id);
 
     }
 

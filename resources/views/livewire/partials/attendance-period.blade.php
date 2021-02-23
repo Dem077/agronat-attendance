@@ -8,11 +8,18 @@
 @push('js-bottom')
     <script>
         var periods=@JSON($periods);
+        var period_id={{$period_id??''}};
+        
         $.each(periods, function(i,v) {
-            $('#attendance-period-month').append(new Option(v['month'],i));
+            var op=new Option(v['month'],i);
+            $('#attendance-period-month').append(op);
         });
         $('#attendance-period-month').on('change', function (e) {
             Livewire.emit('periodSelected',periods[e.target.value])
+        });
+
+        $(function(){
+            $('#attendance-period-month').val(period_id).change();
         });
     </script>
 @endpush

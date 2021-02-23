@@ -19,7 +19,7 @@ class Users extends Component
 
     public function render()
     {
-        $employees=User::select(['id','name'])->orderBy('name','asc')->get();
+        $employees=User::orderBy('name','asc')->pluck('name','id')->toArray();
         $users=$this->getUsers()->paginate(5);
         $departments=Department::all();
         $this->resetPage();

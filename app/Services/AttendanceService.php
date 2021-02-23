@@ -22,6 +22,7 @@ class AttendanceService{
 
     public function addLog($data){
         //check user time
+        $punch=date('Y-m-d H:i:s',strtotime($data['punch']));
         $date=date('Y-m-d',strtotime($data['punch']));
         $day_start=new DateTime($date);
         $day_end=new DateTime($date." 23:59:59");
@@ -30,8 +31,13 @@ class AttendanceService{
 
         Log::info(['from'=>$day_start,'to'=>$day_end,'user_id'=>$user_id]);
 
-        $fix=TimeSheet::where('punch','>',$data['punch'])->where('punch','<',$day_end)->where('user_id',$user_id)->exists();
+        $fix=TimeSheet::where('punch','>=',$data['punch'])->where('punch','<',$day_end)->where('user_id',$user_id)->pluck('punch')->toArray();
 
+        Log::info([$punch,$fix]);
+
+        if(in_array($punch,$fix)){
+            return;
+        }
         if($fix){
             Log::info(['from'=>$day_start,'to'=>$day_end,'fix'=>1]);
             $timeLog=TimeSheet::create($data);
@@ -128,12 +134,11 @@ class AttendanceService{
         return $late_min>0?$late_min:0;
     }
 
-    private function resetAttendance($from,$to,$users){
-        foreach($users as $user_id){
-            foreach(date_range($from,$to) as $date){
-                $this->fixTimeSheet($date,$user_id);
-                $this->resetDailyAttendance($date,$user_id);
-            }
+    public function resetAttendance($from,$to,$user_id){
+        foreach(date_range($from,$to) as $date){
+            $this->fixTimeSheet($date,$user_id);
+            $this->resetDailyAttendance($date,$user_id);
+            $this->resetDailyOT($date,$user_id);
         }
     }
 

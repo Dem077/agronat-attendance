@@ -23,7 +23,15 @@
                     @endcan
                     <div class="row">
                         <div class="col-sm-3 my-1">
-                            @livewire('partials.user-select')
+                            <div>
+                                <label for="user-select-name">Employee:</label>
+                                <select type="text" class="form-control" id="user-select-name" placeholder="Employee">
+                                    <option value=''>Select Employee</option>
+                                    @foreach ($employees as $id=>$name)
+                                        <option value='{{$id}}'>{{$name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
                   <div class="table-responsive">
@@ -75,8 +83,9 @@
     window.livewire.on('.Store', () => {
         $('#exampleModal').modal('hide');
     });
-    Livewire.on('userSelected', id => {
-        @this.set('user_id', id);
-    })
+
+    $('#user-select-name').on('change', function (e) {
+        @this.set('user_id', e.target.value);
+    });
 </script>
 @endpush

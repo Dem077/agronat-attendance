@@ -42,15 +42,6 @@ class AttendanceComponent extends Component
          */
         
         $this->resetPage();
-        
-        /**
-         * 2020-12-25 - 2021-01-24
-         * 2021-01-25 - 2021-02-24
-         * 
-         */
-        $period=[
-            ["month","start","end"]
-        ];
         return view('livewire.attendances.component',['attendances'=>$attendances]);
     }
 
@@ -73,7 +64,9 @@ class AttendanceComponent extends Component
         if($this->end_date){
             $attendances=$attendances->where('ck_date','<=',$this->end_date);
         }
-        if($this->user_id){
+        if(!$this->user_id){
+            $attendances=$attendances->whereIn('user_id',array_keys($this->users));
+        }else{
             $attendances=$attendances->where('user_id',$this->user_id);
         }
 

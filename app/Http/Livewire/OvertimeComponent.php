@@ -32,7 +32,9 @@ class OvertimeComponent extends Component
         if($this->end_date){
             $ots=$ots->where('ck_date','<=',$this->end_date);
         }
-        if($this->user_id){
+        if(!$this->user_id){
+            $ots=$ots->whereIn('user_id',array_keys($this->users));
+        }else{
             $ots=$ots->where('user_id',$this->user_id);
         }
 

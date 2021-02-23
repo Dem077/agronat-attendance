@@ -11,6 +11,7 @@ class AttendancePeriod extends Component
     public function render()
     {
         $this->periods=$this->getPeriods();
+
         return view('livewire.partials.attendance-period');
     }
 
@@ -26,6 +27,12 @@ class AttendancePeriod extends Component
                 "start"=>$start->format("Y-m-25"),
                 "end"=>$end->format('Y-m-d')
             ];
+
+            if(!$this->period_id){
+                if($today->format('m')==$end->format('m')){
+                    $this->period_id=count($period)-1;
+                }
+            }
         }
 
         return  $period;

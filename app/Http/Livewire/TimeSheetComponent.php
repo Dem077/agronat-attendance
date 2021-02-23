@@ -44,7 +44,9 @@ class TimeSheetComponent extends Component
         if($this->end_date){
             $timesheet=$timesheet->where('punch','<=',$this->end_date);
         }
-        if($this->user_id){
+        if(!$this->user_id){
+            $timesheet=$timesheet->whereIn('user_id',array_keys($this->users));
+        }else{
             $timesheet=$timesheet->where('user_id',$this->user_id);
         }
 
@@ -85,6 +87,9 @@ class TimeSheetComponent extends Component
      */
     public function store()
     {
+        if(!auth()->user()->can('timelog-create')){
+            abort(403);
+        }
         $validatedDate = $this->validate([
             'user_id' => 'required',
             'punchdate' => 'required',
@@ -107,15 +112,9 @@ class TimeSheetComponent extends Component
 
     }
 
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     public function delete($id)
     {
-        TimeSheet::find($id)->delete();
+        TimeSheet::destroy($id);
         session()->flash('message', 'Time Deleted Successfully.');
     }
 }
