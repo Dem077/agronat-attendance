@@ -172,7 +172,7 @@ class AttendanceService{
         }
     }
 
-    private function resetDailyOT($date,$user_id){
+    public function resetDailyOT($date,$user_id){
         Overtime::where('ck_date','=',$date)
                                 ->where('user_id',$user_id)
                                 ->delete();
@@ -183,7 +183,6 @@ class AttendanceService{
                             ->get();
 
         foreach($time_logs as $time_log){
-            ProcessOvertime::dispatchNow($time_log);
             $this->addOT($time_log);
         }
     }
@@ -225,42 +224,63 @@ class AttendanceService{
 
         $dt=strtotime($timelog->punch);
         $date=date('Y-m-d',$dt);
-        $time=date('H:i:s',$dt);
+        $time=date('H:i',$dt);
         $user_id=$timelog->user_id;
         //process OT
         $attendable=Attendance::where('ck_date',$date)->where('user_id',$user_id)->first();
         if(!$attendable){
             return;
         }
+        $attendable->sc_in=date('H:i',strtotime($attendable->sc_in));
+        $attendable->sc_out=date('H:i',strtotime($attendable->sc_out));
+
         if(in_array($attendable->status,['Normal','Late'])){
             if($timelog->status==0){
-                if($time < $this->schedule['in'] || $time >= $this->schedule['out']){
+                if($time < $attendable->sc_in || $time >= $attendable->sc_out){
                     Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time]);
                 }
             }else{
                 $last_ot=Overtime::where('user_id',$user_id)
                             ->where('ck_date',$date)
                             ->whereNull('out')->first();
+                
                 if($last_ot){
-                    if($last_ot->in < $this->schedule['in']){
-                        if($time >= $this->schedule['in']){
-                            $last_ot->out=$this->schedule['in'];
-                        }else{
-                            $last_ot->out=$time;
-                        }
-                        $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
-                        $last_ot->save();
-        
-                        if($time > $this->schedule['out']){
-                            $ot=$this->calculateOT($this->schedule['out'],$time);
-                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$this->schedule['out'],'out'=>$time,'ot'=>$ot]);
-                        }
-                    }elseif($last_ot->in >= $this->schedule['out']){
+                    $last_ot->in=date('H:i',strtotime($last_ot->in));
+
+                    if($time <= $attendable->sc_in){
                         $last_ot->out=$time;
-                        $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
-                        $last_ot->save();
+                    }elseif($last_ot->in < $attendable->sc_in && $time > $attendable->sc_in){
+                        if($time<=$attendable->sc_out){
+                            $last_ot->out=$attendable->sc_in;
+                        }else{
+                            $last_ot->out=$attendable->sc_in;
+                            //split for after hour ot
+                            $after_hour_ot=$this->calculateOT($attendable->sc_out,$time);
+                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$attendable->sc_out,'out'=>$time,'ot'=>$after_hour_ot]);
+                        }
+                    }else{
+                        
+                        $last_ot->out=$time;
                     }
+                    $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                    $last_ot->save();
+                }else{
+                    $last_log=TimeSheet::where('user_id',$user_id)
+                        ->where('punch','<',$timelog->punch)
+                        ->where('punch','>',$date)->orderBy('punch','desc')->first();
+                    if($last_log){
+                        $log_log_time=date('H:i',strtotime($last_log->punch));
+                        if($log_log_time<=$attendable->sc_out){
+                            $after_hour_ot=$this->calculateOT($attendable->sc_out,$time);
+                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$attendable->sc_out,'out'=>$time,'ot'=>$after_hour_ot]);
+                        }else{
+                            $after_hour_ot=$this->calculateOT($log_log_time,$time);
+                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$log_log_time,'out'=>$time,'ot'=>$after_hour_ot]);
+                        }
+                    }
+
                 }
+
 
             }
         }elseif(in_array($attendable->status,['Holiday'])){
