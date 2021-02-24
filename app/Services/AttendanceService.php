@@ -246,34 +246,40 @@ class AttendanceService{
                 
                 if($last_ot){
                     $last_ot->in=date('H:i',strtotime($last_ot->in));
-
                     if($time <= $attendable->sc_in){
                         $last_ot->out=$time;
+                        $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                        $last_ot->save();
                     }elseif($last_ot->in < $attendable->sc_in && $time > $attendable->sc_in){
                         if($time<=$attendable->sc_out){
                             $last_ot->out=$attendable->sc_in;
+                            $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                            $last_ot->save();
                         }else{
                             $last_ot->out=$attendable->sc_in;
+                            $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                            $last_ot->save();
                             //split for after hour ot
                             $after_hour_ot=$this->calculateOT($attendable->sc_out,$time);
                             Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$attendable->sc_out,'out'=>$time,'ot'=>$after_hour_ot]);
                         }
-                    }else{
-                        
+                    }elseif($time > $attendable->sc_out){
                         $last_ot->out=$time;
+                        $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
+                        $last_ot->save();
                     }
-                    $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
-                    $last_ot->save();
+
                 }else{
                     $last_log=TimeSheet::where('user_id',$user_id)
                         ->where('punch','<',$timelog->punch)
                         ->where('punch','>',$date)->orderBy('punch','desc')->first();
                     if($last_log){
                         $log_log_time=date('H:i',strtotime($last_log->punch));
-                        if($log_log_time<=$attendable->sc_out){
+                        if($log_log_time<=$attendable->sc_out && $time>=$attendable->sc_out){
                             $after_hour_ot=$this->calculateOT($attendable->sc_out,$time);
                             Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$attendable->sc_out,'out'=>$time,'ot'=>$after_hour_ot]);
-                        }else{
+                        }
+                        elseif($log_log_time>=$attendable->sc_out){
                             $after_hour_ot=$this->calculateOT($log_log_time,$time);
                             Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$log_log_time,'out'=>$time,'ot'=>$after_hour_ot]);
                         }
