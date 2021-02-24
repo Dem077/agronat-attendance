@@ -30,7 +30,7 @@ class TimeSheetComponent extends Component
     public function render()
     {
         $this->setUser();
-        $logs=$this->getTimeSheet()->paginate(5);
+        $logs=$this->getTimeSheet()->paginate(10);
         $this->resetPage();
         return view('livewire.timesheets.component',['logs'=>$logs]);
     }

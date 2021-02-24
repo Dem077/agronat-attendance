@@ -33,7 +33,7 @@ class AttendanceComponent extends Component
     {
         $this->setUser();
 
-        $attendances=$this->getAttendances()->paginate(5);
+        $attendances=$this->getAttendances()->paginate(31);
 
         /**
          * manage all

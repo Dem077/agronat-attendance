@@ -20,7 +20,7 @@ class Users extends Component
     public function render()
     {
         $employees=User::orderBy('name','asc')->pluck('name','id')->toArray();
-        $users=$this->getUsers()->paginate(5);
+        $users=$this->getUsers()->paginate(10);
         $departments=Department::all();
         $this->resetPage();
         return view('livewire.users.component',['employees'=>$employees,'users'=>$users,'departments'=>$departments]);

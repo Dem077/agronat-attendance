@@ -20,6 +20,16 @@ use phpDocumentor\Reflection\Types\Null_;
 
 class AttendanceService{
 
+    private $schedule;
+
+    public function __construct()
+    {
+        $this->schedule=[
+            "in"=>date('H:i:s',strtotime('08:00')),
+            "out"=>date('H:i:s',strtotime('14:00'))
+        ];
+    }
+
     public function addLog($data){
         //check user time
         $punch=date('Y-m-d H:i:s',strtotime($data['punch']));
@@ -115,13 +125,9 @@ class AttendanceService{
                 $attendance->save();
             }
         }else{
-            $schedule=[
-                "in"=>date('H:i:s',strtotime('08:00')),
-                "out"=>date('H:i:s',strtotime('16:00'))
-            ];
-            $late_min=$this->lateFine($time,$schedule['in']);
+            $late_min=$this->lateFine($time,$this->schedule['in']);
             $status=$late_min>0?'Late':'Normal';
-            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
+            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$this->schedule['in'],'sc_out'=>$this->schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
         }
 
     }
@@ -200,11 +206,7 @@ class AttendanceService{
                 Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'status'=>$leave->type->title]);
             }else{
                 //get schedule for each employee
-                $schedule=[
-                    "in"=>date('H:i:s',strtotime('08:00')),
-                    "out"=>date('H:i:s',strtotime('16:00'))
-                ];
-                Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out']]);
+                Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$this->schedule['in'],'sc_out'=>$this->schedule['out']]);
             }
         }
     }
@@ -221,11 +223,6 @@ class AttendanceService{
     public function addOT($timelog)
     {
 
-        $schedule=[
-            "in"=>date('H:i:s',strtotime('08:00')),
-            "out"=>date('H:i:s',strtotime('16:00'))
-        ];
-
         $dt=strtotime($timelog->punch);
         $date=date('Y-m-d',$dt);
         $time=date('H:i:s',$dt);
@@ -237,7 +234,7 @@ class AttendanceService{
         }
         if(in_array($attendable->status,['Normal','Late'])){
             if($timelog->status==0){
-                if($time < $schedule['in'] || $time >= $schedule['out']){
+                if($time < $this->schedule['in'] || $time >= $this->schedule['out']){
                     Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$time]);
                 }
             }else{
@@ -245,20 +242,20 @@ class AttendanceService{
                             ->where('ck_date',$date)
                             ->whereNull('out')->first();
                 if($last_ot){
-                    if($last_ot->in < $schedule['in']){
-                        if($time >= $schedule['in']){
-                            $last_ot->out=$schedule['in'];
+                    if($last_ot->in < $this->schedule['in']){
+                        if($time >= $this->schedule['in']){
+                            $last_ot->out=$this->schedule['in'];
                         }else{
                             $last_ot->out=$time;
                         }
                         $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
                         $last_ot->save();
         
-                        if($time > $schedule['out']){
-                            $ot=$this->calculateOT($schedule['out'],$time);
-                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$schedule['out'],'out'=>$time,'ot'=>$ot]);
+                        if($time > $this->schedule['out']){
+                            $ot=$this->calculateOT($this->schedule['out'],$time);
+                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$this->schedule['out'],'out'=>$time,'ot'=>$ot]);
                         }
-                    }elseif($last_ot->in >= $schedule['out']){
+                    }elseif($last_ot->in >= $this->schedule['out']){
                         $last_ot->out=$time;
                         $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
                         $last_ot->save();

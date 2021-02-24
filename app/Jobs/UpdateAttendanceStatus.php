@@ -9,12 +9,14 @@ use App\Models\Leave;
 use App\Models\User;
 use DateInterval;
 use DatePeriod;
+use DateTime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class UpdateAttendanceStatus implements ShouldQueue
 {
@@ -28,8 +30,8 @@ class UpdateAttendanceStatus implements ShouldQueue
      */
     public function __construct($data)
     {
-        $this->date_from=isset($data['from'])?new \DateTime($data['from']):(new \DateTime());
-        $this->date_to=isset($data['to'])?new \DateTime($data['to']):($this->date_from)->modify('+1 day');
+        $this->date_from=isset($data['from'])?new \DateTime($data['from']):new \DateTime();
+        $this->date_to=isset($data['to'])?new \DateTime($data['to']):(clone $this->date_from)->modify('+1 day');
         $this->user_id=isset($data['user_id'])?$data['user_id']:null;
     }
 
@@ -41,11 +43,9 @@ class UpdateAttendanceStatus implements ShouldQueue
     public function handle()
     {
         if($this->user_id){
-            $user=new User();
-            $user->id=$this->user_id;
-            $employees=[$user];
+            $employees=[$this->user_id];
         }else{
-            $employees=User::select('id')->get();
+            $employees=User::pluck('id')->toArray();
         }
 
         foreach (date_range($this->date_from,$this->date_to) as $dt) {
@@ -57,7 +57,7 @@ class UpdateAttendanceStatus implements ShouldQueue
         $holidays=Holiday::where('h_date',$date)
                         ->pluck('h_date')->toArray();
         foreach($employees as $employee){
-            $att=Attendance::where('user_id',$employee->id)->where('ck_date',$date)->first();
+            $att=Attendance::where('user_id',$employee)->where('ck_date',$date)->first();
 
             if($att){
                 //loop range
@@ -65,13 +65,14 @@ class UpdateAttendanceStatus implements ShouldQueue
                     //add holidays to each employee
                     $att->status='Holiday';
                 }else{
-                    $leave=Leave::with('type')->where('user_id',$employee->id)
+                    $leave=Leave::with('type')->where('user_id',$employee)
                                 ->where('from','<=',$date)
                                 ->where('to','>=',$date)
                                 ->first();
                     if($leave){
                         $att->status=$leave->title;
                     }else{
+
                         //get schedule for each employee
                         if(!$att->in){
                             $att->status='Absent';
@@ -79,7 +80,7 @@ class UpdateAttendanceStatus implements ShouldQueue
                         elseif($att->late_min>0){
                             $att->status='Late';
                         }
-                        elseif($att->in<=$att->sc_in){
+                        elseif(new DateTime($att->in)<=new DateTime($att->sc_out)){
                             $att->status='Normal';
                         }else{
                             $att->status='Absent';

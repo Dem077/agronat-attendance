@@ -19,7 +19,7 @@ class OvertimeComponent extends Component
     public function render()
     {
         $this->setUser();
-        $ots=$this->getOvertime()->paginate(5);
+        $ots=$this->getOvertime()->paginate(10);
         $this->resetPage();
         return view('livewire.overtime.component',['ots'=>$ots]);
     }
