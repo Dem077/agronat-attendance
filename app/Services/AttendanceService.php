@@ -273,6 +273,7 @@ class AttendanceService{
             $last_ot=Overtime::where('user_id',$user_id)
                             ->where('ck_date',$date)
                             ->whereNull('out')->first();
+            $steps=[];
             if($last_ot){
                 $last_ot->in=date('H:i',strtotime($last_ot->in));
                 if($time <= $attendable->sc_in){
@@ -281,17 +282,24 @@ class AttendanceService{
                     $last_ot->save();
 
                 }elseif($time > $attendable->sc_in){
-                    if($time <= $attendable->sc_out){
+                    if($time < $attendable->sc_out){
                         $last_ot->out=$attendable->sc_in;
-                        $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
-                        $last_ot->save();
                     }elseif($time > $attendable->sc_out){
-                        $last_ot->out=$attendable->sc_in;
+                        if($last_ot->in < $attendable->sc_in){
+                            $last_ot->out=$attendable->sc_in;
+
+                            //split for after hour ot
+                            $after_hour_ot=$this->calculateOT($attendable->sc_out,$time);
+                            Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$attendable->sc_out,'out'=>$time,'ot'=>$after_hour_ot]);
+                        }elseif($last_ot->in > $attendable->sc_out){
+                            $last_ot->out=$time;
+
+                        }
+                    }
+
+                    if($last_ot->out){
                         $last_ot->ot=$this->calculateOT($last_ot->in,$last_ot->out);
                         $last_ot->save();
-                        //split for after hour ot
-                        $after_hour_ot=$this->calculateOT($attendable->sc_out,$time);
-                        Overtime::create(['user_id'=>$user_id,'ck_date'=>$date,'in'=>$attendable->sc_out,'out'=>$time,'ot'=>$after_hour_ot]);
                     }
                 }
 
