@@ -101,6 +101,7 @@ class TimeSheetComponent extends Component
         unset($validatedDate['punchtime']);
         // TimeSheet::add($validatedDate);
 
+        $validatedDate['sync']=0;
         $this->attendanceService->addLog($validatedDate);
 
         $this->emit('.Store'); // Close model to using to jquery

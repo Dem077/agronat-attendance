@@ -22,7 +22,8 @@ class TimeSheet extends Model
     protected $fillable = [
         'user_id',
         'punch',
-        'status'
+        'status',
+        'sync'
     ];
 
     public function user(){

@@ -86,7 +86,7 @@ class AttendanceService{
         foreach(date_range($from,$to) as $date){
             $this->deleteOT($date,$user_id);
             $this->addSchedule($date,$user_id);
-            TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00:00'))->where('punch','<=',$date->format('Y-m-d 23:59:59'))->where('user_id',$user_id)->delete();
+            TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00:00'))->where('punch','<=',$date->format('Y-m-d 23:59:59'))->where('sync','1')->where('user_id',$user_id)->delete();
             ZKTSync::dispatchNow(['from'=>$date->format('Y-m-d'),'to'=>$date->format('Y-m-d 23:59:59'),'user_id'=>$user_id]);
         }
     }
@@ -180,6 +180,7 @@ class AttendanceService{
         $time_logs=TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00'))
                             ->where('punch','<=',$date->format('Y-m-d 23:59:59'))
                             ->where('user_id',$user_id)
+                            ->orderBy('punch','asc')
                             ->get();
 
         foreach($time_logs as $time_log){
