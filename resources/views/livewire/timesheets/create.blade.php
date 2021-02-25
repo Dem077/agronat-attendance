@@ -24,8 +24,8 @@
                 </div>
                 <div class="form-inline">
                     <label for="punch">DateTime</label>
-                    <input type="text" class="form-control mx-1" id="punchdate" placeholder="YYYY-MM-DD" wire:model="punchdate">
-                    <input type="time" class="form-control" placeholder="YYYY-MM-DD" wire:model="punchtime">
+                    <input type="text" class="form-control mx-1" id="punchdate" placeholder="YYYY-MM-DD" wire:model="punchdate" autocomplete="off">
+                    <input type="time" class="form-control" placeholder="YYYY-MM-DD" wire:model="punchtime" autocomplete="off">
                     @error('start_date') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
             </form>

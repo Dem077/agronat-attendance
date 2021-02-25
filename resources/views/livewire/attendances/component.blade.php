@@ -77,8 +77,8 @@
                                 <td>{{ $attendance->id }}</td>
                                 <td>{{ $attendance->user->name }}</td>
                                 <td>{{ $attendance->ck_date }}</td>
-                                <td>{{ $attendance->scin }}</td>
-                                <td>{{ $attendance->scout }}</td>
+                                <td>{{ $attendance->sc_in }}</td>
+                                <td>{{ $attendance->sc_out }}</td>
                                 <td>{{ $attendance->in }}</td>
                                 <td>{{ $attendance->out }}</td>
                                 <td>{{ $attendance->late_min }}</td>

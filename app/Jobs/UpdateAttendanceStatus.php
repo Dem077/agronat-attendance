@@ -70,7 +70,7 @@ class UpdateAttendanceStatus implements ShouldQueue
                                 ->where('to','>=',$date)
                                 ->first();
                     if($leave){
-                        $att->status=$leave->title;
+                        $att->status=$leave->type->title;
                     }else{
 
                         //get schedule for each employee

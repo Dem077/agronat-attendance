@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Jobs\ProcessAttendance;
 use App\Jobs\ProcessOvertime;
+use App\Jobs\UpdateAttendanceStatus;
 use App\Jobs\ZKTSync;
 use App\Models\Attendance;
 use App\Models\Holiday;
@@ -86,9 +87,23 @@ class AttendanceService{
         foreach(date_range($from,$to) as $date){
             $this->deleteOT($date,$user_id);
             $this->addSchedule($date,$user_id);
-            TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00:00'))->where('punch','<=',$date->format('Y-m-d 23:59:59'))->where('sync','1')->where('user_id',$user_id)->delete();
-            ZKTSync::dispatchNow(['from'=>$date->format('Y-m-d'),'to'=>$date->format('Y-m-d 23:59:59'),'user_id'=>$user_id]);
+            $this->fixTimeSheet($date,$user_id);
+            $time_logs=TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00'))
+                ->where('punch','<=',$date->format('Y-m-d 23:59:59'))
+                ->where('user_id',$user_id)
+                ->orderBy('punch','asc')
+                ->get();
+
+            foreach($time_logs as $time_log){
+                $this->addAttendance($time_log);
+                $this->addOT($time_log);
+            }
+            //TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00:00'))->where('punch','<=',$date->format('Y-m-d 23:59:59'))->where('sync','1')->where('user_id',$user_id)->delete();
+            //ZKTSync::dispatchNow(['from'=>$date->format('Y-m-d'),'to'=>$date->format('Y-m-d 23:59:59'),'user_id'=>$user_id]);
         }
+
+        UpdateAttendanceStatus::dispatchNow(['from'=>$from,'to'=>$to,'user_id'=>$user_id]);
+
     }
 
     public function addAttendance($log){

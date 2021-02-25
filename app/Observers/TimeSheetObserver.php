@@ -48,10 +48,9 @@ class TimeSheetObserver
     public function deleted(TimeSheet $timeSheet)
     {
         
-        $from=date('Y-m-d',strtotime($timeSheet->punch));
-        $to=date('Y-m-d',strtotime($timeSheet->punch." +1 day"));
+        $date=date('Y-m-d',strtotime($timeSheet->punch));
 
-        $this->attendanceService->resetAttendance($from,$to,$timeSheet->user_id);
+        $this->attendanceService->resetAttendance($date,$date,$timeSheet->user_id);
 
     }
 

@@ -80,6 +80,7 @@
 
 @push('js-bottom')
 <script type="text/javascript">
+$('#user-select-name').select2();
     window.livewire.on('.Store', () => {
         $('#exampleModal').modal('hide');
     });
