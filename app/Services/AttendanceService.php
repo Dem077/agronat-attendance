@@ -273,7 +273,6 @@ class AttendanceService{
             $last_ot=Overtime::where('user_id',$user_id)
                             ->where('ck_date',$date)
                             ->whereNull('out')->first();
-            $steps=[];
             if($last_ot){
                 $last_ot->in=date('H:i',strtotime($last_ot->in));
                 if($time <= $attendable->sc_in){
