@@ -8,15 +8,22 @@
 
             <div class="card-body">
                 <div>
+
                     @if (session()->has('message'))
                         <div class="alert alert-success">
                             {{ session('message') }}
                         </div>
                     @endif
                     @can('timelog-create')
+                    @include('livewire.timesheets.create')
+                    <livewire:partials.timesheets.sync-component :users="$users"/>
+
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">
                         Add
                     </button>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#syncModal">
+                      Sync
+                  </button>
                     @endcan
                     <div class="row">
                       <div class="col">
@@ -54,7 +61,6 @@
                       </div>
                   </div>
                     
-                    @include('livewire.timesheets.create')
                   <div class="table-responsive">
                     <table class="table table-bordered mt-5">
                         <thead>
@@ -87,7 +93,6 @@
                     {{$logs->links()}}
                 </div>
                 </div>
-                
             </div>
         </div>
     </div>

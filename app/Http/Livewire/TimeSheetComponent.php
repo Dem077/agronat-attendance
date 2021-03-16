@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Jobs\ZKTSync;
 use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
@@ -18,7 +19,7 @@ class TimeSheetComponent extends Component
     public $updateMode = false;
     private $attendanceService;
 
-    public $punchdate,$punchtime,$start_date,$end_date;
+    public $punchdate,$punchtime,$start_date,$end_date,$sync_data=['user_id'=>'','from'=>'','to'=>''];
 
 
     public function __construct()
@@ -53,6 +54,7 @@ class TimeSheetComponent extends Component
         return $timesheet->orderBy('punch','desc');
     }
 
+    
 
     public function exportRecord() {
         $entries = $this->getTimeSheet()->get()->toArray();

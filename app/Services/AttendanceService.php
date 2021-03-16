@@ -16,6 +16,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Exception;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
 use phpDocumentor\Reflection\Types\Null_;
 
@@ -117,7 +118,8 @@ class AttendanceService{
         $attendance=Attendance::where(['user_id'=>$user_id])->where('ck_date',$date)->first();
         
         if(!$attendance){
-            throw new Exception("attendance entry not found at add Attendance {$date}");
+            $this->addSchedule(new DateTime($date),$user_id);
+            $this->addAttendance($log);
         }
         if(!in_array($attendance->status,$attendable)){
             return;

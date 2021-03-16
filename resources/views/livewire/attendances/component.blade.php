@@ -44,6 +44,10 @@
                                   </div>
                                   <div class="col-auto my-1">
                                     <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+                                    <livewire:partials.attendance.recompute-component :users="$users"/>
+                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#recomputeModal">
+                                      Recompute
+                                  </button>
                                   </div>
                                 </div>
                               </form>
