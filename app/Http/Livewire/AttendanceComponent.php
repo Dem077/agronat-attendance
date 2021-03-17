@@ -9,6 +9,7 @@ use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -55,15 +56,22 @@ class AttendanceComponent extends Component
 
     public function getAttendances(){
         $attendances=Attendance::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
+
         if($this->start_date){
             $attendances=$attendances->where('ck_date','>=',$this->start_date);
         }
+        
         $this->end_date=$this->end_date?$this->end_date:(new \DateTime())->format('Y-m-d');
         if($this->end_date){
             $attendances=$attendances->where('ck_date','<=',$this->end_date);
         }
         if(!$this->user_id){
-            $attendances=$attendances->whereIn('user_id',array_keys($this->users));
+            $ids=[];
+            foreach($this->users as $user){
+                $ids[]=$user['id'];
+            }
+
+            $attendances=$attendances->whereIn('user_id',$ids);
         }else{
             $attendances=$attendances->where('user_id',$this->user_id);
         }

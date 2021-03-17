@@ -44,10 +44,12 @@
                                   </div>
                                   <div class="col-auto my-1">
                                     <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+                                    @can('attendance-create')
                                     <livewire:partials.attendance.recompute-component :users="$users"/>
                                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#recomputeModal">
                                       Recompute
-                                  </button>
+                                    </button>
+                                    @endcan
                                   </div>
                                 </div>
                               </form>

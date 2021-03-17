@@ -18,8 +18,8 @@
                     <label for="recompute-user_id">Employee:</label>
                     <select type="text" class="form-control" placeholder="Employee" wire:bind="user_id" id="recompute-user_id" required>
                         <option value="">Select Employee</option>
-                        @foreach($users as $id=>$name)
-                            <option value="{{$id}}" {{$user_id==$id?'SELECTED':''}}>{{$name}}</option>
+                        @foreach($users as $user)
+                            <option value="{{$user['id']}}" {{$user_id==$user['id']?'SELECTED':''}}>{{$user['name']}}</option>
                         @endforeach
                     </select>
                     @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror
@@ -69,6 +69,7 @@
     $('#recompute-user_id').on('change', function (e) {
        @this.set('user_id', e.target.value);
     });
+    $('#recompute-user_id').select2();
 
     $('#recompute-from').on('change', function (e) {
        @this.set('from', e.target.value);

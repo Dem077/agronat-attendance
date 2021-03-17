@@ -27,7 +27,7 @@ class RecomputeComponent extends Component
 
         $attendanceService=new AttendanceService();
         $attendanceService->recompute(new DateTime($validatedDate['from']),new DateTime($validatedDate['to']),new DateTime($validatedDate['user_id']));
-        $this->emit('.Recomputed'); // Close model to using to jquery
+        $this->emit('.Recomputed');
 
         session()->flash('message', 'Recompute Successfully.');
 

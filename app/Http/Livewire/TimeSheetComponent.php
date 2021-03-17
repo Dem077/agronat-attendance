@@ -46,7 +46,11 @@ class TimeSheetComponent extends Component
             $timesheet=$timesheet->where('punch','<=',$this->end_date);
         }
         if(!$this->user_id){
-            $timesheet=$timesheet->whereIn('user_id',array_keys($this->users));
+            $ids=[];
+            foreach($this->users as $user){
+                $ids[]=$user['id'];
+            }
+            $timesheet=$timesheet->whereIn('user_id',$ids);
         }else{
             $timesheet=$timesheet->where('user_id',$this->user_id);
         }

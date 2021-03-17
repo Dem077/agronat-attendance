@@ -13,11 +13,11 @@ trait UserTrait {
     {
         $user=Auth::user();
         if(auth()->user()->can('reporting-manager')){
-            $this->users=User::orderBy('name','asc')->pluck('name','id')->toArray();
+            $this->users=User::select('name','id')->orderBy('name','asc')->get()->toArray();
         }elseif(auth()->user()->can('reporting-supervisor')){
-            $this->users=User::orderBy('name','asc')->where('department_id',$user->department_id)->pluck('name','id')->toArray();
+            $this->users=User::select('name','id')->where('department_id',$user->department_id)->orderBy('name','asc')->get()->toArray();
         }else{
-            $this->users=[$user->id=>$user->name];
+            $this->users=[['id'=>$user->id,'name'=>$user->name]];
             $this->user_id=$user->id;
         }
     }

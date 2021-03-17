@@ -28,7 +28,7 @@
                                 <select type="text" class="form-control" id="user-select-name" placeholder="Employee">
                                     <option value=''>Select Employee</option>
                                     @foreach ($employees as $id=>$name)
-                                        <option value='{{$id}}'>{{$name}}</option>
+                                        <option value='{{$id}}' {{$id==$user_id?'SELECTED':''}}>{{$name}}</option>
                                     @endforeach
                                 </select>
                             </div>

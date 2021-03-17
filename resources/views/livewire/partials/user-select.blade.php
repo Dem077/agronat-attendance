@@ -2,9 +2,8 @@
     <label for="user-select-name">Employee:</label>
     <select type="text" class="form-control" id="user-select-name" placeholder="Employee">
         <option value=''>Select Employee</option>
-        <?= asort($users); ?>
-        @foreach($users as $id=>$name)
-            <option value='{{$id}}' {{$user_id==$id?'SELECTED':''}}>{{$name}}</option>
+        @foreach($users as $user)
+            <option value='{{$user['id']}}' {{$user_id==$user['id']?'SELECTED':''}}>{{$user['name']}}</option>
         @endforeach
     </select>
 </div>
