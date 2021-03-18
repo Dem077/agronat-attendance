@@ -14,7 +14,7 @@
                         </div>
                     @endif
                     @can('user-create')
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">
                         Add
                     </button>
                     @include('livewire.users.view')
@@ -82,9 +82,12 @@
 <script type="text/javascript">
 $('#user-select-name').select2();
     window.livewire.on('.Store', () => {
-        $('#exampleModal').modal('hide');
+        $('#createModal').modal('hide');
     });
 
+    window.livewire.on('.userUpdated', () => {
+        $('#updateModal').modal('hide');
+    });
     $('#user-select-name').on('change', function (e) {
         @this.set('user_id', e.target.value);
     });

@@ -14,7 +14,7 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $name, $user_id, $email, $designation,$password,$emp_no,$department_id,$mobile,$phone;
+    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$mobile,$phone;
     public $updateMode = false;
 
     public function render()
@@ -48,6 +48,9 @@ class Users extends Component
         $this->department_id = '';
         $this->mobile = '';
         $this->phone = '';
+        $this->password='';
+        $this->password_confirmation='';
+        
     }
 
     /**
@@ -57,7 +60,7 @@ class Users extends Component
      */
     public function store()
     {
-        $validatedDate = $this->validate([
+        $validatedData = $this->validate([
             'name' => 'required',
             'email' => 'required',
             'emp_no' => 'required',
@@ -65,11 +68,11 @@ class Users extends Component
             'department_id' => 'sometimes',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
-            // 'password' => 'required',
+            //'password' => 'sometimes|password',
         ]);
-  
-        $validatedDate['password']=Hash::make('agro2020');
-        User::create($validatedDate);
+
+        $validatedData['password']=Hash::make('agro2020');
+        User::create($validatedData);
   
         $this->emit('.Store'); // Close model to using to jquery
 
@@ -135,7 +138,7 @@ class Users extends Component
      */
     public function update()
     {
-        $validatedDate = $this->validate([
+        $validatedData = $this->validate([
             'name' => 'required',
             'email' => 'required',
             'designation' => 'required',
@@ -143,13 +146,10 @@ class Users extends Component
             'department_id' => 'sometimes',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
-            // 'password' => 'sometimes',
+            'password' => 'sometimes|confirmed',
         ]);
-  
 
-        $user = User::find($this->user_id);
-
-        $user->update([
+        $update=[
             "name"=>$this->name,
             "email"=>$this->email,
             "designation"=>$this->designation,
@@ -157,13 +157,23 @@ class Users extends Component
             "department_id"=>$this->department_id,
             "mobile"=>$this->mobile,
             "phone"=>$this->phone
-        ]);
+        ];
   
-        $this->updateMode = false;
-  
-        session()->flash('message', 'User Updated Successfully.');
+        if(isset($validatedData['password'])){
+            $update['password']=Hash::make($validatedData['password']);
+        }
+
+        $user = User::findOrFail($this->user_id);
+
+        if($user->update($update)){
+            $this->emit('.userUpdated'); // Close model to using to jquery  
+            session()->flash('message', 'User Updated Successfully.');
+        }else{
+            session()->flash('error', 'User Update Failed.');
+        }
+
         $this->resetInputFields();
-        
+
     }
    
     /**

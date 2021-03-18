@@ -1,11 +1,11 @@
 
 
 <!-- Modal -->
-<div wire:ignore.self class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div wire:ignore.self class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add Employee</h5>
+                <h5 class="modal-title" id="createModalLabel">Add Employee</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                      <span aria-hidden="true close-btn">×</span>
                 </button>
@@ -41,13 +41,13 @@
                     <input type="text" class="form-control" id="emp_no" wire:model="emp_no" placeholder="emp no"/>
                     @error('emp_no') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
-                <div class="form-inline">
-                    <div class="form-group">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
                         <label for="mobile">mobile:</label>
                         <input type="text" class="form-control" id="mobile" wire:model="mobile" placeholder="mobile"/>
                         @error('mobile') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
-                    <div class="form-group">
+                    <div class="form-group col-md-6">
                         <label for="phone">phone:</label>
                         <input type="text" class="form-control" id="phone" wire:model="phone" placeholder="phone"/>
                         @error('phone') <span class="text-danger">{{ $message }}</span>@enderror
