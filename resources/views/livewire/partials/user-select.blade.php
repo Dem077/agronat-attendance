@@ -1,4 +1,4 @@
-<div>
+<div class="form-group">
     <label for="user-select-name">Employee:</label>
     <select type="text" class="form-control" id="user-select-name" placeholder="Employee">
         <option value=''>Select Employee</option>

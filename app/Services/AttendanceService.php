@@ -119,7 +119,7 @@ class AttendanceService{
         
         if(!$attendance){
             $this->addSchedule(new DateTime($date),$user_id);
-            $this->addAttendance($log);
+            return $this->addAttendance($log);
         }
         if(!in_array($attendance->status,$attendable)){
             return;

@@ -17,33 +17,18 @@
                     <div class="row">
                       <div class="col">
                           <form>
-                              <div class="form-row align-items-center">
-                                <div class="col-sm-3 my-1">
+                              <div class="row">
+                                <div class="col-md-4">
                                     @livewire('partials.user-select')
                                 </div>
-                                <div class="col-sm-3 my-1">
+                                <div class="col-md-4">
                                     @livewire('partials.attendance-period')
                                 </div>
-                                <div class="col-sm-3 my-1">
-                                  <label for="inlineFormInputGroupStartDate">Start Date</label>
-                                  <div class="input-group">
-                                    <div class="input-group-prepend">
-                                      <div class="input-group-text">Start</div>
-                                    </div>
-                                      <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
-                                  </div>
-                                </div>
-                                <div class="col-sm-3 my-1">
-                                  <label for="inlineFormInputGroupEndDate">End Date</label>
-                                  <div class="input-group">
-                                    <div class="input-group-prepend">
-                                      <div class="input-group-text">End</div>
-                                    </div>
-                                    <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
-                                  </div>
-                                </div>
-                                <div class="col-auto my-1">
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-4">
                                   <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+
                                 </div>
                               </div>
                             </form>
@@ -57,24 +42,37 @@
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>User</th>
                                 <th>Date</th>
                                 <th>Day</th>
+                                <th>User</th>
                                 <th>Checkin</th>
                                 <th>Checkout</th>
                                 <th>OT Minutes</th>
+                                <th>status</th>
+                                <th>action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($ots as $ot)
                             <tr>
                                 <td>{{ $ot->id }}</td>
-                                <td>{{ $ot->user->name }}</td>
                                 <td>{{ $ot->ck_date }}</td>
                                 <td>{{ $ot->day }}</td>
-                                <td>{{ $ot->in }}</td>
-                                <td>{{ $ot->out }}</td>
-                                <td>{{ $ot->ot }}</td>
+                                <td>{{ $ot->user->name }}</td>
+                                <td>{{ $ot->applied->in ?? $ot->in }}</td>
+                                <td>{{ $ot->applied->out ?? $ot->out }}</td>
+                                <td>{{ $ot->applied->ot ?? $ot->ot }}</td>
+                                <td>Pending</td>
+                                
+                                <td>
+                                  @can('overtime-create')
+                                  <button class="btn btn-success btn-sm m-1" wire:click="create({{$ot}})" data-toggle="modal" data-target="#applyModal">Apply</button>
+                                  <button class="btn btn-primary btn-sm m-1" wire:click="show({{$ot}})" data-toggle="modal" data-target="#applyModal">Show</button>
+                                  @endcan
+                                  @can('overtime-create')
+                                  <button class="btn btn-primary btn-sm m-1" wire:click="edit({{$ot}})" data-toggle="modal" data-target="#applyModal">Update</button>
+                                  @endcan
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -86,6 +84,8 @@
             </div>
         </div>
     </div>
+    @include('livewire.overtime.apply')
+
 </div>
 
 @push('js-bottom')
@@ -99,15 +99,6 @@
         todayHighlight: true,
         autoclose: true,
       };
-    $('#inlineFormInputGroupStartDate').datepicker(options);
-    $('#inlineFormInputGroupEndDate').datepicker(options);
-
-    $('#inlineFormInputGroupStartDate').on('change', function (e) {
-       @this.set('start_date', e.target.value);
-    });
-    $('#inlineFormInputGroupEndDate').on('change', function (e) {
-       @this.set('end_date', e.target.value);
-    });
     Livewire.on('userSelected', id => {
         @this.set('user_id', id);
     });

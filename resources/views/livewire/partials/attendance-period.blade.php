@@ -1,4 +1,4 @@
-<div>
+<div class="form-group">
     <label for="user-select-name">Month:</label>
     <select type="text" class="form-control" id="attendance-period-month" placeholder="Month">
         <option value=''>Select Month</option>
