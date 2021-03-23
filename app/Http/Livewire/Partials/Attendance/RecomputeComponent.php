@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Partials\Attendance;
 
+use App\Models\User;
 use App\Services\AttendanceService;
 use DateTime;
 use Livewire\Component;
@@ -24,9 +25,20 @@ class RecomputeComponent extends Component
             'from' => 'required',
             'to' => 'required'
         ]);
-
+        // $validatedDate['from']=new DateTime($validatedDate['from']);
+        // $validatedDate['to']=new DateTime($validatedDate['to']);
+        $users=[];
         $attendanceService=new AttendanceService();
-        $attendanceService->recompute(new DateTime($validatedDate['from']),new DateTime($validatedDate['to']),new DateTime($validatedDate['user_id']));
+
+        if($this->user_id){
+            $users=[$this->user_id];
+        }else{
+            $users=User::pluck('id')->toArray();
+        }
+        foreach($users as $user_id){
+            $attendanceService->recompute($this->from,$this->to,$user_id);
+        }
+
         $this->emit('.Recomputed');
 
         session()->flash('message', 'Recompute Successfully.');
