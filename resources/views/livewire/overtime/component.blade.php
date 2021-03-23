@@ -59,6 +59,7 @@
                                 <th>No.</th>
                                 <th>User</th>
                                 <th>Date</th>
+                                <th>Day</th>
                                 <th>Checkin</th>
                                 <th>Checkout</th>
                                 <th>OT Minutes</th>
@@ -70,6 +71,7 @@
                                 <td>{{ $ot->id }}</td>
                                 <td>{{ $ot->user->name }}</td>
                                 <td>{{ $ot->ck_date }}</td>
+                                <td>{{ $ot->day }}</td>
                                 <td>{{ $ot->in }}</td>
                                 <td>{{ $ot->out }}</td>
                                 <td>{{ $ot->ot }}</td>
