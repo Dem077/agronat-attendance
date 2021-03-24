@@ -106,7 +106,7 @@ class TimeSheetComponent extends Component
     public function exportRecord() {
         $entries = [];
         foreach($this->getTimeSheet()['data'] as $att){
-            $dt=["employee"=>$att->employee,'day'=>$att->day,'date'=>$att->ck_date,'status'=>$att->status,'late_min'=>$att->late_min];
+            $dt=["employee"=>$att->employee,'day'=>$att->day,'ck_date'=>$att->ck_date,'status'=>$att->status,'late_min'=>$att->late_min];
             for($i=0;$i<6;$i++){
                 $key="check{$i}";
                 $dt[$key]="";
