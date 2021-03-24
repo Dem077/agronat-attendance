@@ -18,7 +18,7 @@ class OvertimeComponent extends Component
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
 
-    public $applied_id,$status,$date,$ot_in, $ot_out, $in, $out,$reason,$hash,$employee_id, $ot, $start_date, $end_date, $readonly=true;
+    public $status,$date,$ot_in, $ot_out, $in, $out,$reason,$hash,$employee_id, $ot, $start_date, $end_date, $readonly=true;
 
     public function render()
     {
@@ -33,8 +33,7 @@ class OvertimeComponent extends Component
 
     public function getOvertime(){
         $ots=Overtime::with('applied')->select('id','user_id','ck_date','in','out','ot',DB::raw("DATE_FORMAT(ck_date,'%a') as day"))
-                        ->addSelect(['status' => Attendance::select('status')->whereColumn('ck_date','overtimes.ck_date')->whereColumn('user_id', 'overtimes.user_id')->limit(1)])
-                        ->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'overtimes.user_id')->limit(1)]);
+                        ->addSelect(['employee' => User::select('name')->whereColumn('users.id', 'overtimes.user_id')->limit(1)]);
         if($this->start_date){
             $ots=$ots->where('ck_date','>=',$this->start_date);
         }
@@ -51,7 +50,7 @@ class OvertimeComponent extends Component
             $ots=$ots->where('user_id',$this->user_id);
         }
 
-        return $ots->orderBy('ck_date','desc');
+        return $ots->orderBy('ck_date','asc');
     }
 
   
@@ -72,13 +71,14 @@ class OvertimeComponent extends Component
         $this->reason=$ot['reason']??'';
     }
 
-    public function edit($applied){
-        $this->applied_id=$applied['id'];
-        $this->date=$applied['ck_date'];
-        $this->in=$applied['in'];
-        $this->out=$applied['out'];
-        $this->employee_id=$applied['user_id'];
-        $this->reason=$applied['reason']??'';
+    public function edit($hash){
+        $applied=AppliedOt::where('hash',$hash)->firstOrFail();
+        $this->applied_id=$applied->id;
+        $this->date=$applied->ck_date;
+        $this->in=$applied->in;
+        $this->out=$applied->out;
+        $this->employee_id=$applied->user_id;
+        $this->reason=$applied->reason;
     }
 
 
@@ -106,8 +106,7 @@ class OvertimeComponent extends Component
             'reason'=>'required',
             'hash'=>'required'
         ]);
-
-        $applied=AppliedOt::findOrFail($this->applied_id);
+        $applied=AppliedOt::where('hash',$validated['hash'])->firstOrFail();
         $applied->update($validated);
         $this->emit('.Saved');
 

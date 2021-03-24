@@ -76,7 +76,7 @@ class AttendanceComponent extends Component
             $attendances=$attendances->where('user_id',$this->user_id);
         }
 
-        return $attendances->orderBy('ck_date','desc');
+        return $attendances->orderBy('ck_date','asc');
     }
 
 

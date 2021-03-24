@@ -3,11 +3,13 @@
 namespace App\Http\Livewire;
 
 use App\Jobs\ZKTSync;
+use App\Models\Attendance;
 use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
 use App\Traits\UserTrait;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -31,46 +33,105 @@ class TimeSheetComponent extends Component
     public function render()
     {
         $this->setUser();
-        $logs=$this->getTimeSheet()->paginate(10);
+        $logs=$this->getTimeSheet(10);
         $this->resetPage();
         return view('livewire.timesheets.component',['logs'=>$logs]);
     }
 
-    public function getTimeSheet(){
-        $timesheet=TimeSheet::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)])
-                        ->addSelect(DB::raw("(CASE when status=0 Then 'IN' ELSE 'OUT' END) AS IN_OUT"));
+    public function getTimeSheet($pagination=null){
+        $attendance=Attendance::select('*',DB::raw("date_format(ck_Date,'%a') as day"))
+                        ->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
+                    // ->whereExists(function($q){
+                    //     $q->select(DB::raw(1))
+                    //     ->from('time_sheets')
+                    //     ->whereRaw("date_format(time_sheets.punch,'%Y-%m-%d') = attendances.ck_date")
+                    //     ->whereRaw("time_sheets.user_id = attendances.user_id");
+                    // });
+        $timesheet=TimeSheet::select('*');
         if($this->start_date){
+            $attendance=$attendance->where('ck_date','>=',$this->start_date);
             $timesheet=$timesheet->where('punch','>=',$this->start_date);
-        }
+        }  
         if($this->end_date){
-            $timesheet=$timesheet->where('punch','<=',$this->end_date);
+            $attendance=$attendance->where('ck_date','<=',$this->end_date);
+            $timesheet=$timesheet->where('punch','<=',$this->end_date.' 23:59:59');
         }
         if(!$this->user_id){
             $ids=[];
             foreach($this->users as $user){
                 $ids[]=$user['id'];
             }
+            $attendance=$attendance->whereIn('user_id',$ids);
             $timesheet=$timesheet->whereIn('user_id',$ids);
+
         }else{
+            $attendance=$attendance->where('user_id',$this->user_id);
             $timesheet=$timesheet->where('user_id',$this->user_id);
         }
 
-        return $timesheet->orderBy('punch','desc');
+        $attendance=$attendance->orderBy('ck_date','asc');
+        $timesheet=$timesheet->orderBy('punch','asc');
+        $links='';
+        if($pagination){
+            $attendance=$attendance->paginate($pagination);
+            $timesheet=$timesheet->where("punch",">=",$attendance->min("ck_date"))
+                                ->where("punch","<=",$attendance->max("ck_date")." 23:59:59")->get();
+            $links=$attendance->links();
+
+        }else{
+            $attendance=$attendance->get();
+            $timesheet=$timesheet->get();
+        }
+
+        $data=[];
+
+
+        foreach($attendance as $att){
+            $p=[];
+            $punches=$timesheet->where('user_id',$att->user_id)->where("punch",">=",$att->ck_date)->where("punch","<=",$att->ck_date." 23:59:59");
+            $timesheet=$timesheet->whereNotIn('id',$punches->pluck('id'));
+            foreach($punches as $punch){
+                $p[]=date('G:i',strtotime($punch->punch));
+            }
+            $att->punch=$p;
+            $data[]=$att;
+        }
+
+        return ['data'=>$data,'links'=>$links];
+
     }
 
     
 
     public function exportRecord() {
-        $entries = $this->getTimeSheet()->get()->toArray();
-    
+        $entries = [];
+        foreach($this->getTimeSheet()['data'] as $att){
+            $dt=["employee"=>$att->employee,'day'=>$att->day,'date'=>$att->ck_date,'status'=>$att->status,'late_min'=>$att->late_min];
+            for($i=0;$i<6;$i++){
+                $key="check{$i}";
+                $dt[$key]="";
+                if($i<count($att->punch)){
+                    $dt[$key]=$att->punch[$i];
+                }
+            }
+            $entries[]=$dt;
+        }
         $filename = sprintf('%1$s-%2$s-%3$s', str_replace(' ', '', 'timesheet'), date('Ymd'), date('His'));
 
         $header = array(
             'Employee'=>'employee',
-            'Punch Time'=>'punch',
-            'IN/OUT'=>'IN_OUT',
+            'Date'=>'ck_date',
+            'Day'=>'day',
+            'Status'=>'status',
+            'Late Min'=>'late_min'
         );
-    
+        for($i=0;$i<6;$i++){
+            $v="check{$i}";
+            $c=floor($i/2+1);
+            $key="Check".($i%2?"Out {$c}":"In {$c}");
+            $header[$key]=$v;
+        }
+        
         return export_csv($header, $entries, $filename);
         
     }

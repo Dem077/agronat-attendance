@@ -68,29 +68,33 @@
                                 <th>No.</th>
                                 <th>User</th>
                                 <th>Date</th>
-                                <th>Status</th>
-                                @can('timelog-delete')
-                                <th width="150px">Action</th>
-                                @endcan
+                                <th>Day</th>
+                                <th>Attend</th>
+                                @for($i=0;$i<6;$i++)
+                                  <th>Check{{$i%2?'Out':'In'}} {{floor($i/2+1)}}</th>
+                                @endfor
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($logs as $log)
+                            @foreach($logs['data'] as $log)
                             <tr>
                                 <td>{{ $log->id }}</td>
-                                <td>{{ $log->user->name }}</td>
-                                <td>{{ $log->punch }}</td>
-                                <td>{{ $log->IN_OUT }}</td>
-                                @can('timelog-delete')
-                                <td>
-                                    <button wire:click="delete({{ $log->id }})" class="btn btn-danger btn-sm">Delete</button>
-                                </td>
-                                @endcan
+                                <td>{{ $log->employee }}</td>
+                                <td>{{ $log->ck_date }}</td>
+                                <td>{{ $log->day }}</td>
+                                <td>{{ $log->status }}</td>
+                                @for($i=0;$i<6;$i++)
+                                  @if($i<count($log->punch))
+                                    <td>{{$log->punch[$i]}}</td>
+                                  @else
+                                  <td></td>
+                                  @endif
+                                @endfor
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    {{$logs->links()}}
+                    {{$logs['links']}}
                 </div>
                 </div>
             </div>

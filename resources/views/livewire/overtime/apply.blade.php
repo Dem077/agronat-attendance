@@ -45,9 +45,9 @@
                     <div class="form-group col-md-12">
                         <label for="apply-status">status</label>
                         <select class="form-control" id="apply-status" wire:model="status" required {{$readonly?'readonly':''}}>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approve</option>
-                            <option value="Rejected">Reject</option>
+                            <option value="Pending" {{$status=='Pending'?'SELECTED':''}}>Pending</option>
+                            <option value="Approved" {{$status=='Approved'?'SELECTED':''}}>Approve</option>
+                            <option value="Rejected" {{$status=='Rejected'?'SELECTED':''}}>Reject</option>
                         </select>
                         @error('status') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
