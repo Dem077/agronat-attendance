@@ -32,7 +32,7 @@ class OvertimeComponent extends Component
     }
 
     public function getOvertime(){
-        $ots=Overtime::with('applied')->select('id','user_id','ck_date','in','out','ot',DB::raw("DATE_FORMAT(ck_date,'%a') as day"))
+        $ots=Overtime::select('id','user_id','ck_date','in','out','ot',DB::raw("DATE_FORMAT(ck_date,'%a') as day"))
                         ->addSelect(['employee' => User::select('name')->whereColumn('users.id', 'overtimes.user_id')->limit(1)]);
         if($this->start_date){
             $ots=$ots->where('ck_date','>=',$this->start_date);

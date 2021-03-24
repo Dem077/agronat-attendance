@@ -59,19 +59,19 @@
                                 <td>{{ $ot->ck_date }}</td>
                                 <td>{{ $ot->day }}</td>
                                 <td>{{ $ot->user->name }}</td>
-                                <td>{{ $ot->applied->in ?? $ot->in }}</td>
-                                <td>{{ $ot->applied->out ?? $ot->out }}</td>
-                                <td>{{ $ot->applied->ot ?? $ot->ot }}</td>
-                                <td>Pending</td>
+                                <td>{{ $ot->in }}</td>
+                                <td>{{ $ot->out }}</td>
+                                <td>{{ $ot->ot }}</td>
+                                <td></td>
                                 
                                 <td>
-                                  @can('overtime-create')
+                                  {{-- @can('overtime-create')
                                   <button class="btn btn-success btn-sm m-1" wire:click="create({{$ot}})" data-toggle="modal" data-target="#applyModal">Apply</button>
                                   <button class="btn btn-primary btn-sm m-1" wire:click="show({{$ot}})" data-toggle="modal" data-target="#applyModal">Show</button>
                                   @endcan
                                   @can('overtime-create')
                                   <button class="btn btn-primary btn-sm m-1" wire:click="edit({{$ot}})" data-toggle="modal" data-target="#applyModal">Update</button>
-                                  @endcan
+                                  @endcan --}}
                                 </td>
                             </tr>
                             @endforeach
