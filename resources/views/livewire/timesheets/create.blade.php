@@ -11,6 +11,11 @@
                 </button>
             </div>
            <div class="modal-body">
+            @if (session()->has('message'))
+                <div class="alert alert-success">
+                    {{ session('message') }}
+                </div>
+            @endif
             <form>
                 <div class="form-group">
                     <label for="user_id">Employee</label>

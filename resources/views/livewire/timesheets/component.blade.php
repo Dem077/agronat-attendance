@@ -9,11 +9,7 @@
             <div class="card-body">
                 <div>
 
-                    @if (session()->has('message'))
-                        <div class="alert alert-success">
-                            {{ session('message') }}
-                        </div>
-                    @endif
+
                     @can('timelog-create')
                     @include('livewire.timesheets.create')
                     <livewire:partials.timesheets.sync-component :users="$users"/>
@@ -85,7 +81,11 @@
                                 <td>{{ $log->status }}</td>
                                 @for($i=0;$i<6;$i++)
                                   @if($i<count($log->punch))
-                                    <td>{{$log->punch[$i]}}</td>
+                                    <td>{{$log->punch[$i]['time']}}
+                                      @can('timelog-create')
+                                      <span onclick="deleteLog({{$log->punch[$i]['id']}})" class="text-danger">&times;</span>
+                                      @endcan
+                                    </td>
                                   @else
                                   <td></td>
                                   @endif
@@ -104,9 +104,6 @@
 
 @push('js-bottom')
 <script type="text/javascript">
-    window.livewire.on('.Store', () => {
-        $('#createModal').modal('hide');
-    });
 
     var options={
         format: 'yyyy-mm-dd',
@@ -129,5 +126,11 @@
       @this.set('start_date', period['start']);
       @this.set('end_date', period['end']);
     });
+
+    function deleteLog(id){
+      if (confirm('Are you sure?')) {
+          Livewire.emit('deleteLog',id);
+      }
+    }
 </script>
 @endpush

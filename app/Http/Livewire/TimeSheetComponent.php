@@ -23,7 +23,7 @@ class TimeSheetComponent extends Component
 
     public $punchdate,$punchtime,$start_date,$end_date,$sync_data=['user_id'=>'','from'=>'','to'=>''];
 
-
+    protected $listeners = ['deleteLog' => 'delete'];
     public function __construct()
     {
         $this->attendanceService=new AttendanceService();
@@ -91,7 +91,7 @@ class TimeSheetComponent extends Component
             $punches=$timesheet->where('user_id',$att->user_id)->where("punch",">=",$att->ck_date)->where("punch","<=",$att->ck_date." 23:59:59");
             $timesheet=$timesheet->whereNotIn('id',$punches->pluck('id'));
             foreach($punches as $punch){
-                $p[]=date('G:i',strtotime($punch->punch));
+                $p[]=['time'=>date('G:i',strtotime($punch->punch)),'id'=>$punch->id];
             }
             $att->punch=$p;
             $data[]=$att;
@@ -111,7 +111,7 @@ class TimeSheetComponent extends Component
                 $key="check{$i}";
                 $dt[$key]="";
                 if($i<count($att->punch)){
-                    $dt[$key]=$att->punch[$i];
+                    $dt[$key]=$att->punch[$i]['time'];
                 }
             }
             $entries[]=$dt;
@@ -142,7 +142,6 @@ class TimeSheetComponent extends Component
      * @var array
      */
     private function resetInputFields(){
-        $this->user_id = '';
         $this->punchdate = '';
         $this->punchtime = '';
     }
@@ -169,19 +168,21 @@ class TimeSheetComponent extends Component
         // TimeSheet::add($validatedDate);
 
         $validatedDate['sync']=0;
+
         $this->attendanceService->addLog($validatedDate);
 
-        $this->emit('.Store'); // Close model to using to jquery
+        $this->resetInputFields();
 
         session()->flash('message', 'Time Added Successfully.');
   
-        $this->resetInputFields();
-
 
     }
 
     public function delete($id)
     {
+        if(!auth()->user()->can('timelog-create')){
+            abort(403);
+        }
         TimeSheet::destroy($id);
         session()->flash('message', 'Time Deleted Successfully.');
     }

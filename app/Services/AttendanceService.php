@@ -41,17 +41,12 @@ class AttendanceService{
         $user_id=$data['user_id'];
         $timeLog=null;
 
-        Log::info(['from'=>$day_start,'to'=>$day_end,'user_id'=>$user_id]);
-
-        $fix=TimeSheet::where('punch','>=',$data['punch'])->where('punch','<',$day_end)->where('user_id',$user_id)->pluck('punch')->toArray();
-
-        Log::info([$punch,$fix]);
+        $fix=TimeSheet::withTrashed()->where('punch','>=',$data['punch'])->where('punch','<',$day_end)->where('user_id',$user_id)->pluck('punch')->toArray();
 
         if(in_array($punch,$fix)){
             return;
         }
         if($fix){
-            Log::info(['from'=>$day_start,'to'=>$day_end,'fix'=>1]);
             $timeLog=TimeSheet::create($data);
             $this->fixTimeSheet($day_start,$user_id);
             $this->resetDailyAttendance($day_start,$user_id);
@@ -75,10 +70,8 @@ class AttendanceService{
         $data['status']=1;
         $records=TimeSheet::where('punch','>=',$from)->where('punch','<',$to)->where('user_id',$user_id)->orderBy('punch','asc')->get();
         $status=1;
-        Log::info(['date'=>$from,'to'=>$to]);
         foreach($records as $record){
             $status=($status+1)%2;
-            Log::info(['date'=>$record->punch,'status'=>$status]);
             $record->status=$status;
             $record->save();
         }
@@ -137,15 +130,21 @@ class AttendanceService{
                     $attendance->status=$attendance->late_min>0?'Late':'Normal';
                     $attendance->save();
                 }
+
             }else{
                 $attendance->out = $time;
                 $attendance->save();
             }
+
+            UpdateAttendanceStatus::dispatchNow(['from'=>$date,'user_id'=>$user_id]);
+
         }else{
             $late_min=$this->lateFine($time,$this->schedule['in']);
             $status=$late_min>0?'Late':'Normal';
             Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$this->schedule['in'],'sc_out'=>$this->schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
         }
+
+
 
     }
 
@@ -187,6 +186,7 @@ class AttendanceService{
         foreach($time_logs as $time_log){
             $this->addAttendance($time_log);
         }
+
     }
 
     public function resetDailyOT($date,$user_id){

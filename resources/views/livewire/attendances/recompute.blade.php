@@ -39,7 +39,7 @@
                     <button type="button" wire:click="recompute"  id="recompute-button" class="btn btn-primary">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
 
-                        Start Sync</button>
+                        Recompute</button>
                 </form>
             </div>
             <div class="modal-footer">
