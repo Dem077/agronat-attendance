@@ -1,5 +1,5 @@
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-12">
         <h3>OT Report</h3>
         <div class="card shadow mb-4">
             <div class="card-body">

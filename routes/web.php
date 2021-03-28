@@ -10,6 +10,8 @@ use App\Http\Livewire\OvertimeComponent;
 use App\Http\Livewire\ResetPassword;
 use App\Http\Livewire\RolesComponent;
 use App\Http\Livewire\TimeSheetComponent;
+use App\Http\Livewire\LeavesComponent;
+use App\Http\Livewire\LeaveTypeComponent;
 use App\Http\Livewire\Users as UsersComponent;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +41,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('assign-roles',AssignRole::class)->name('assign-roles');
     Route::get('attendance-report',AttendanceReport::class)->name('reports.attendance');
     Route::get('ot-report',OTReport::class)->name('reports.ot');
+    Route::get('leaves',LeavesComponent::class)->name('leaves');
+    Route::get('leaves-types',LeaveTypeComponent::class)->name('leave-types');
 
     Route::get('recompute',LogRecompute::class)->name('recompute');
 });

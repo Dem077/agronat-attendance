@@ -94,8 +94,8 @@
         <div id="collapseLeave" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Leave Management:</h6>
-                <a class="collapse-item" href="#">Employee Leaves</a>
-                <a class="collapse-item" href="#">Leave Types</a>
+                <a class="collapse-item" href="{{route('leaves')}}">Employee Leaves</a>
+                <a class="collapse-item" href="{{route('leave-types')}}">Leave Types</a>
             </div>
         </div>
     </li>

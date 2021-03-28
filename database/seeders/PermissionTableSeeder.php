@@ -36,7 +36,21 @@ class PermissionTableSeeder extends Seeder
             'overtime-edit',
             'overtime-delete',
             'reporting-manager',
-            'reporting-supervisor'
+            'reporting-supervisor',
+            'schedule-list',
+            'schedule-create',
+            'schedule-edit',
+            'schedule-delete',
+            'leave-list',
+            'leave-create',
+            'leave-edit',
+            'leave-delete',
+            'setting-list',
+            'setting-create',
+            'setting-edit',
+            'setting-delete',
+            'report-list'
+
          ];
  
  
