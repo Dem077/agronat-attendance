@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Livewire\ApplyOtComponent;
 use App\Http\Livewire\AssignRole;
 use App\Http\Livewire\AttendanceComponent;
 use App\Http\Livewire\AttendanceReport;
 use App\Http\Livewire\DashboardComponent;
+use App\Http\Livewire\DepartmentComponent;
 use App\Http\Livewire\LogRecompute;
 use App\Http\Livewire\OTReport;
 use App\Http\Livewire\OvertimeComponent;
@@ -35,7 +37,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('employees',UsersComponent::class)->name('employees');
     Route::get('attendances',AttendanceComponent::class)->name('attendances');
     Route::get('overtime',OvertimeComponent::class)->name('overtime');
+    Route::get('applied-overtime',ApplyOtComponent::class)->name('applied-overtime');
+
     Route::get('timesheets',TimeSheetComponent::class)->name('timesheets');
+    
     Route::get('/reset-password',ResetPassword::class)->name('reset-password');
     Route::get('roles',RolesComponent::class)->name('roles');
     Route::get('assign-roles',AssignRole::class)->name('assign-roles');
@@ -43,6 +48,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('ot-report',OTReport::class)->name('reports.ot');
     Route::get('leaves',LeavesComponent::class)->name('leaves');
     Route::get('leaves-types',LeaveTypeComponent::class)->name('leave-types');
+    Route::get('departments',DepartmentComponent::class)->name('departments');
 
     Route::get('recompute',LogRecompute::class)->name('recompute');
 });

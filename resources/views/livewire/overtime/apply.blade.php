@@ -14,31 +14,43 @@
                         {{ session('message') }}
                     </div>
                 @endif
-                <input type="hidden" v-model="employee_id"/>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="apply-user">Employee</label>
+                        <select class="form-control" id="apply-user" wire:model.defer="ot.user_id">
+                            <option value="">Select Employee</option>
+                            @foreach ($users as $user)
+                                <option value="{{$user['id']}}" {{$user['id']==$ot['user_id']?'SELECTED':''}}>{{$user['name']}}</option>
+                            @endforeach
+                        </select>
+                        @error('ot.user_id') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                </div>
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="apply-date">Date</label>
-                        <input type="text" class="form-control mt-1" placeholder="YYYY-MM-DD" wire:model="date" autocomplete="off" readonly>
-                        @error('date') <span class="text-danger">{{ $message }}</span>@enderror
+                        <input type="text" class="form-control mt-1" id="apply-date" placeholder="YYYY-MM-DD" wire:model.defer="ot.ck_date" autocomplete="off">
+                        @error('ot.ck_date') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="apply-in">Start Time</label>
-                        <input type="time" class="form-control mt-1" id="apply-in" placeholder="YYYY-MM-DD" wire:model="in" autocomplete="off" required {{$readonly?'readonly':''}}>
-                        @error('in') <span class="text-danger">{{ $message }}</span>@enderror
+                        <input type="time" class="form-control mt-1" id="apply-in" wire:model.defer="ot.in" autocomplete="off" >
+                        @error('ot.in') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group col-md-6">
                         <label for="apply-out">End Time</label>
-                        <input type="time" class="form-control mt-1" id="apply-out" placeholder="YYYY-MM-DD" wire:model="out" autocomplete="off" required {{$readonly?'readonly':''}}>
-                        @error('out') <span class="text-danger">{{ $message }}</span>@enderror
+                        <input type="time" class="form-control mt-1" id="apply-out" wire:model.defer="ot.out" autocomplete="off" >
+                        @error('ot.out') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                 </div>
+                {{-- 
                 <div class="row">
                     <div class="form-group col-md-12">
                         <label for="apply-reason">Reason</label>
-                        <textarea type="text"  rows="2" class="form-control" id="apply-reason" wire:model="reason" autocomplete="off" required {{$readonly?'readonly':''}}></textarea>
-                        @error('reason') <span class="text-danger">{{ $message }}</span>@enderror
+                        <textarea type="text"  rows="2" class="form-control" id="apply-reason" wire:model.defer="ot.reason" autocomplete="off" required {{$readonly?'readonly':''}}></textarea>
+                        @error('ot.reason') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                 </div>
                 <div class="row">
@@ -51,7 +63,7 @@
                         </select>
                         @error('status') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
-                </div>
+                </div> --}}
                 @if(!$readonly)
                     <button type="button" wire:click="store" id="apply-button" class="btn btn-primary">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
@@ -72,7 +84,16 @@
   </div>
 
 @push('js-bottom')
-<script type="text/javascript">
-
+<script>
+    $('#apply-user').select2();
+    var options={
+        format: 'yyyy-mm-dd',
+        todayHighlight: true,
+        autoclose: true,
+      };
+    $('#apply-date').datepicker(options);
+    $('#apply-date').on('change', function (e) {
+       @this.set('ot.ck_date', e.target.value);
+    });
 </script>
 @endpush

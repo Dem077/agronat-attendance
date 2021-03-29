@@ -17,22 +17,21 @@ class Users extends Component
     public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$mobile,$phone;
     public $updateMode = false;
 
-    public function render()
-    {
-        $employees=User::orderBy('name','asc')->pluck('name','id')->toArray();
-        $users=$this->getUsers()->paginate(10);
-        $departments=Department::all();
-        $this->resetPage();
-        return view('livewire.users.component',['employees'=>$employees,'users'=>$users,'departments'=>$departments]);
-    }
 
-    public function getUsers(){
+    public function getUsersProperty(){
         $users=User::select('*');
         if($this->user_id){
             $users=$users->where('id',$this->user_id);
         }
 
-        return $users->orderBy('name','asc');
+        return $users->orderBy('name','asc')->paginate(10);
+    }
+    public function render()
+    {
+        $employees=User::orderBy('name','asc')->pluck('name','id')->toArray();
+        $departments=Department::all();
+        $this->resetPage();
+        return view('livewire.users.component',['employees'=>$employees,'departments'=>$departments]);
     }
 
     /**
@@ -159,7 +158,7 @@ class Users extends Component
             "phone"=>$this->phone
         ];
   
-        if(isset($validatedData['password'])){
+        if($this->password){
             $update['password']=Hash::make($validatedData['password']);
         }
 

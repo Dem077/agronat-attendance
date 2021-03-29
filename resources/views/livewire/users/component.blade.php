@@ -25,10 +25,10 @@
                         <div class="col-sm-3 my-1">
                             <div>
                                 <label for="user-select-name">Employee:</label>
-                                <select type="text" class="form-control" id="user-select-name" placeholder="Employee">
+                                <select type="text" class="form-control" id="user-select-name" wire:model="user_id" placeholder="Employee">
                                     <option value=''>Select Employee</option>
                                     @foreach ($employees as $id=>$name)
-                                        <option value='{{$id}}' {{$id==$user_id?'SELECTED':''}}>{{$name}}</option>
+                                        <option value='{{$id}}'>{{$name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -50,7 +50,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($users as $user)
+                            @foreach($this->users as $user)
                             <tr>
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
@@ -69,7 +69,7 @@
                             @endforeach
                         </tbody>
                     </table>
-                    {{$users->links()}}
+                    {{$this->users->links()}}
                 </div>
                 </div>
                 
@@ -88,7 +88,8 @@ $('#user-select-name').select2();
     window.livewire.on('.userUpdated', () => {
         $('#updateModal').modal('hide');
     });
-    $('#user-select-name').on('change', function (e) {
+
+    $('#user-select-name').on('change',function(e){
         @this.set('user_id', e.target.value);
     });
 </script>

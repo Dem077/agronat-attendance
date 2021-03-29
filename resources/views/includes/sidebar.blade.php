@@ -40,9 +40,19 @@
 
     @can('overtime-list')
     <li class="nav-item">
-        <a class="nav-link" href="{{route('overtime')}}">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Overtime</span></a>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOT" aria-expanded="false" aria-controls="collapseOT">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Overtime</span>
+        </a>
+        <div id="collapseOT" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Overtime:</h6>
+                <a class="collapse-item" href="{{route('overtime')}}">All OT</a>
+                @can('overtime-create')
+                <a class="collapse-item" href="{{route('applied-overtime')}}">Applied OT</a>
+                @endcan
+            </div>
+        </div>
     </li>
     @endcan
 
@@ -57,7 +67,7 @@
     @can('report-list')
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAR" aria-expanded="false" aria-controls="collapseAR">
-            <i class="fas fa-fw fa-cog"></i>
+            <i class="fas fa-fw fa-chart-area"></i>
             <span>Reports</span>
         </a>
         <div id="collapseAR" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
@@ -98,6 +108,13 @@
                 <a class="collapse-item" href="{{route('leave-types')}}">Leave Types</a>
             </div>
         </div>
+    </li>
+    @endcan
+    @can('department-list')
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('departments')}}">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Departments</span></a>
     </li>
     @endcan
     @can('role-create')

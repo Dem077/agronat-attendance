@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Models\Overtime;
 use App\Models\User;
 use App\Exports\OtSummary;
+use App\Models\AppliedOt;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -60,7 +61,7 @@ class MultiOvertime implements WithMultipleSheets
         $attendances=Attendance::where('user_id',$user_id)
                         ->where('ck_date','>=',$this->start_date)
                         ->where('ck_date','<=',$this->end_date)->get();
-        $overtimes=Overtime::where('user_id',$user_id)
+        $overtimes=AppliedOt::where('user_id',$user_id)
                         ->where('ck_date','>=',$this->start_date)
                         ->where('ck_date','<=',$this->end_date)->get();
         $report=[];

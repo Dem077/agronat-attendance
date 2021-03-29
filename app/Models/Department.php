@@ -15,10 +15,15 @@ class Department extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name',
+        'supervisor_id'
     ];
     public function employees(){
         return $this->hasMany(User::class,'department_id');
+    }
+
+    public function supervisor(){
+        return $this->belongsTo(User::class,'supervisor_id');
     }
 
 }

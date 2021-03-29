@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddHashToOvertimesTable extends Migration
+class AddSupervisorToDepartmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ class AddHashToOvertimesTable extends Migration
      */
     public function up()
     {
-        Schema::table('overtimes', function (Blueprint $table) {
-            $table->string('hash')->nullable();
-
+        Schema::table('departments', function (Blueprint $table) {
+            $table->foreignId('supervisor_id')->nullable();
         });
     }
 
@@ -26,8 +25,8 @@ class AddHashToOvertimesTable extends Migration
      */
     public function down()
     {
-        Schema::table('overtimes', function (Blueprint $table) {
-            $table->dropColumn('hash');
+        Schema::table('departments', function (Blueprint $table) {
+            $table->dropColumn('supervisor_id');
 
         });
     }
