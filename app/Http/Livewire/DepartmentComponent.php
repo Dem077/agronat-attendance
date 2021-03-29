@@ -20,6 +20,8 @@ class DepartmentComponent extends Component
         'department.supervisor_id'=>'sometimes',
     ];
 
+    protected $listeners = ['deleteLog' => 'delete'];
+
     public function mount(){
         $this->department=new Department();
     }
@@ -61,5 +63,9 @@ class DepartmentComponent extends Component
         $this->resetInput();
 
         session()->flash('message','Department Updated');
+    }
+
+    public function delete($id){
+        Department::destroy($id);
     }
 }
