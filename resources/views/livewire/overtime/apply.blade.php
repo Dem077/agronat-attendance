@@ -64,16 +64,10 @@
                         @error('status') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                 </div> --}}
-                @if(!$readonly)
-                    <button type="button" wire:click="store" id="apply-button" class="btn btn-primary">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                        Save
-                    </button>
-                    <button type="button" wire:click="update" id="apply-button" class="btn btn-primary">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                        Update
-                    </button>
-                @endif
+                <button type="button" wire:click="store" id="apply-button" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    Save
+                </button>
                 </form>
             </div>
             <div class="modal-footer">

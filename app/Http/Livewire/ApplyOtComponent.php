@@ -75,10 +75,12 @@ class ApplyOtComponent extends Component
         $ot=$ot>0?round($ot/60,2):0;
         $this->ot->ot=$ot;
         $this->ot->save();
+        $this->mount();
         session()->flash('message', 'OT Applied');
     }
 
     public function update($id){
+        
     }
 
     public function delete($id){
