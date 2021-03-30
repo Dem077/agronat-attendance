@@ -81,9 +81,10 @@ class MultiOvertime implements WithMultipleSheets
                 if($att->in<$att->sc_in){
                     $att->in=$att->sc_in;
                 }
-                if($att->out>$att->sc_out || !$att->out){
+                if($att->out>$att->sc_out || !$att->out || $att->out<=$att->sc_in){
                     $att->out=$att->sc_out;
                 }
+                $att->out=$att->sc_out;
                 $att->weekday=round((strtotime($att->out)-strtotime($att->in))/3600,2);
                 $att->holiday=0;
                 $att->date=$att->ck_date;
