@@ -56,6 +56,7 @@ class UpdateAttendanceStatus implements ShouldQueue
     private function updateAttendenceStatus($employees,$date){
         $holidays=Holiday::where('h_date',$date)
                         ->pluck('h_date')->toArray();
+        $today=new DateTime('+1 day');
         foreach($employees as $employee){
             $att=Attendance::where('user_id',$employee)->where('ck_date',$date)->first();
 
@@ -72,9 +73,12 @@ class UpdateAttendanceStatus implements ShouldQueue
                     if($leave){
                         $att->status=$leave->type->title;
                     }else{
-
                         //get schedule for each employee
-                        if(!$att->in){
+
+                        if($date<$today){
+                            $att->status='';
+                        }
+                        elseif(!$att->in){
                             $att->status='Absent';
                         }
                         elseif($att->late_min>0){
@@ -83,7 +87,7 @@ class UpdateAttendanceStatus implements ShouldQueue
                         elseif(new DateTime($att->in)<=new DateTime($att->sc_out)){
                             $att->status='Normal';
                         }else{
-                            $att->status='Absent';
+                            $att->status='';
                         }
                     }
                 }

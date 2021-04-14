@@ -27,8 +27,8 @@ class AttendanceService{
     public function __construct()
     {
         $this->schedule=[
-            "in"=>date('H:i:s',strtotime('08:00')),
-            "out"=>date('H:i:s',strtotime('14:00'))
+            "in"=>date('H:i:s',strtotime('09:00')),
+            "out"=>date('H:i:s',strtotime('13:00'))
         ];
     }
 
