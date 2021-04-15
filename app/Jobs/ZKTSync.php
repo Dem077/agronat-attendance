@@ -73,7 +73,8 @@ class ZKTSync implements ShouldQueue
     }
 
     public function getAttendance($from=null,$to=null,$external_id=null){
-        $logs=$this->db->table('CHECKINOUT')->where('CHECKTIME','>',$from)->addSelect(['USERID'=>$this->db->table('USERINFO')->select('SSN')->whereColumn('CHECKINOUT.USERID', 'USERINFO.USERID')->limit(1)]);
+        $logs=$this->db->table('CHECKINOUT')->where('CHECKTIME','>',$from)
+                    ->whereIn('SENSORID',config('sync.machines'))->addSelect(['USERID'=>$this->db->table('USERINFO')->select('SSN')->whereColumn('CHECKINOUT.USERID', 'USERINFO.USERID')->limit(1)]);
         if($to){
             $logs=$logs->where('CHECKTIME','<=',$to);
         }
