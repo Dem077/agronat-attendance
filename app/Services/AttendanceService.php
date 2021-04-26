@@ -22,14 +22,22 @@ use phpDocumentor\Reflection\Types\Null_;
 
 class AttendanceService{
 
-    private $schedule;
+    public $schedule;
 
-    public function __construct()
+    public function __construct($schedule=null)
     {
-        $this->schedule=[
-            "in"=>date('H:i:s',strtotime('09:00')),
-            "out"=>date('H:i:s',strtotime('13:00'))
-        ];
+        if($schedule){
+            $this->schedule=[
+                "in"=>date('H:i:s',$schedule['in']),
+                "out"=>date('H:i:s',$schedule['out'])
+            ];
+        }else{
+            $this->schedule=[
+                "in"=>date('H:i:s',strtotime('09:00')),
+                "out"=>date('H:i:s',strtotime('13:00'))
+            ];
+        }
+
     }
 
     public function addLog($data){

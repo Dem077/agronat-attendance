@@ -9,9 +9,12 @@ use Livewire\Component;
 
 class RecomputeComponent extends Component
 {
-    public $user_id,$from,$to,$users;
+    public $user_id,$from,$to,$users,$in,$out;
     public function render()
     {
+        $attendanceService=new AttendanceService();
+        $this->in=$attendanceService->schedule['in'];
+        $this->out=$attendanceService->schedule['out'];
         return view('livewire.attendances.recompute');
     }
 
@@ -36,7 +39,7 @@ class RecomputeComponent extends Component
             $users=User::pluck('id')->toArray();
         }
         foreach($users as $user_id){
-            $attendanceService->recompute($this->from,$this->to,$user_id);
+            $attendanceService->recompute($this->from,$this->to,$user_id,['in'=>$this->in,'out'=>$this->out]);
         }
 
         $this->emit('.Recomputed');

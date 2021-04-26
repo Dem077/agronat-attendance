@@ -24,6 +24,7 @@
                     </select>
                     @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
+
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="recompute-from">From</label>
@@ -36,6 +37,20 @@
                         @error('to') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     </div>
+                    <hr/>
+                    <strong>Schedule</strong>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="recompute-in">In</label>
+                            <input type="time" class="form-control mt-1" id="recompute-in"wire:model="in" autocomplete="off" required>
+                            @error('in') <span class="text-danger">{{ $message }}</span>@enderror
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="recompute-out">Out</label>
+                            <input type="time" class="form-control mt-1" id="recompute-out" wire:model="out" autocomplete="off" required>
+                            @error('out') <span class="text-danger">{{ $message }}</span>@enderror
+                        </div>
+                        </div>
                     <button type="button" wire:click="recompute"  id="recompute-button" class="btn btn-primary">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
 
