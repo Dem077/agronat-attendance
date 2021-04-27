@@ -151,11 +151,14 @@ class AttendanceReport extends Component
                     ->get();
         
         $report=[];
-        $header=['name'=>'employee','late min'=>'late_min','Normal'=>'Present'];
+        $header=['name'=>'employee','late min'=>'late_min','Normal'=>'Present','Na'=>'Na'];
 
         foreach($attendances as $att){
             if($att->status=='Holiday'){
-                continue;
+                //continue;
+            }
+            if(!$att->status){
+                $att->status='Na';
             }
             if(!in_array($att->status,$header)){
                 $header[$att->status]=$att->status;

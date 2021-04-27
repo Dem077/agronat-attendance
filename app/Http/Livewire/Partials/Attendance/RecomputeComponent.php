@@ -12,9 +12,11 @@ class RecomputeComponent extends Component
     public $user_id,$from,$to,$users,$in,$out;
     public function render()
     {
-        $attendanceService=new AttendanceService();
-        $this->in=$attendanceService->schedule['in'];
-        $this->out=$attendanceService->schedule['out'];
+        if(!$this->in || !$this->out){
+            $attendanceService=new AttendanceService();
+            $this->in=$attendanceService->schedule['in'];
+            $this->out=$attendanceService->schedule['out'];
+        }
         return view('livewire.attendances.recompute');
     }
 

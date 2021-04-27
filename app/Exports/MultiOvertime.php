@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Exports\OtSummary;
 use App\Models\AppliedOt;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
@@ -45,10 +46,30 @@ class MultiOvertime implements WithMultipleSheets
 
         foreach ($users as $user) {
             $ots=$this->exportRecord($user->id);
-            $summary[$user->name]=['employee'=>$user->name,'weekday'=>0,'holiday'=>0];
-            foreach($ots as $ot){
-                $summary[$user->name]['weekday']+=$ot['weekday']>$ot['days']*8?$ot['weekday']-$ot['days']*8:0;
+            $summary[$user->name]=['employee'=>$user->name,'weekday'=>0,'holiday'=>0,'weekly_hours'=>0];
+            foreach($ots as $i=>$ot){
+                $weekly_hours=0;
+                $elligible_ot=0;
+                $days=$ot['end']->diff($ot['start'])->days+1;
+                $ramadan=new DateTime('2021-04-13');
+                if($ot['start']<$ramadan && $ot['end']>=$ramadan){
+                    $rdays=$ot['end']->diff($ramadan)->days-1;
+                    $days=$days-$ot['hdays'];
+                    $weekly_hours=($days-$rdays)*8+$rdays*4;
+                }elseif($ot['start']>=$ramadan){
+                    $weekly_hours=($days-$ot['hdays'])*4;
+                }else{
+                    $weekly_hours=($days-$ot['hdays'])*8;
+                }
+                
+                $elligible_ot=$ot['weekday']-$weekly_hours;
+                $elligible_ot=$elligible_ot>0?$elligible_ot:0;
+                $summary[$user->name]['weekly_hours']=$weekly_hours;
+                $summary[$user->name]['weekday']+=$elligible_ot;
                 $summary[$user->name]['holiday']+=$ot['holiday'];
+
+                $ots[$i]['weekly_hours']=$weekly_hours;
+                $ots[$i]['weekday']=$elligible_ot;
             }
             $sheets[] = new ExportsOvertime($ots,$user->name);
         }
@@ -115,21 +136,23 @@ class MultiOvertime implements WithMultipleSheets
 
     public function group($start,$end,$data){
         
-        $groups=[['start'=>new DateTime($start),'holiday'=>0,'weekday'=>0,'days'=>0,'data'=>[]]];
+        $groups=[['start'=>new DateTime($start),'holiday'=>0,'weekday'=>0,'days'=>7,'hdays'=>0,'data'=>[]]];
+
         foreach (date_range($start,$end) as $date) {
             $ck_date=$date->format('Y-m-d');
 
             if($date->format('D')=='Sun'){
                 $et=(clone $date)->modify('-1 day');
                 $groups[count($groups)-1]['end']=$et;
-                $groups[count($groups)-1]['days']+=$groups[count($groups)-1]['start']->diff($et)->days+1;
+                //$groups[count($groups)-1]['days']+=$groups[count($groups)-1]['start']->diff($et)->days+1;
 
-                $groups[]=['start'=>$date,'holiday'=>0,'weekday'=>0,'days'=>0,'data'=>[]];
+                $groups[]=['start'=>$date,'holiday'=>0,'weekday'=>0,'days'=>7,'hdays'=>0,'data'=>[]];
             }
 
             if(isset($data[$ck_date])){
                 if($data[$ck_date]['status']=='holiday'){
                     $groups[count($groups)-1]['days']-=1;
+                    $groups[count($groups)-1]['hdays']+=1;
                 }
                 foreach ($data[$ck_date]['data'] as $log) {
                     $groups[count($groups)-1]['data'][]=$log;

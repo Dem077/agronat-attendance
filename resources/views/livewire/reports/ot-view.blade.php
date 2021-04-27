@@ -27,12 +27,12 @@
         </tr>
         <tr>
             <td colspan="3" class="text-right">Deduct</td>
-            <td>{{$log['days']*8}}</td>
+            <td>{{$log['weekly_hours']}}</td>
             <td></td>
         </tr>
         <tr>
             <td colspan="3" class="text-right">Total</td>
-            <td>{{$log['weekday']-$log['days']*8>0?$log['weekday']-$log['days']*8:0}}</td>
+            <td>{{$log['weekday']}}</td>
             <td>{{$log['holiday']}}</td>
         </tr>
     </tbody>
