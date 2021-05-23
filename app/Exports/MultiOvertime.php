@@ -9,6 +9,7 @@ use App\Models\Overtime;
 use App\Models\User;
 use App\Exports\OtSummary;
 use App\Models\AppliedOt;
+use App\Models\Department;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -41,7 +42,8 @@ class MultiOvertime implements WithMultipleSheets
         if($this->user_id){
             $users=[User::find($this->user_id)];
         }else{
-            $users=User::select('id','name')->get();
+            $exclude_departments=[17];
+            $users=User::select('id','name')->whereNotIn('department_id',$exclude_departments)->get();
         }
 
         foreach ($users as $user) {
