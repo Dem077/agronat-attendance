@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\AttendStatus;
 use App\Models\Holiday;
 use App\Models\Leave;
+use App\Models\LeaveType;
 use App\Models\User;
 use DateInterval;
 use DatePeriod;
@@ -66,12 +67,22 @@ class UpdateAttendanceStatus implements ShouldQueue
                     //add holidays to each employee
                     $att->status='Holiday';
                 }else{
-                    $leave=Leave::with('type')->where('user_id',$employee)
-                                ->where('from','<=',$date)
-                                ->where('to','>=',$date)
-                                ->first();
-                    if($leave){
-                        $att->status=$leave->type->title;
+                    $leavetype=LeaveType::whereExists(function($q)use($employee,$date){
+                        $q->from('leaves')
+                            ->whereRaw('leave_types.id = leaves.leave_type_id')
+                            ->where('user_id',$employee)
+                            ->where('from','<=',$date)
+                            ->where('to','>=',$date);
+                    })
+                    ->orderBy('sort_order','asc')
+                    ->first();
+                    // $leave=Leave::with('type')->where('user_id',$employee)
+                    //             ->where('from','<=',$date)
+                    //             ->where('to','>=',$date)
+                    //             ->orderBy('sort_order','asc')
+                    //             ->first();
+                    if($leavetype){
+                        $att->status=$leavetype->title;
                     }else{
                         //get schedule for each employee
 
