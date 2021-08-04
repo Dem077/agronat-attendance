@@ -12,7 +12,7 @@ class RecomputeComponent extends Component
     public $user_id,$from,$to,$users,$in,$out;
     public function render()
     {
-        if(!$this->in || !$this->out){
+        if(!isset($this->in) || !isset($this->out)){
             $attendanceService=new AttendanceService();
             $this->in=$attendanceService->schedule['in'];
             $this->out=$attendanceService->schedule['out'];
@@ -21,7 +21,6 @@ class RecomputeComponent extends Component
     }
 
     public function recompute(){
-
         if(!auth()->user()->can('timelog-create')){
             abort(403);
         }
