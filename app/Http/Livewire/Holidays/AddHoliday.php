@@ -30,6 +30,9 @@ class AddHoliday extends Component
     {
         $this->validate();
         foreach(date_range($this->from_date,$this->to_date) as $date){
+            if(Holiday::where('h_date',$date)->exists()){
+                continue;
+            }
             Holiday::create(['h_date'=>$date,'description'=>$this->description]);
         }
         $this->resetInput();
