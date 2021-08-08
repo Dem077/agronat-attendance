@@ -23,7 +23,7 @@
             <input type="text" wire:model="description" class="form-control mt-1" required>
         </div>
         <div class="col-auto mt-4">
-            <button type="button" wire:click="add" class="btn btn-primary text-right">
+            <button type="button" onclick="addHoliday()" id="submit" class="btn btn-primary text-right">
                 Save</button>
         </div>
 
@@ -48,6 +48,11 @@
     $('#from_date').on('change', function (e) {
        @this.set('from_date', e.target.value);
     });
+
+    function addHoliday(){
+        $('#submit').attr('disabled','disabled');
+        @this.add()
+    }
 </script>
 @endpush
 
