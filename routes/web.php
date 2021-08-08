@@ -6,6 +6,7 @@ use App\Http\Livewire\AttendanceComponent;
 use App\Http\Livewire\AttendanceReport;
 use App\Http\Livewire\DashboardComponent;
 use App\Http\Livewire\DepartmentComponent;
+use App\Http\Livewire\Holidays\ListHolidays;
 use App\Http\Livewire\LogRecompute;
 use App\Http\Livewire\OTReport;
 use App\Http\Livewire\OvertimeComponent;
@@ -49,6 +50,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('leaves',LeavesComponent::class)->name('leaves');
     Route::get('leaves-types',LeaveTypeComponent::class)->name('leave-types');
     Route::get('departments',DepartmentComponent::class)->name('departments');
+    Route::get('holidays',ListHolidays::class)->name('holidays.list');
 
     Route::get('recompute',LogRecompute::class)->name('recompute');
 });

@@ -80,7 +80,7 @@
         
     </li>
     @endcan
-    @can('schedule-list')
+    @can('report-list')
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSchedule" aria-expanded="false" aria-controls="collapseSchedule">
             <i class="fas fa-fw fa-cog"></i>
@@ -89,8 +89,7 @@
         <div id="collapseSchedule" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Schedule Management:</h6>
-                <a class="collapse-item" href="#">Employee Schedule</a>
-                <a class="collapse-item" href="#">Holidays</a>
+                <a class="collapse-item" href="{{route('holidays.list')}}">Holidays</a>
             </div>
         </div>
     </li>
