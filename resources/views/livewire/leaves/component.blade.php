@@ -18,11 +18,11 @@
                             <form>
                                 <div class="form-row align-items-center">
                                   <div class="col-sm-3 my-1">
-                                      @livewire('partials.user-select')
+                                      @livewire('partials.user-select',['ref'=>'leave-user-select'])
                                   </div>
-                                  <div class="col-sm-3 my-1">
+                                  {{-- <div class="col-sm-3 my-1">
                                       @livewire('partials.attendance-period')
-                                  </div>
+                                  </div> --}}
                                 </div>
                               </form>
                         </div>
@@ -75,6 +75,8 @@
           Livewire.emit('deleteLeave',id);
       }
     }
+
+
 
 </script>
 @endpush

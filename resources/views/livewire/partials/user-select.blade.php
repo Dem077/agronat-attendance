@@ -1,6 +1,7 @@
+
 <div class="form-group">
-    <label for="user-select-name">Employee:</label>
-    <select type="text" class="form-control" id="user-select-name" placeholder="Employee">
+    <label for="{{$ref}}">Employee:</label>
+    <select type="text" class="form-control" id="{{$ref}}" placeholder="Employee">
         <option value=''>Select Employee</option>
         @foreach($users as $user)
             <option value='{{$user['id']}}' {{$user_id==$user['id']?'SELECTED':''}}>{{$user['name']}}</option>
@@ -9,9 +10,11 @@
 </div>
 
 @push('js-bottom')
+
     <script>
-        $('#user-select-name').select2();
-        $('#user-select-name').on('change', function (e) {
+        var ref= "#"+@json($ref);
+        $(ref).select2();
+        $(ref).on('change', function (e) {
             Livewire.emit('userSelected',e.target.value)
         });
     </script>

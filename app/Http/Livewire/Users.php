@@ -71,7 +71,9 @@ class Users extends Component
         ]);
 
         $validatedData['password']=Hash::make('agro2020');
-        User::create($validatedData);
+        $user=User::create($validatedData);
+        $user->assignRole('Staff');
+        
   
         $this->emit('.Store'); // Close model to using to jquery
 

@@ -12,14 +12,15 @@ class RecomputeComponent extends Component
     public $user_id,$from,$to,$users,$in,$out;
     public function render()
     {
-        $attendanceService=new AttendanceService();
-        $this->in=$attendanceService->schedule['in'];
-        $this->out=$attendanceService->schedule['out'];
+        if(!isset($this->in) || !isset($this->out)){
+            $attendanceService=new AttendanceService();
+            $this->in=$attendanceService->schedule['in'];
+            $this->out=$attendanceService->schedule['out'];
+        }
         return view('livewire.attendances.recompute');
     }
 
     public function recompute(){
-
         if(!auth()->user()->can('timelog-create')){
             abort(403);
         }

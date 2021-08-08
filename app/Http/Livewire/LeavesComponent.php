@@ -21,11 +21,27 @@ class LeavesComponent extends Component
     public function render()
     {
         $this->setUser();
-        $leaves=Leave::with(['user','type'])->paginate(10);
+        $leaves=$this->getLeaves();
         $leave_types=LeaveType::all();
         $this->resetPage();
 
         return view('livewire.leaves.component',['leaves'=>$leaves,'leave_types'=>$leave_types]);
+    }
+
+    public function getLeaves(){
+        $leaves=Leave::with(['user','type']);
+        if(!$this->user_id){
+            $ids=[];
+            foreach($this->users as $user){
+                $ids[]=$user['id'];
+            }
+
+            $leaves=$leaves->whereIn('user_id',$ids);
+        }else{
+            $leaves=$leaves->where('user_id',$this->user_id);
+        }
+
+        return $leaves->orderBy('from','desc')->orderBy('user_id','asc')->paginate(10);
     }
 
     public function resetInput(){

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Attendance;
+use App\Models\Department;
 use App\Models\User;
 use DateTime;
 use Illuminate\Support\Arr;
@@ -52,6 +53,9 @@ class AttendanceReport extends Component
         $attendances=Attendance::select('user_id','ck_date','late_min','status')->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
         if($this->user_id){
             $attendances=$attendances->where('user_id','=',$this->user_id);
+        }else{
+            $limit_users=User::whereNotIn('department_id',[17])->get()->pluck('id');
+            $attendances=$attendances->whereIn('user_id',$limit_users);
         }
 
         if($this->start_date){
@@ -138,6 +142,9 @@ class AttendanceReport extends Component
         $attendances=Attendance::select(DB::raw("user_id,status,count(1) as count, sum(late_min) as late_min"))->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
         if($this->user_id){
             $attendances=$attendances->where('user_id','=',$this->user_id);
+        }else{
+            $limit_users=User::whereNotIn('department_id',[17])->get()->pluck('id');
+            $attendances=$attendances->whereIn('user_id',$limit_users);
         }
 
         if($this->start_date){
@@ -151,11 +158,14 @@ class AttendanceReport extends Component
                     ->get();
         
         $report=[];
-        $header=['name'=>'employee','late min'=>'late_min','Normal'=>'Present'];
+        $header=['name'=>'employee','late min'=>'late_min','Normal'=>'Present','Na'=>'Na'];
 
         foreach($attendances as $att){
             if($att->status=='Holiday'){
-                continue;
+                //continue;
+            }
+            if(!$att->status){
+                $att->status='Na';
             }
             if(!in_array($att->status,$header)){
                 $header[$att->status]=$att->status;
