@@ -34,7 +34,7 @@ class ZKTSync implements ShouldQueue
                 $this->from='2020-01-01';
             }
         }
-        $this->to=isset($data['to'])?$data['to']:null;
+        $this->to=isset($data['to'])?$data['to']." 23:59:59":null;
         $this->user_id=isset($data['user_id'])?$data['user_id']:null;
         $this->db=DB::connection('sqlsrv');
         $this->attendanceService=new AttendanceService();
