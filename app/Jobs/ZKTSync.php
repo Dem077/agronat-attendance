@@ -29,7 +29,7 @@ class ZKTSync implements ShouldQueue
         if(isset($data['from'])){
             $this->from=$data['from'];
         }else{
-            $this->from=TimeSheet::max('punch');
+            $this->from=today()->format('Y-m-d');
             if(!$this->from){
                 $this->from='2020-01-01';
             }
