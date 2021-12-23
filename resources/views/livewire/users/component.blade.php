@@ -51,7 +51,7 @@
                         </thead>
                         <tbody>
                             @foreach($this->users as $user)
-                            <tr>
+                            <tr class="{{$user->active?'':'text-danger'}}">
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>

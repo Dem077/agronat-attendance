@@ -71,6 +71,16 @@
                             @error('password_confirmation') <span class="text-danger">{{ $message }}</span>@enderror
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="form-check-label" for="activeCheck">
+                            Active:
+                          </label>
+                        <div class="form-check">
+                            
+                          <input class="form-check-input" type="checkbox" id="activeCheck"  wire:model="active">
+
+                        </div>
+                      </div>
 
                 </form>
             </div>

@@ -14,7 +14,7 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$mobile,$phone;
+    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$mobile,$phone, $active;
     public $updateMode = false;
 
 
@@ -49,7 +49,7 @@ class Users extends Component
         $this->phone = '';
         $this->password='';
         $this->password_confirmation='';
-        
+        $this->active='';
     }
 
     /**
@@ -67,6 +67,7 @@ class Users extends Component
             'department_id' => 'sometimes',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
+            'active'=>'sometimes'
             //'password' => 'sometimes|password',
         ]);
 
@@ -100,6 +101,7 @@ class Users extends Component
         $this->department_id = $user->department_id;
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
+        $this->active = $user->active;
         $this->updateMode = true;
     }
 
@@ -119,6 +121,7 @@ class Users extends Component
         $this->department_id = $user->department_id;
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
+        $this->active = $user->active;
         $this->updateMode = true;
     }
   
@@ -144,10 +147,11 @@ class Users extends Component
             'email' => 'required',
             'designation' => 'required',
             'emp_no' => 'required',
-            'department_id' => 'sometimes',
+            'department_id' => 'required',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
             'password' => 'sometimes|confirmed',
+            'active'=>'sometimes'
         ]);
 
         $update=[
@@ -157,7 +161,8 @@ class Users extends Component
             "emp_no"=>$this->emp_no,
             "department_id"=>$this->department_id,
             "mobile"=>$this->mobile,
-            "phone"=>$this->phone
+            "phone"=>$this->phone,
+            "active"=>$this->active
         ];
   
         if($this->password){

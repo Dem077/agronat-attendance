@@ -143,7 +143,7 @@ class AttendanceReport extends Component
         if($this->user_id){
             $attendances=$attendances->where('user_id','=',$this->user_id);
         }else{
-            $limit_users=User::whereNotIn('department_id',[17])->get()->pluck('id');
+            $limit_users=User::active()->whereNotIn('department_id',[17])->get()->pluck('id');
             $attendances=$attendances->whereIn('user_id',$limit_users);
         }
 

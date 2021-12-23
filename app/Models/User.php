@@ -37,6 +37,7 @@ class User extends Authenticatable
         'phone',
         'emp_no',
         'password',
+        'active'
     ];
 
     /**
@@ -76,5 +77,10 @@ class User extends Authenticatable
 
     public function leaves(){
         return $this->hasMany(Leave::class);
+    }
+
+    public function scopeActive($query)
+    {
+        $query->where('active', 1);
     }
 }
