@@ -22,11 +22,12 @@
                     <select name="department_id" id="department_id" class="form-control" wire:bind="department_id">
                         <option value="">Select department</option>
                         @foreach ($departments as $department)
-                            <option value="{{$department->id}}" {{$department->id==$department_id?'SELECTED':''}}>{{$department->name}}</option>
+                            <option value="{{$department->id}}">{{$department->name}}</option>
                         @endforeach
                     </select>
                     @error('department_id') <span class="text-danger">{{ $message }}</span>@enderror
-
+                </div>
+                <div class="form-group">
                     <label for="designation">designation:</label>
                     <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation"/>
                     @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
