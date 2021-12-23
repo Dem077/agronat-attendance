@@ -71,6 +71,7 @@ class Users extends Component
             //'password' => 'sometimes|password',
         ]);
 
+        $validatedData['active']=true;
         $validatedData['password']=Hash::make('agro2020');
         $user=User::create($validatedData);
         $user->assignRole('Staff');
