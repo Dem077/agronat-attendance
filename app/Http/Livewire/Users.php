@@ -67,8 +67,7 @@ class Users extends Component
             'department_id' => 'sometimes',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
-            'active'=>'sometimes'
-            //'password' => 'sometimes|password',
+            'password' => 'required|confirmed'
         ]);
 
         $validatedData['active']=true;

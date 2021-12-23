@@ -53,6 +53,18 @@
                         @error('phone') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="password">Password:</label>
+                        <input type="password" class="form-control" id="password" wire:model="password" placeholder="Password"/>
+                        @error('password') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="password_confirmation">Password Confirmation:</label>
+                        <input type="password" class="form-control" id="password_confirmation" wire:model="password_confirmation" placeholder="Password Confirmation"/>
+                        @error('password_confirmation') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                </div>
                 {{-- <div class="form-group">
                     <label for="password">password:</label>
                     <input type="password" class="form-control" id="password" wire:model="password" placeholder="password"/>
