@@ -10,6 +10,24 @@
                     <div class="col-sm-3 my-1">
                         @livewire('partials.attendance-period')
                     </div>
+                    <div class="col-sm-3 my-1">
+                        <label for="inlineFormInputGroupStartDate">Start Date</label>
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">Start</div>
+                          </div>
+                            <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupStartDate" placeholder="YYYY-MM-DD" wire:model="start_date">
+                        </div>
+                      </div>
+                      <div class="col-sm-3 my-1">
+                        <label for="inlineFormInputGroupEndDate">End Date</label>
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <div class="input-group-text">End</div>
+                          </div>
+                          <input type="text" class="form-control" autocomplete="off" id="inlineFormInputGroupEndDate" placeholder="YYYY-MM-DD" wire:model="end_date">
+                        </div>
+                      </div>
                     <div class="col-auto my-1">
                       <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
                     </div>
