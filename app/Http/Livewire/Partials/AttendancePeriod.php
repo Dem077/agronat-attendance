@@ -21,25 +21,31 @@ class AttendancePeriod extends Component
         //current period
         $current=new DateTime();
         if((int)$current->format('d')>24){
-            $current->modify('next month');
+            $current->modify('+10 days');
         }
         $end=new DateTime($current->format('Y-m-24'));
-        $start=$start=(clone $end)->modify("last month");
-        $period[]=[
-            "month"=>"Current (".$end->format('M, y').")",
-            "start"=>$start->format("Y-m-25"),
-            "end"=>$end->format('Y-m-d')
-        ];
-
-        //last period
-        $end=new DateTime($start->format('Y-m-24'));
         $start=(clone $end)->modify("last month");
         $period[]=[
-            "month"=>"Last (".$end->format('M, y').")",
+            "month"=>$end->format('M, Y')." (Current)",
             "start"=>$start->format("Y-m-25"),
             "end"=>$end->format('Y-m-d')
         ];
 
+        for ($i=1; $i<=6; $i++){
+            $period[]=$this->getPeriodByDate(end($period));
+        }
+
         return  $period;
+    }
+
+    private function getPeriodByDate($pd){
+        $dt=new DateTime($pd['end']);
+        $end=$dt->modify('first day of last month');
+        $start=(clone $end)->modify("last month");
+        return [
+            "month"=>$end->format('M, Y'),
+            "start"=>$start->format("Y-m-25"),
+            "end"=>$end->format('Y-m-24')
+        ];
     }
 }
