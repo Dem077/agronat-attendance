@@ -21,7 +21,7 @@ class AttendancePeriod extends Component
         //current period
         $current=new DateTime();
         if((int)$current->format('d')>24){
-            $current->modify('+10 days');
+            $current->modify('first day of next month');
         }
         $end=new DateTime($current->format('Y-m-24'));
         $start=(clone $end)->modify("last month");
