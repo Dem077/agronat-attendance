@@ -27,12 +27,15 @@ class RecomputeComponent extends Component
         $validatedDate = $this->validate([
             'user_id' => 'sometimes',
             'from' => 'required',
-            'to' => 'required'
+            'to' => 'required',
+            'in' => 'required',
+            'out' => 'required'
         ]);
+
         // $validatedDate['from']=new DateTime($validatedDate['from']);
         // $validatedDate['to']=new DateTime($validatedDate['to']);
         $users=[];
-        $attendanceService=new AttendanceService();
+        $attendanceService=new AttendanceService(['in'=>$this->in,'out'=>$this->out]);
 
         if($this->user_id){
             $users=[$this->user_id];
@@ -40,7 +43,7 @@ class RecomputeComponent extends Component
             $users=User::pluck('id')->toArray();
         }
         foreach($users as $user_id){
-            $attendanceService->recompute($this->from,$this->to,$user_id,['in'=>$this->in,'out'=>$this->out]);
+            $attendanceService->recompute($this->from,$this->to,$user_id);
         }
 
         $this->emit('.Recomputed');
