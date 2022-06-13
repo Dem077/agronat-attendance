@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\AddSchedule;
 use App\Jobs\UpdateAttendanceStatus;
 use App\Jobs\ZKTSync;
 use Illuminate\Console\Scheduling\Schedule;
@@ -31,6 +32,14 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             ZKTSync::dispatchNow();
         })->everyFiveMinutes();
+
+        $schedule->call(function () {
+            AddSchedule::dispatchNow([]);
+        })->dailyAt('01:00');
+
+        $schedule->call(function () {
+            UpdateAttendanceStatus::dispatchNow([]);
+        })->dailyAt('10:00');
     }
 
     /**

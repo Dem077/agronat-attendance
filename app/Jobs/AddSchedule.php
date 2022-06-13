@@ -58,6 +58,12 @@ class AddSchedule implements ShouldQueue
     }
 
     private function addSchedule($employees,$date){
+        if(in_array(date('D',strtotime($date)),['Sat','Fri'])){
+            Holiday::create([
+                'h_date'=>$date,
+                'description'=>'Holiday'
+            ]);
+        }
         $is_holiday=Holiday::where('h_date',$date)->exists();
         if($is_holiday){
             foreach($employees as $employee){
@@ -65,8 +71,8 @@ class AddSchedule implements ShouldQueue
             }
         }else{
             $schedule=[
-                "in"=>date('H:i:s',strtotime('08:00')),
-                "out"=>date('H:i:s',strtotime('16:00'))
+                "in"=>date('H:i:s',strtotime(env('SC_IN','08:00'))),
+                "out"=>date('H:i:s',strtotime(env('SC_OUT','16:00')))
             ];
             foreach($employees as $employee){
                 if(!Attendance::where('user_id',$employee->id)->where('ck_date',$date)->exists()){
