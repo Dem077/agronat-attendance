@@ -19,13 +19,14 @@
                 </div>
                 <div class="form-group">
                     <label for="department_id">department:</label>
-                    <select name="department_id" id="department_id" class="form-control" wire:bind="department_id">
-                        <option value="">Select department</option>
-                        @foreach ($departments as $department)
-                            <option value="{{$department->id}}">{{$department->name}}</option>
-                        @endforeach
-                    </select>
-                    @error('department_id') <span class="text-danger">{{ $message }}</span>@enderror
+                        <select name="department_id" id="department_id" class="form-control" wire:model="department_id">
+                            <option value="">Select department</option>
+                            @foreach ($departments as $department)
+                                <option value="{{$department->id}}" >{{$department->name}}</option>
+                            @endforeach
+                        </select>
+                        @error('department_id') <span class="text-danger">{{ $message }}</span>@enderror
+    
                 </div>
                 <div class="form-group">
                     <label for="designation">designation:</label>

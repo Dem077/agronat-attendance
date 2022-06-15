@@ -64,12 +64,12 @@ class Users extends Component
             'email' => 'required',
             'emp_no' => 'required',
             'designation' => 'required',
-            'department_id' => 'sometimes',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
             'password' => 'required|confirmed'
         ]);
 
+        $validatedData['department_id']=$this->department_id;
         $validatedData['active']=true;
         $validatedData['password']=Hash::make($validatedData['password']);
         $user=User::create($validatedData);
