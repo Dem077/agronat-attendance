@@ -81,7 +81,7 @@
         
     </li>
     @endcan
-    @can('report-list')
+    @can('leave-list')
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSchedule" aria-expanded="false" aria-controls="collapseSchedule">
             <i class="fas fa-fw fa-cog"></i>
