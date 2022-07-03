@@ -40,6 +40,10 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             UpdateAttendanceStatus::dispatchNow([]);
         })->dailyAt('10:00');
+
+        $schedule->call(function () {
+            UpdateAttendanceStatus::dispatchNow([]);
+        })->dailyAt('18:05');
     }
 
     /**
