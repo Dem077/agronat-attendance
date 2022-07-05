@@ -167,6 +167,7 @@ class TimeSheetComponent extends Component
         unset($validatedDate['punchtime']);
         // TimeSheet::add($validatedDate);
 
+        $validatedDate['logged_by']=auth()->id;
         $validatedDate['sync']=0;
 
         $this->attendanceService->addLog($validatedDate);
