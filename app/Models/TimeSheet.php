@@ -24,7 +24,8 @@ class TimeSheet extends Model
         'user_id',
         'punch',
         'status',
-        'sync'
+        'sync',
+        'logged_by'
     ];
 
     public function user(){
