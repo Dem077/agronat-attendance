@@ -8,6 +8,7 @@ use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
 use App\Traits\UserTrait;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -167,7 +168,7 @@ class TimeSheetComponent extends Component
         unset($validatedDate['punchtime']);
         // TimeSheet::add($validatedDate);
 
-        $validatedDate['logged_by']=auth()->id;
+        $validatedDate['logged_by']=Auth::id();
         $validatedDate['sync']=0;
 
         $this->attendanceService->addLog($validatedDate);
