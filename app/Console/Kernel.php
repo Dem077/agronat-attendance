@@ -35,15 +35,15 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             AddSchedule::dispatchNow([]);
-        })->dailyAt('01:00');
+        })
+        ->everySixHours()
+        ->between('05:00','13:00');
 
         $schedule->call(function () {
             UpdateAttendanceStatus::dispatchNow([]);
-        })->dailyAt('10:00');
-
-        $schedule->call(function () {
-            UpdateAttendanceStatus::dispatchNow([]);
-        })->dailyAt('18:05');
+        })
+        ->everySixHours()
+        ->between('05:00','20:00');
     }
 
     /**
