@@ -42,8 +42,8 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             UpdateAttendanceStatus::dispatchNow([]);
         })
-        ->everySixHours()
-        ->between('05:00','20:00');
+        ->everyThreeHours()
+        ->between('08:00','12:00');
     }
 
     /**
