@@ -56,4 +56,3 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('recompute',LogRecompute::class)->name('recompute');
 });
-
