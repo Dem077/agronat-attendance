@@ -13,7 +13,6 @@
                     @can('timelog-create')
                     @include('livewire.timesheets.create')
                     <livewire:partials.timesheets.sync-component :users="$users"/>
-                    <livewire:partials.timesheets.import-logs/>
 
 
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">Add</button>

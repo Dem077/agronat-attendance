@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Department;
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -14,10 +15,15 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$mobile,$phone, $active;
+    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active;
     public $updateMode = false;
+    public $locations=[];
 
 
+    public function mount()
+    {
+        $this->locations=Location::all();
+    }
     public function getUsersProperty(){
         $users=User::select('*');
         if($this->user_id){
@@ -45,6 +51,7 @@ class Users extends Component
         $this->emp_no = '';
         $this->designation = '';
         $this->department_id = '';
+        $this->location_id = '';
         $this->mobile = '';
         $this->phone = '';
         $this->password='';
@@ -70,6 +77,7 @@ class Users extends Component
         ]);
 
         $validatedData['department_id']=$this->department_id;
+        $validatedData['location_id']=$this->location_id;
         $validatedData['active']=true;
         $validatedData['password']=Hash::make($validatedData['password']);
         $user=User::create($validatedData);
@@ -99,6 +107,7 @@ class Users extends Component
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
         $this->department_id = $user->department_id;
+        $this->location_id = $user->location_id;
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
@@ -119,6 +128,7 @@ class Users extends Component
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
         $this->department_id = $user->department_id;
+        $this->location_id = $user->location_id;
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
@@ -148,6 +158,7 @@ class Users extends Component
             'designation' => 'required',
             'emp_no' => 'required',
             'department_id' => 'required',
+            'location_id' => 'required',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
             'password' => 'sometimes|confirmed',
@@ -160,6 +171,7 @@ class Users extends Component
             "designation"=>$this->designation,
             "emp_no"=>$this->emp_no,
             "department_id"=>$this->department_id,
+            "location_id"=>$this->location_id,
             "mobile"=>$this->mobile,
             "phone"=>$this->phone,
             "active"=>$this->active

@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Partials\Timesheets;
 
+use App\Models\Location;
 use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
@@ -28,6 +29,7 @@ class ImportLogs extends Component
 
     public function mount()
     {
+        $this->locations=Location::all();
         $attendanceService=new AttendanceService();
     }
     public function render()
@@ -37,8 +39,13 @@ class ImportLogs extends Component
  
     public function logImport()
     {
+        dd($this->loadSheet(storage_path().'/app/livewire-tmp/kbPru7eH4y8KcrX8521drwLUVakfrH-metaMjVBdWd0bzE4U2VwMjAyMi5jc3Y=-.txt'));
+
         $this->validate();
+
         $this->sheet->store('timesheets');
+
+        $this->loadSheet($this->sheet);
 
         foreach($this->date_range as $range){
             $this->attendanceService->recompute($range['start'],$range['end'],$range['user_id']);
@@ -95,6 +102,24 @@ class ImportLogs extends Component
 
     }
 
+    public function headerValidate($data)
+    {
+        
+        foreach($this->headers as $th){
+            $valid=false;
+            foreach($data as $d){
+                if($th==preg_replace("/[^a-zA-Z\s]+/", "", $d)){
+                    $valid=true;
+                    break;
+                }
+            }
+            if(!$valid){
+                throw ValidationException ::withMessages(['column' => "column {$th} missing"]);
+            }
+        }
+
+    }
+
 
     public function loadSheet($sheet)
     {
@@ -102,15 +127,11 @@ class ImportLogs extends Component
         $logs=[];
         if (($open = fopen($sheet, "r")) !== FALSE) {
             $data = fgetcsv($open, 1000, ",");
-            foreach($this->headers as $title){
-                if(!in_array($title,$data)){
-                    throw ValidationException::withMessages(['sheet' => "{$title} missing in header"]);
-                }
-            }
+            $this->headerValidate($data);
             while (($data = fgetcsv($open, 1000, ",")) !== FALSE) {
                 $logs[]=[
-                    'punch'=>$this->parsePunchTime($data['Punch Time']),
-                    'user_id'=>$this->getUserId($data['Number'])
+                    'punch'=>$this->parsePunchTime($data[2]),
+                    'user_id'=>$this->getUserId($data[0])
                 ];
             }
 
@@ -130,7 +151,7 @@ class ImportLogs extends Component
         if(isset($this->users[$external_id])){
             return $this->users[$external_id];
         }
-        $user=User::select('id')->whereExternalId($external_id)->first();
+        $user=User::select('id')->where('location_id',$this->location)->whereExternalId($external_id)->first();
         if(!$user){
             throw ValidationException ::withMessages(['user' => "external id {$external_id} not registered"]);
         }

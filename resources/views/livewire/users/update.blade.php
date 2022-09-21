@@ -38,6 +38,17 @@
                         @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
+                        <label for="location_id">location:</label>
+                            <select name="location_id" id="location_id" class="form-control" wire:model="location_id">
+                                <option value="">Select location</option>
+                                @foreach ($locations as $location)
+                                    <option value="{{$location->id}}" >{{$location->name}}</option>
+                                @endforeach
+                            </select>
+                            @error('location_id') <span class="text-danger">{{ $message }}</span>@enderror
+        
+                    </div>
+                    <div class="form-group">
                         <label for="email">email:</label>
                         <input type="email" class="form-control" id="email" wire:model="email" placeholder="email"/>
                         @error('email') <span class="text-danger">{{ $message }}</span>@enderror

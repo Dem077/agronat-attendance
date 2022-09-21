@@ -29,6 +29,17 @@
     
                 </div>
                 <div class="form-group">
+                    <label for="location_id">location:</label>
+                        <select name="location_id" id="location_id" class="form-control" wire:model="location_id">
+                            <option value="">Select location</option>
+                            @foreach ($locations as $location)
+                                <option value="{{$location->id}}" >{{$location->name}}</option>
+                            @endforeach
+                        </select>
+                        @error('location_id') <span class="text-danger">{{ $message }}</span>@enderror
+    
+                </div>
+                <div class="form-group">
                     <label for="designation">designation:</label>
                     <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation"/>
                     @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
