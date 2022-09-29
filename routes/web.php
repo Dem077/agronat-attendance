@@ -15,6 +15,8 @@ use App\Http\Livewire\RolesComponent;
 use App\Http\Livewire\TimeSheetComponent;
 use App\Http\Livewire\LeavesComponent;
 use App\Http\Livewire\LeaveTypeComponent;
+use App\Http\Livewire\Overtime\PreOtRequest as OvertimePreOtRequest;
+use App\Http\Livewire\Overtime\PreOtRequest\Add as OvertimePreOtRequestAdd;
 use App\Http\Livewire\Partials\Timesheets\ImportLogs;
 use App\Http\Livewire\Reports\LeaveReport;
 use App\Http\Livewire\Users as UsersComponent;
@@ -40,6 +42,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('employees',UsersComponent::class)->name('employees');
     Route::get('attendances',AttendanceComponent::class)->name('attendances');
     Route::get('overtime',OvertimeComponent::class)->name('overtime');
+    Route::get('overtime/pre-ot-request',OvertimePreOtRequest::class)->name('overtime.pre-ot-request');
+    Route::get('overtime/pre-ot-request/create',OvertimePreOtRequestAdd::class)->name('overtime.pre-ot-request.create');
+
     Route::get('applied-overtime',ApplyOtComponent::class)->name('applied-overtime');
 
     Route::get('timesheets1',TimeSheetComponent::class)->name('timesheets');

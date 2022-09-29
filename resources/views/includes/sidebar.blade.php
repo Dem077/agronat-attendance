@@ -47,10 +47,7 @@
         <div id="collapseOT" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar" style="">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Overtime:</h6>
-                <a class="collapse-item" href="{{route('overtime')}}">All OT</a>
-                @can('overtime-create')
-                <a class="collapse-item" href="{{route('applied-overtime')}}">Applied OT</a>
-                @endcan
+                <a class="collapse-item" href="{{route('overtime.pre-ot-request')}}">Pre OT Request</a>
             </div>
         </div>
     </li>
