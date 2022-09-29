@@ -19,9 +19,11 @@
                       <div class="col">
                           <form>
                               <div class="row">
+                                @if (count($this->users)>1)
                                 <div class="col-md-4">
                                     @livewire('partials.user-select')
                                 </div>
+                                @endif
                                 <div class="col-md-4">
                                     @livewire('partials.attendance-period')
                                 </div>

@@ -47,6 +47,8 @@ class Add extends Component
             throw ValidationException::withMessages(['duplicate entry' => "Matching entries exist. {$entries}"]);
         }
         $this->ot->save();
+        $this->ot=PreOTRequest::make();
+
         session()->flash('message', 'Requested Successfully');
     }
 

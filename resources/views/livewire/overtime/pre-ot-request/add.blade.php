@@ -21,12 +21,15 @@
                         </ul>
                     </div>
                 @endif
-                    <div class="row">
-                        <div class="form-group col-md-6">
-                            @livewire('partials.user-select')
-                            @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror
-                        </div>
+                @if (count($this->users)>1)
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        @livewire('partials.user-select')
+                        @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
+                </div>
+                @endif
+
                     <div class="row">
                         <div class="form-group col-md-6">
                             <label for="apply-date">Date</label>
