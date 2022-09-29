@@ -14,6 +14,7 @@
                         </div>
                     @endif
 
+
                     <div class="row">
                       <div class="col">
                           <form>
@@ -37,11 +38,11 @@
                             </form>
                       </div>
                   </div>
-                    
+
                     {{-- @include('livewire.users.update')
                     @include('livewire.users.create') --}}
                   <div class="table-responsive">
-                    <table class="table table-bordered mt-5">
+                    <table class="table mt-5">
                         <thead>
                             <tr>
                                 <th>User</th>
@@ -50,16 +51,35 @@
                                 <th>Start</th>
                                 <th>End</th>
                                 <th>OT Minutes</th>
+                                <th>Purpose</th>
                                 <th>status</th>
-                                <th>action</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($this->ot_requests as $item)
+                                <tr>
+                                    <td>{{$item->employee}}</td>
+                                    <td>{{$item->ot_date}}</td>
+                                    <td>{{date_format(date_create($item->ot_date),'D')}}</td>
+                                    <td>{{$item->start_time}}</td>
+                                    <td>{{$item->end_time}}</td>
+                                    <td>{{$item->mins}}</td>
+                                    <td>{{$item->purpose}}</td>
+                                    <td>{{$item->status}}
+                                        @can('overtime.pre-ot-approve')
+                                            @if($item->status=='pending')
+                                                <button class="btn btn-outline text-success" onclick="decision({{$item->id}},'approved')">✔</button>
+                                                <button class="btn btn-outline text-danger" onclick="decision({{$item->id}},'rejected')">❌</button>
+                                            @endif
+                                        @endcan
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
                 </div>
-                
+
             </div>
         </div>
     </div>
@@ -80,5 +100,10 @@
       @this.set('start_date', period['start']);
       @this.set('end_date', period['end']);
     });
+    function decision(id,status){
+      if (confirm('Are you sure?')) {
+          Livewire.emit('updateStatus',id,status);
+      }
+    }
 </script>
 @endpush

@@ -29,7 +29,7 @@ class CreatePreOtRequestsTable extends Migration
             $table->time('checkin')->nullable();
             $table->time('checkout')->nullable();
             $table->unsignedDecimal('ot_mins',5,2)->nullable();
-            $table->string('status');
+            $table->string('status')->default('pending');
             $table->timestamps();
 
         });

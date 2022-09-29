@@ -12,6 +12,15 @@
                             {{ session('message') }}
                         </div>
                     @endif
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                     <div class="row">
                         <div class="form-group col-md-6">
                             @livewire('partials.user-select')
@@ -44,8 +53,8 @@
                             @error('ot.purpose') <span class="text-danger">{{ $message }}</span>@enderror
                         </div>
                     </div>
-                    {{-- 
-    
+                    {{--
+
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label for="apply-status">status</label>
@@ -64,7 +73,7 @@
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
                         Save
                     </button>
-                    
+
                     </form>
             </div>
         </div>
