@@ -44,19 +44,17 @@
                     <table class="table table-bordered mt-5">
                         <thead>
                             <tr>
-                                <th>No.</th>
+                                <th>User</th>
                                 <th>Date</th>
                                 <th>Day</th>
-                                <th>User</th>
-                                <th>Checkin</th>
-                                <th>Checkout</th>
+                                <th>Start</th>
+                                <th>End</th>
                                 <th>OT Minutes</th>
                                 <th>status</th>
                                 <th>action</th>
                             </tr>
                         </thead>
                         <tbody>
-
                         </tbody>
                     </table>
                 </div>

@@ -11,12 +11,11 @@ class Add extends Component
     use UserTrait;
 
     protected $rules=[
-        'ot.ck_date'=>'required',
-        'ot.in'=>'required',
-        'ot.out'=>'required',
+        'ot.ot_date'=>'required',
+        'ot.start_time'=>'required',
+        'ot.end_time'=>'required',
         'user_id'=>'required',
-        'ot.purpose'=>'required',
-        'ot.hash'=>'sometimes'
+        'ot.purpose'=>'required'
     ];
 
     public PreOTRequest $ot;
@@ -32,11 +31,11 @@ class Add extends Component
     public function store()
     {
         $this->validate();
-        $othours=strtotime($this->ot->out)-strtotime($this->ot->in);
-        $othours=$othours>0?round($othours/60,2):0;
+        $otmins=strtotime($this->ot->end_time)-strtotime($this->ot->start_time);
+        $otmins=$otmins>0?round($otmins/60,2):0;
         $this->ot->user_id=$this->user_id;
-        $this->ot->othours=$othours;
-        //dd($this->ot);
+        $this->ot->mins=$otmins;
+        dd($this->ot);
         //$this->ot->save();
         $this->mount();
         session()->flash('message', 'Requested Successfully');
