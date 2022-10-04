@@ -36,7 +36,7 @@ class PreOtRequest extends Component
             $otrequest=ModelsPreOTRequest::find($id);
             $otrequest->status=$status;
             if($status=='approved'){
-                $otrequest->approved_by=auth()->id();
+                $otrequest->approved_user_id=auth()->id();
                 $otrequest->approved_date=now();
                 $otrequest->approved_start_time=$otrequest->start_time;
                 $otrequest->approved_end_time=$otrequest->end_time;

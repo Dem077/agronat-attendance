@@ -55,6 +55,7 @@ class Add extends Component
         $this->ot->save();
 
         session()->flash('message', 'Requested Successfully');
+        return redirect()->route('overtime.pre-ot-request.create');
     }
 
     public function checkDuplicateEnrtry(PreOTRequest $preOTRequest)
