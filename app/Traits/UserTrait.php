@@ -26,4 +26,5 @@ trait UserTrait {
             $this->user_id=$user->id;
         }
     }
+    
 }

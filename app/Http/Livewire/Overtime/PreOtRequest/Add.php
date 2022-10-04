@@ -29,25 +29,30 @@ class Add extends Component
 
     }
 
+    public function otmins($start_time,$end_time)
+    {
+        $otmins=strtotime($end_time)-strtotime($start_time);
+        return $otmins>0?round($otmins/60,2):0;
+    }
+
     public function store()
     {
 
         $this->validate();
-        $otmins=strtotime($this->ot->end_time)-strtotime($this->ot->start_time);
-        $otmins=$otmins>0?round($otmins/60,2):0;
+        
         $this->ot->user_id=$this->user_id;
-        $this->ot->mins=$otmins;
+        $this->ot->requested_user_id=auth()->id();
+        $this->ot->mins=$this->otmins($this->ot->start_time,$this->ot->end_time);
         $this->ot->status='pending';
         $duplicates=$this->checkDuplicateEnrtry($this->ot);
         if(!$duplicates->isEmpty()){
             $entries="";
             foreach($duplicates as $d){
-                $entries.="{$d->start_time} - {$d->end_time}; ";
+                $entries.=date('H:i',strtotime($this->ot->start_time))." - ".date('H:i',strtotime($this->ot->end_time));
             }
             throw ValidationException::withMessages(['duplicate entry' => "Matching entries exist. {$entries}"]);
         }
         $this->ot->save();
-        $this->ot=PreOTRequest::make();
 
         session()->flash('message', 'Requested Successfully');
     }

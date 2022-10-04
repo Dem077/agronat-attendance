@@ -43,15 +43,13 @@
 
                     {{-- @include('livewire.users.update')
                     @include('livewire.users.create') --}}
-                  <div class="table-responsive">
+                  <div class="table-responsive table-hover">
                     <table class="table mt-5">
                         <thead>
                             <tr>
-                                <th>User</th>
+                                <th>Staff</th>
                                 <th>Date</th>
-                                <th>Day</th>
-                                <th>Start</th>
-                                <th>End</th>
+                                <th>Duaration</th>
                                 <th>OT Minutes</th>
                                 <th>Purpose</th>
                                 <th>status</th>
@@ -60,14 +58,12 @@
                         <tbody>
                             @foreach ($this->ot_requests as $item)
                                 <tr>
-                                    <td>{{$item->employee}}</td>
-                                    <td>{{$item->ot_date}}</td>
-                                    <td>{{date_format(date_create($item->ot_date),'D')}}</td>
-                                    <td>{{$item->start_time}}</td>
-                                    <td>{{$item->end_time}}</td>
+                                    <td>{{$item->employee}}{!!$item->user_id!=$item->requested_user_id?"<br/><small>requested by: {$item->requested_by}</small>":""!!}</td>
+                                    <td>{{$item->ot_date}} <br/><small>[ {{date_format(date_create($item->ot_date),'D')}} ]</small></td>
+                                    <td>{{date('H:i',strtotime($item->start_time))}} - {{date('H:i',strtotime($item->end_time))}}</td>
                                     <td>{{$item->mins}}</td>
                                     <td>{{$item->purpose}}</td>
-                                    <td>{{$item->status}}
+                                    <td>{{$item->status}}{!!$item->status=='approved'?"<br/><small>[ {$item->approved_by} ]</small>":""!!}
                                         @can('overtime.pre-ot-approve')
                                             @if($item->status=='pending')
                                                 <button class="btn btn-outline text-success" onclick="decision({{$item->id}},'approved')">✔</button>
@@ -80,6 +76,8 @@
                         </tbody>
                     </table>
                 </div>
+                {{$this->ot_requests->links()}}
+
                 </div>
 
             </div>
@@ -95,13 +93,7 @@
         todayHighlight: true,
         autoclose: true,
       };
-    Livewire.on('userSelected', id => {
-        @this.set('user_id', id);
-    });
-    Livewire.on('periodSelected', period => {
-      @this.set('start_date', period['start']);
-      @this.set('end_date', period['end']);
-    });
+
     function decision(id,status){
       if (confirm('Are you sure?')) {
           Livewire.emit('updateStatus',id,status);
