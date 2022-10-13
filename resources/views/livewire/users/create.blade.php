@@ -26,7 +26,7 @@
                             @endforeach
                         </select>
                         @error('department_id') <span class="text-danger">{{ $message }}</span>@enderror
-    
+
                 </div>
                 <div class="form-group">
                     <label for="location_id">location:</label>
@@ -37,7 +37,7 @@
                             @endforeach
                         </select>
                         @error('location_id') <span class="text-danger">{{ $message }}</span>@enderror
-    
+
                 </div>
                 <div class="form-group">
                     <label for="designation">designation:</label>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="form-group">
                     <label for="email">email:</label>
-                    <input type="email" class="form-control" id="email" wire:model="email" placeholder="email"/>
+                    <input type="email" class="form-control" id="email" wire:model="email" autocomplete="off" placeholder="email"/>
                     @error('email') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
@@ -69,12 +69,12 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="password">Password:</label>
-                        <input type="password" class="form-control" id="password" wire:model="password" placeholder="Password"/>
+                        <input type="password" class="form-control" id="password" wire:model="password" autocomplete="off" placeholder="Password"/>
                         @error('password') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group col-md-6">
                         <label for="password_confirmation">Password Confirmation:</label>
-                        <input type="password" class="form-control" id="password_confirmation" wire:model="password_confirmation" placeholder="Password Confirmation"/>
+                        <input type="password" class="form-control" id="password_confirmation" wire:model="password_confirmation" autocomplete="off" placeholder="Password Confirmation"/>
                         @error('password_confirmation') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                 </div>

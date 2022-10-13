@@ -32,7 +32,7 @@
                             @endforeach
                         </select>
                         @error('department_id') <span class="text-danger">{{ $message }}</span>@enderror
-    
+
                         <label for="designation">designation:</label>
                         <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation"/>
                         @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
@@ -46,17 +46,22 @@
                                 @endforeach
                             </select>
                             @error('location_id') <span class="text-danger">{{ $message }}</span>@enderror
-        
+
                     </div>
                     <div class="form-group">
                         <label for="email">email:</label>
-                        <input type="email" class="form-control" id="email" wire:model="email" placeholder="email"/>
+                        <input type="email" class="form-control" id="email" wire:model="email" autocomplete="off" placeholder="email"/>
                         @error('email') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <label for="emp_no">emp no:</label>
                         <input type="text" class="form-control" id="emp_no" wire:model="emp_no" placeholder="emp no"/>
                         @error('emp_no') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="external_id">External ID:</label>
+                        <input type="text" class="form-control" id="external_id" wire:model="external_id" placeholder="External ID"/>
+                        @error('external_id') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -73,12 +78,12 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="password">Password:</label>
-                            <input type="password" class="form-control" id="password" wire:model="password" placeholder="Password"/>
+                            <input type="password" class="form-control" id="password" wire:model="password" autocomplete="off" placeholder="Password"/>
                             @error('password') <span class="text-danger">{{ $message }}</span>@enderror
                         </div>
                         <div class="form-group col-md-6">
                             <label for="password_confirmation">Password Confirmation:</label>
-                            <input type="password" class="form-control" id="password_confirmation" wire:model="password_confirmation" placeholder="Password Confirmation"/>
+                            <input type="password" class="form-control" id="password_confirmation" wire:model="password_confirmation" autocomplete="off" placeholder="Password Confirmation"/>
                             @error('password_confirmation') <span class="text-danger">{{ $message }}</span>@enderror
                         </div>
                     </div>
@@ -87,7 +92,7 @@
                             Active:
                           </label>
                         <div class="form-check">
-                            
+
                           <input class="form-check-input" type="checkbox" id="activeCheck"  wire:model="active">
 
                         </div>
