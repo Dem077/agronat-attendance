@@ -64,12 +64,10 @@
                                     <td>{{$item->mins}}</td>
                                     <td>{{$item->purpose}}</td>
                                     <td>{{$item->status}}{!!$item->status=='approved'?"<br/><small>[ {$item->approved_by} ]</small>":""!!}
-                                        @can('overtime.pre-ot-approve')
-                                            @if($item->status=='pending')
+                                        @if($item->status=='pending' && $can_approve)
                                                 <button class="btn btn-outline text-success" onclick="decision({{$item->id}},'approved')">✔</button>
                                                 <button class="btn btn-outline text-danger" onclick="decision({{$item->id}},'rejected')">❌</button>
-                                            @endif
-                                        @endcan
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

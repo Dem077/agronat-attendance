@@ -15,12 +15,15 @@ class PreOtRequest extends Component
     use WithPagination, UserTrait;
     protected $paginationTheme = 'bootstrap';
 
-    public $start_date, $end_date, $readonly=false;
+    public $start_date, $end_date, $readonly=false,$can_approve=false;
     protected $listeners=['updateStatus','userSelected','periodSelected'];
 
     public function mount()
     {
         $this->setUser();
+        if(auth()->user()->can('overtime.pre-ot-approve') || count($this->users)>1){
+            $this->can_approve=true;
+        }
 
     }
 
