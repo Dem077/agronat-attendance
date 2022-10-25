@@ -35,7 +35,7 @@ class PreOtRequest extends Component
 
     public function updateStatus($id,$status)
     {
-        if(auth()->user()->can('overtime.pre-ot-approve')){
+        if($this->can_approve){
             $otrequest=ModelsPreOTRequest::find($id);
             $otrequest->status=$status;
             if($status=='approved'){

@@ -62,6 +62,7 @@ class Add extends Component
     {
         return PreOTRequest::where('user_id',$preOTRequest->user_id)
                                 ->where('ot_date',$preOTRequest->ot_date)
+                                ->where('status','<>','rejected')
                                 ->where(function($q)use($preOTRequest){
                                     $q->whereBetween('start_time',[$preOTRequest->start_time,$preOTRequest->end_time])
                                     ->orWhereBetween('end_time',[$preOTRequest->start_time,$preOTRequest->end_time]);

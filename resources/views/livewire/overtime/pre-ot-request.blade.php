@@ -68,6 +68,7 @@
                                                 <button class="btn btn-outline text-success" onclick="decision({{$item->id}},'approved')">✔</button>
                                                 <button class="btn btn-outline text-danger" onclick="decision({{$item->id}},'rejected')">❌</button>
                                         @endif
+                                        
                                     </td>
                                 </tr>
                             @endforeach
