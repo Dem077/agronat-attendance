@@ -7,6 +7,7 @@ use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
 use DateTime;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -38,21 +39,24 @@ class ImportLog extends Component
 
     public function logImport()
     {
-        $filepath="C:\htdocs\attendance\storage\app/timesheets/166564282425 Sept 2022 to 10 Oct 2022.csv";
 
-        // $this->validate();
+        $this->validate();
 
-        // $filename = time().$this->sheet->getClientOriginalName();
+        $filename = time().$this->sheet->getClientOriginalName();
 
-        // Storage::disk('local')->putFileAs(
-        //     'timesheets',
-        //     $this->sheet,
-        //     $filename
-        // );
+        Storage::disk('local')->putFileAs(
+            'timesheets',
+            $this->sheet,
+            $filename
+        );
 
-        // $filepath=Storage::disk('local')->path('timesheets/'.$filename);
+        $filepath=Storage::disk('local')->path('timesheets/'.$filename);
 
         $logs=$this->loadSheet($filepath);
+
+        if($logs['user_errors']){
+            throw ValidationException::withMessages(['user_errors' => "invalid user ids: ".implode(',',$logs['user_errors'])]);
+        }
 
         $this->attendanceService=app()->make(AttendanceService::class);
 
