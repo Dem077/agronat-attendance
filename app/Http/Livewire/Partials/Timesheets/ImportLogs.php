@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Http\Livewire\Partials\Timesheets;
+namespace App\Http\Livewire\Timesheets;
 
 use App\Models\Location;
 use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
 use DateTime;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class ImportLogs extends Component
+class ImportLog extends Component
 {
     use WithFileUploads;
 
@@ -30,46 +31,52 @@ class ImportLogs extends Component
     public function mount()
     {
         $this->locations=Location::all();
-        $attendanceService=new AttendanceService();
     }
     public function render()
     {
-        return view('livewire.partials.timesheets.import-logs');
+        return view('livewire.timesheets.import-log');
     }
- 
+
     public function logImport()
     {
-        dd($this->loadSheet(storage_path().'/app/livewire-tmp/kbPru7eH4y8KcrX8521drwLUVakfrH-metaMjVBdWd0bzE4U2VwMjAyMi5jc3Y=-.txt'));
 
         $this->validate();
 
-        $this->sheet->store('timesheets');
+        $filename = time().$this->sheet->getClientOriginalName();
 
-        $this->loadSheet($this->sheet);
+        Storage::disk('local')->putFileAs(
+            'timesheets',
+            $this->sheet,
+            $filename
+        );
+
+        $filepath=Storage::disk('local')->path('timesheets/'.$filename);
+
+        $logs=$this->loadSheet($filepath);
+
+        if($logs['user_errors']){
+            throw ValidationException::withMessages(['user_errors' => "invalid user ids: ".implode(',',$logs['user_errors'])]);
+        }
+
+        $this->attendanceService=app()->make(AttendanceService::class);
 
         foreach($this->date_range as $range){
-            $this->attendanceService->recompute($range['start'],$range['end'],$range['user_id']);
+            $this->attendanceService->recompute($range['start']->format('Y-m-d'),$range['end']->format('Y-m-d'),$range['user_id']);
         }
 
         $this->emit('logImported'); // Close model to using to jquery
 
-        session()->flash('message', 'Sync Successfully.');
- 
+        session()->flash('message', 'Import Successfully.');
+
     }
 
-    public function import($logs)
-    {
-        foreach($logs as $log){
-            $this->populateDateRange($this->addLog($log));
-        }
-    }
 
     public function populateDateRange($log)
     {
         if(!$log){
             return;
         }
-        $date=date('Y-m-d',strtotime($log['punch']));
+        $date=$log['punch'];
         if(!isset($this->date_range[$log['user_id']])){
             $this->date_range[$log['user_id']]=['user_id'=>$log['user_id'],'start'=>$date,'end'=>$date];
         }else{
@@ -87,8 +94,8 @@ class ImportLogs extends Component
 
     public function addLog($data)
     {
-        $punch=date('Y-m-d H:i:s',strtotime($data['punch']));
-        $date=date('Y-m-d',strtotime($data['punch']));
+        $punch=$data['punch']->format('Y-m-d H:i:s');
+        $date=$data['punch']->format('Y-m-d');
         $day_end=new DateTime($date." 23:59:59");
         $user_id=$data['user_id'];
 
@@ -104,7 +111,6 @@ class ImportLogs extends Component
 
     public function headerValidate($data)
     {
-        
         foreach($this->headers as $th){
             $valid=false;
             foreach($data as $d){
@@ -114,7 +120,7 @@ class ImportLogs extends Component
                 }
             }
             if(!$valid){
-                throw ValidationException ::withMessages(['column' => "column {$th} missing"]);
+                throw ValidationException::withMessages(['column' => "column {$th} missing"]);
             }
         }
 
@@ -125,20 +131,36 @@ class ImportLogs extends Component
     {
 
         $logs=[];
+        $id_errors=[];
         if (($open = fopen($sheet, "r")) !== FALSE) {
             $data = fgetcsv($open, 1000, ",");
             $this->headerValidate($data);
             while (($data = fgetcsv($open, 1000, ",")) !== FALSE) {
-                $logs[]=[
-                    'punch'=>$this->parsePunchTime($data[2]),
-                    'user_id'=>$this->getUserId($data[0])
-                ];
+                $punch=$this->parsePunchTime($data[2]);
+                $user_id=$this->getUserId($data[0]);
+                if(!$user_id){
+                    if(!in_array($data[0],$id_errors)){
+                        $id_errors[]=$data[0];
+                    }
+                }else{
+                    $log=[
+                        'punch'=>$punch,
+                        'sync'=>0,
+                        'logged_by'=>auth()->id(),
+                        'user_id'=>$user_id
+                    ];
+                    $logs[]=$log;
+                    $this->populateDateRange($log);
+                    $this->addLog($log);
+
+                }
+
             }
 
             fclose($open);
         }
 
-        return $logs;
+        return ['logs'=>$logs,'user_errors'=>$id_errors];
     }
 
     public function parsePunchTime($date_time)
@@ -151,9 +173,10 @@ class ImportLogs extends Component
         if(isset($this->users[$external_id])){
             return $this->users[$external_id];
         }
-        $user=User::select('id')->where('location_id',$this->location)->whereExternalId($external_id)->first();
+        $user=User::select('id')->where('location_id',$this->location)->where('external_id',$external_id)->first();
+
         if(!$user){
-            throw ValidationException ::withMessages(['user' => "external id {$external_id} not registered"]);
+            return null;
         }
         $this->users[$external_id]=$user->id;
         return $user->id;
