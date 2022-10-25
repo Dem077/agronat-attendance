@@ -141,6 +141,8 @@ class ImportLog extends Component
                 }else{
                     $log=[
                         'punch'=>$punch,
+                        'sync'=>0,
+                        'logged_by'=>auth()->id(),
                         'user_id'=>$user_id
                     ];
                     $logs[]=$log;
