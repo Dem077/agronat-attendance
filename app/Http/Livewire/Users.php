@@ -15,6 +15,8 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
+    public $department;
+    public $employee;
     public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active,$external_id;
     public $updateMode = false;
     public $locations=[];
@@ -22,22 +24,23 @@ class Users extends Component
 
     public function mount()
     {
+        $this->department=request()->department??'';
+        $this->employee=request()->employee??'';
         $this->locations=Location::all();
     }
-    public function getUsersProperty(){
-        $users=User::select('*');
-        if($this->user_id){
-            $users=$users->where('id',$this->user_id);
-        }
 
-        return $users->orderBy('name','asc')->paginate(10);
-    }
     public function render()
     {
         $employees=User::orderBy('name','asc')->pluck('name','id')->toArray();
-        $departments=Department::all();
+        $departments=Department::orderBy('name','asc')->get();
+        $user_list=User::when($this->department,function($q){
+                                $q->where('department_id',$this->department);
+                            })
+                        ->when($this->employee,function($q){
+                            $q->where('id',$this->employee);
+                        })->orderBy('id','asc')->paginate(10)->withQueryString();
         $this->resetPage();
-        return view('livewire.users.component',['employees'=>$employees,'departments'=>$departments]);
+        return view('livewire.users.component',['employees'=>$employees,'departments'=>$departments,'user_list'=>$user_list]);
     }
 
     /**

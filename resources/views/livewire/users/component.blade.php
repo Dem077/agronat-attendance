@@ -6,7 +6,7 @@
                 <h2>Employees</h2>
             </div>
 
-            <div class="card-body">
+            <div class="card-body" x-data="{department:'{{$department}}'}">
                 <div>
                     @if (session()->has('message'))
                         <div class="alert alert-success">
@@ -24,11 +24,22 @@
                     <div class="row">
                         <div class="col-sm-3 my-1">
                             <div>
+                                <label for="user-select-name">Department:</label>
+                                <select type="text" class="form-control" id="department-select-name" placeholder="Department" x-model="department" x-on:change="window.location.href='?department='+department">
+                                    <option value="">Select Department</option>
+                                    @foreach ($departments as $id=>$department)
+                                        <option value='{{$department->id}}'>{{$department->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 my-1">
+                            <div>
                                 <label for="user-select-name">Employee:</label>
-                                <select type="text" class="form-control" id="user-select-name" wire:model="user_id" placeholder="Employee">
-                                    <option value=''>Select Employee</option>
+                                <select type="text" class="form-control" id="user-select-name" placeholder="Employee">
+                                    <option value="">Select Employee</option>
                                     @foreach ($employees as $id=>$name)
-                                        <option value='{{$id}}'>{{$name}}</option>
+                                        <option value='{{$id}}' {{strval($employee)==strval($id)?'SELECTED="SELECTED"':''}}>{{$name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -50,7 +61,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($this->users as $user)
+                            @foreach($user_list as $user)
                             <tr class="{{$user->active?'':'text-danger'}}">
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
@@ -69,7 +80,7 @@
                             @endforeach
                         </tbody>
                     </table>
-                    {{$this->users->links()}}
+                    {{$user_list->links()}}
                 </div>
                 </div>
                 
@@ -80,7 +91,7 @@
 
 @push('js-bottom')
 <script type="text/javascript">
-$('#user-select-name').select2();
+    $('#user-select-name').select2();
     window.livewire.on('.Store', () => {
         $('#createModal').modal('hide');
     });
@@ -90,7 +101,7 @@ $('#user-select-name').select2();
     });
 
     $('#user-select-name').on('change',function(e){
-        @this.set('user_id', e.target.value);
+        window.location.href="?employee="+e.target.value;
     });
 </script>
 @endpush

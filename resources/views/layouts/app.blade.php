@@ -21,6 +21,8 @@
     <link href="{{asset('css/sb-admin-2.min.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script defer src="https://unpkg.com/alpinejs@3.10.4/dist/cdn.min.js"></script>
+
     @stack('js-top')
     @livewireStyles
 </head>

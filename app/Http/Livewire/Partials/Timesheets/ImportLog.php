@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Timesheets;
+namespace App\Http\Livewire\Partials\Timesheets;
 
 use App\Models\Location;
 use App\Models\TimeSheet;
