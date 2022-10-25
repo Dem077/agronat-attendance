@@ -17,8 +17,8 @@ use App\Http\Livewire\LeavesComponent;
 use App\Http\Livewire\LeaveTypeComponent;
 use App\Http\Livewire\Overtime\PreOtRequest as OvertimePreOtRequest;
 use App\Http\Livewire\Overtime\PreOtRequest\Add as OvertimePreOtRequestAdd;
-use App\Http\Livewire\Partials\Timesheets\ImportLogs;
 use App\Http\Livewire\Reports\LeaveReport;
+use App\Http\Livewire\Timesheets\ImportLog;
 use App\Http\Livewire\Users as UsersComponent;
 use Illuminate\Support\Facades\Route;
 
@@ -48,7 +48,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('applied-overtime',ApplyOtComponent::class)->name('applied-overtime');
 
     Route::get('timesheets1',TimeSheetComponent::class)->name('timesheets');
-    Route::get('import-logs',ImportLogs::class)->name('timesheets.import-logs');
+    Route::get('timesheet/import-log',ImportLog::class)->name('timesheet.import-log');
 
 
     Route::get('/reset-password',ResetPassword::class)->name('reset-password');

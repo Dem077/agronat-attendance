@@ -15,9 +15,10 @@
                     <livewire:partials.timesheets.sync-component :users="$users"/>
 
 
+
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">Add</button>
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#syncModal">Sync</button>
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#logImportModal">Import</button>
+                    <a href="{{route('timesheet.import-log')}}" class="btn btn-success" >Import Log</a>
                     @endcan
                     <div class="row">
                       <div class="col">
@@ -54,7 +55,7 @@
                             </form>
                       </div>
                   </div>
-                    
+
                   <div class="table-responsive">
                     <table class="table table-bordered mt-5">
                         <thead>

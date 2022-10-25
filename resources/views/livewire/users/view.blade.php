@@ -27,7 +27,7 @@
                             @endforeach
                         </select>
                         @error('department_id') <span class="text-danger">{{ $message }}</span>@enderror
-    
+
                         <label for="designation">designation:</label>
                         <input type="text" class="form-control" id="designation" wire:model="designation" placeholder="designation" readonly="readonly"/>
                         @error('designation') <span class="text-danger">{{ $message }}</span>@enderror
@@ -41,7 +41,7 @@
                                 @endforeach
                             </select>
                             @error('location_id') <span class="text-danger">{{ $message }}</span>@enderror
-        
+
                     </div>
                     <div class="form-group">
                         <label for="email">email:</label>
@@ -52,6 +52,11 @@
                         <label for="emp_no">emp no:</label>
                         <input type="text" class="form-control" id="emp_no" wire:model="emp_no" placeholder="emp no" readonly="readonly"/>
                         @error('emp_no') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="external_id">External ID:</label>
+                        <input type="text" class="form-control" id="external_id" wire:model="external_id" placeholder="External ID" readonly="readonly"/>
+                        @error('external_id') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
                         <div class="form-group mt-1">

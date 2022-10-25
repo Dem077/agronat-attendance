@@ -15,7 +15,7 @@ class Users extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active;
+    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active,$external_id;
     public $updateMode = false;
     public $locations=[];
 
@@ -51,6 +51,7 @@ class Users extends Component
         $this->emp_no = '';
         $this->designation = '';
         $this->department_id = '';
+        $this->external_id = '';
         $this->location_id = '';
         $this->mobile = '';
         $this->phone = '';
@@ -70,6 +71,7 @@ class Users extends Component
             'name' => 'required',
             'email' => 'required',
             'emp_no' => 'required',
+            'external_id' => 'sometimes',
             'designation' => 'required',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
@@ -82,17 +84,17 @@ class Users extends Component
         $validatedData['password']=Hash::make($validatedData['password']);
         $user=User::create($validatedData);
         $user->assignRole('Staff');
-        
-  
+
+
         $this->emit('.Store'); // Close model to using to jquery
 
         session()->flash('message', 'user Created Successfully.');
-  
+
         $this->resetInputFields();
 
 
     }
-  
+
     /**
      * The attributes that are mass assignable.
      *
@@ -106,6 +108,7 @@ class Users extends Component
         $this->email = $user->email;
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
+        $this->external_id = $user->external_id;
         $this->department_id = $user->department_id;
         $this->location_id = $user->location_id;
         $this->mobile = $user->mobile;
@@ -127,6 +130,7 @@ class Users extends Component
         $this->email = $user->email;
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
+        $this->external_id = $user->external_id;
         $this->department_id = $user->department_id;
         $this->location_id = $user->location_id;
         $this->mobile = $user->mobile;
@@ -134,7 +138,7 @@ class Users extends Component
         $this->active = $user->active;
         $this->updateMode = true;
     }
-  
+
     /**
      * The attributes that are mass assignable.
      *
@@ -157,6 +161,7 @@ class Users extends Component
             'email' => 'required',
             'designation' => 'required',
             'emp_no' => 'required',
+            'external_id' => 'sometimes',
             'department_id' => 'required',
             'location_id' => 'required',
             'mobile' => 'sometimes',
@@ -170,13 +175,14 @@ class Users extends Component
             "email"=>$this->email,
             "designation"=>$this->designation,
             "emp_no"=>$this->emp_no,
+            "external_id"=>$this->external_id??null,
             "department_id"=>$this->department_id,
             "location_id"=>$this->location_id,
             "mobile"=>$this->mobile,
             "phone"=>$this->phone,
             "active"=>$this->active
         ];
-  
+
         if($this->password){
             $update['password']=Hash::make($validatedData['password']);
         }
@@ -184,7 +190,7 @@ class Users extends Component
         $user = User::findOrFail($this->user_id);
 
         if($user->update($update)){
-            $this->emit('.userUpdated'); // Close model to using to jquery  
+            $this->emit('.userUpdated'); // Close model to using to jquery
             session()->flash('message', 'User Updated Successfully.');
         }else{
             session()->flash('error', 'User Update Failed.');
@@ -193,7 +199,7 @@ class Users extends Component
         $this->resetInputFields();
 
     }
-   
+
     /**
      * The attributes that are mass assignable.
      *
