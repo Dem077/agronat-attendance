@@ -26,7 +26,7 @@ class ImportLog extends Component
         'location'=>'required',
         'sheet' => 'required|mimes:csv,txt|max:1024'
     ];
-    private $headers=['Number','Name','Punch Time','Work State','Terminal','Punch Type'];
+    private $headers=['Number','Name','Punch Time'];
 
     public function mount()
     {
@@ -165,7 +165,11 @@ class ImportLog extends Component
 
     public function parsePunchTime($date_time)
     {
-        return DateTime::createFromFormat('l-d-M-y h:i:s A',$date_time);
+        $d=DateTime::createFromFormat('d-M-y h:i:s A',$date_time);
+        if($d===false){
+            $d=DateTime::createFromFormat('l-d-M-y h:i:s A',$date_time);
+        }
+        return $d;
     }
 
     public function getUserId($external_id)
