@@ -26,7 +26,11 @@ class ImportLog extends Component
         'location'=>'required',
         'sheet' => 'required|mimes:csv,txt|max:1024'
     ];
-    private $headers=['Number','Name','Punch Time'];
+    const PUNCH_TIME='Punch Time';
+    const NUMBER='Number';
+    const NAME='Name';
+
+    private $headers=[self::NUMBER=>0,self::NAME=>0,self::PUNCH_TIME=>0];
 
     public function mount()
     {
@@ -111,11 +115,12 @@ class ImportLog extends Component
 
     public function headerValidate($data)
     {
-        foreach($this->headers as $th){
+        foreach($this->headers as $th=>$index){
             $valid=false;
-            foreach($data as $d){
+            foreach($data as $index=>$d){
                 if($th==preg_replace("/[^a-zA-Z\s]+/", "", $d)){
                     $valid=true;
+                    $this->headers[$th]=$index;
                     break;
                 }
             }
@@ -136,11 +141,11 @@ class ImportLog extends Component
             $data = fgetcsv($open, 1000, ",");
             $this->headerValidate($data);
             while (($data = fgetcsv($open, 1000, ",")) !== FALSE) {
-                $punch=$this->parsePunchTime($data[2]);
-                $user_id=$this->getUserId($data[0]);
+                $punch=$this->parsePunchTime($data[$this->headers[self::PUNCH_TIME]]);
+                $user_id=$this->getUserId($data[$this->headers[self::NUMBER]]);
                 if(!$user_id){
-                    if(!in_array($data[0],$id_errors)){
-                        $id_errors[]=$data[0];
+                    if(!in_array($data[$this->headers[self::NUMBER]],$id_errors)){
+                        $id_errors[]=$data[$this->headers[self::NUMBER]];
                     }
                 }else{
                     $log=[
@@ -165,7 +170,7 @@ class ImportLog extends Component
 
     public function parsePunchTime($date_time)
     {
-        $d=DateTime::createFromFormat('d-M-y h:i:s A',$date_time);
+        $d=DateTime::createFromFormat('d-M-Y h:i:s A',$date_time);
         if($d===false){
             $d=DateTime::createFromFormat('l-d-M-y h:i:s A',$date_time);
         }

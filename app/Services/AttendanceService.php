@@ -216,10 +216,17 @@ class AttendanceService{
     public function addSchedule($date,$user_id){
         //store all holidays in the range for fast processing
         Attendance::where('ck_date',$date)->where('user_id',$user_id)->delete();
-        $holidays=Holiday::where('h_date',$date)
-                        ->pluck('h_date')->toArray();
+        if(in_array($date->format('D'),['Sat','Fri'])){
+            Holiday::create([
+                'h_date'=>$date,
+                'description'=>'Holiday'
+            ]);
+        }
+
+        $is_holiday=Holiday::where('h_date',$date)->exists();
+
         //loop range
-        if(in_array($date->format('Y-m-d'),$holidays)){
+        if($is_holiday){
             //add holidays to each employee
             Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'status'=>'Holiday']);
         }else{
