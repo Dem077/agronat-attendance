@@ -59,7 +59,7 @@ class AddSchedule implements ShouldQueue
 
     private function addSchedule($employees,$date){
         if(in_array(date('D',strtotime($date)),['Sat','Fri'])){
-            Holiday::create([
+            Holiday::updateOrCreate([
                 'h_date'=>$date,
                 'description'=>'Holiday'
             ]);

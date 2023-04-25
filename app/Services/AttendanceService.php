@@ -217,7 +217,7 @@ class AttendanceService{
         //store all holidays in the range for fast processing
         Attendance::where('ck_date',$date)->where('user_id',$user_id)->delete();
         if(in_array($date->format('D'),['Sat','Fri'])){
-            Holiday::create([
+            Holiday::updateOrCreate([
                 'h_date'=>$date,
                 'description'=>'Holiday'
             ]);
