@@ -45,7 +45,7 @@ class ImportLog extends Component
     {
 
         $this->validate();
-
+        set_time_limit(1000);
         $filename = time().$this->sheet->getClientOriginalName();
 
         Storage::disk('local')->putFileAs(
