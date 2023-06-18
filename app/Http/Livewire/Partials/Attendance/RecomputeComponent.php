@@ -21,6 +21,8 @@ class RecomputeComponent extends Component
     }
 
     public function recompute(){
+        set_time_limit(1000);
+
         if(!auth()->user()->can('timelog-create')){
             abort(403);
         }
