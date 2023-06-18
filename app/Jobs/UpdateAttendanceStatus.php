@@ -63,7 +63,11 @@ class UpdateAttendanceStatus implements ShouldQueue
 
             if($att){
                 //loop range
-                if(in_array($date->format('Y-m-d'),$holidays)){
+                $work_saturday=User::where('id',$employee)
+                                ->whereHas('department',function($q){
+                                    $q->where('work_on_saturday',1);
+                                })->exists() && $date->format('D')=='Sat';
+                if(in_array($date->format('Y-m-d'),$holidays) && !$work_saturday){
                     //add holidays to each employee
                     $att->status='Holiday';
                 }else{

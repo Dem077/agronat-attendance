@@ -18,6 +18,7 @@ class DepartmentComponent extends Component
     protected $rules=[
         'department.name'=>'required',
         'department.supervisor_id'=>'sometimes',
+        'department.work_on_saturday'=>'required'
     ];
 
     protected $listeners = ['deleteLog' => 'delete'];

@@ -65,21 +65,32 @@ class AddSchedule implements ShouldQueue
             ]);
         }
         $is_holiday=Holiday::where('h_date',$date)->exists();
-        if($is_holiday){
-            foreach($employees as $employee){
+
+
+        foreach($employees as $employee){
+            $work_saturday=User::where('id',$employee->id)
+                                ->whereHas('department',function($q){
+                                    $q->where('work_on_saturday',1);
+                                })->exists() && date('D',strtotime($date))=='Sat';
+            if($is_holiday && !$work_saturday){
                 Attendance::create(['user_id'=>$employee->id,'ck_date'=>$date,'status'=>'Holiday']);
-            }
-        }else{
-            $schedule=[
-                "in"=>date('H:i:s',strtotime(env('SC_IN','08:00'))),
-                "out"=>date('H:i:s',strtotime(env('SC_OUT','16:00')))
-            ];
-            foreach($employees as $employee){
+            }else{
+                $schedule=[
+                    "in"=>date('H:i:s',strtotime(env('SC_IN','08:00'))),
+                    "out"=>date('H:i:s',strtotime(env('SC_OUT','16:00')))
+                ];
+                if($work_saturday){
+                    $schedule=[
+                        "in"=>date('H:i:s',strtotime(env('SC_SAT_IN','09:00'))),
+                        "out"=>date('H:i:s',strtotime(env('SC_SAT_OUT','16:00')))
+                    ];
+                }
                 if(!Attendance::where('user_id',$employee->id)->where('ck_date',$date)->exists()){
                     Attendance::create(['user_id'=>$employee->id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out']]);
                 }
             }
         }
+
     }
 
 

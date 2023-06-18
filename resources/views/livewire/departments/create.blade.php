@@ -33,6 +33,17 @@
                             </select>
                             @error('department.supervisor_id') <span class="text-danger">{{ $message }}</span>@enderror
                         </div>
+                        <div class="form-group col-md-6">
+                            <label class="form-check-label" for="activeCheck">
+                                Work On Saturday:
+                            </label>
+                            <div class="form-check">
+
+                            <input class="form-check-input" type="checkbox" id="activeCheck"  wire:model="department.work_on_saturday">
+
+                            </div>
+                      </div>
+
                     </div>
                 </form>
             </div>

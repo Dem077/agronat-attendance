@@ -16,7 +16,8 @@ class Department extends Model
      */
     protected $fillable = [
         'name',
-        'supervisor_id'
+        'supervisor_id',
+        'work_on_saturday'
     ];
     public function employees(){
         return $this->hasMany(User::class,'department_id');

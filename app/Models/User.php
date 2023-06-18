@@ -85,4 +85,9 @@ class User extends Authenticatable
     {
         $query->where('active', 1);
     }
+
+    public function workOnSaturday() {
+        return Department::where('id',$this->department_id)
+                            ->where('work_on_saturday',1)->exists();
+    }
 }

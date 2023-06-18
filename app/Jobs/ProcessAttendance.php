@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Attendance;
+use App\Models\Department;
 use App\Models\Holiday;
 use App\Models\Overtime;
 use App\Models\TimeSheet;
@@ -44,7 +45,11 @@ class ProcessAttendance implements ShouldQueue
         $user_id=$this->punch_log->user_id;
 
         $is_holiday=Holiday::where('h_date',$date)->exists();
-        if($is_holiday){
+        $work_saturday=User::where('id',$user_id)
+                                ->whereHas('department',function($q){
+                                    $q->where('work_on_saturday',1);
+                                })->exists() && date('D',$dt)=='Sat';
+        if($is_holiday && !$work_saturday){
             return true;
         }
         $attendance=Attendance::where(['user_id'=>$user_id])->where('ck_date',$date)->first();
@@ -91,9 +96,15 @@ class ProcessAttendance implements ShouldQueue
 
         }else{
             $schedule=[
-                "in"=>date('H:i:s',strtotime('08:00')),
-                "out"=>date('H:i:s',strtotime('16:00'))
+                "in"=>date('H:i:s',strtotime(env('SC_IN','08:00'))),
+                "out"=>date('H:i:s',strtotime(env('SC_OUT','16:00')))
             ];
+            if($work_saturday){
+                $schedule=[
+                    "in"=>date('H:i:s',strtotime(env('SC_SAT_IN','09:00'))),
+                    "out"=>date('H:i:s',strtotime(env('SC_SAT_OUT','16:00')))
+                ];
+            }
             $late_min=$this->lateFine($time,$schedule['in']);
             $status=$late_min>0?'Late':'Normal';
             Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
@@ -102,7 +113,6 @@ class ProcessAttendance implements ShouldQueue
     }
 
     public function lateFine($ck_in,$sc_in){
-        Log::info(['ck_in'=>$ck_in,'sc_in'=>$sc_in]);
         $sc_in=strtotime($sc_in);
         $ck_in=strtotime($ck_in);
         $late_min=floor(($ck_in-$sc_in)/60);

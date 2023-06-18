@@ -149,7 +149,19 @@ class AttendanceService{
         }else{
             $late_min=$this->lateFine($time,$this->schedule['in']);
             $status=$late_min>0?'Late':'Normal';
-            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$this->schedule['in'],'sc_out'=>$this->schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
+            $work_saturday=User::where('id',$user_id)
+                                ->whereHas('department',function($q){
+                                    $q->where('work_on_saturday',1);
+                                })->exists() && date('D',strtotime($date))=='Sat';
+            $schedule=[...$this->schedule];
+            if($work_saturday){
+                $schedule=[
+                    "in"=>date('H:i:s',strtotime(env('SC_SAT_IN','09:00'))),
+                    "out"=>date('H:i:s',strtotime(env('SC_SAT_OUT','16:00')))
+                ];
+            }
+            
+            Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
         }
 
 
@@ -226,7 +238,18 @@ class AttendanceService{
         $is_holiday=Holiday::where('h_date',$date)->exists();
 
         //loop range
-        if($is_holiday){
+        $work_saturday=User::where('id',$user_id)
+                            ->whereHas('department',function($q){
+                                $q->where('work_on_saturday',1);
+                            })->exists() && $date->format('D')=='Sat';
+        $schedule=[...$this->schedule];
+        if($work_saturday){
+            $schedule=[
+                "in"=>date('H:i:s',strtotime(env('SC_SAT_IN','09:00'))),
+                "out"=>date('H:i:s',strtotime(env('SC_SAT_OUT','16:00')))
+            ];
+        }
+        if($is_holiday && !$work_saturday){
             //add holidays to each employee
             Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'status'=>'Holiday']);
         }else{
@@ -238,7 +261,7 @@ class AttendanceService{
                 Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'status'=>$leave->type->title]);
             }else{
                 //get schedule for each employee
-                Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$this->schedule['in'],'sc_out'=>$this->schedule['out']]);
+                Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out']]);
             }
         }
     }
