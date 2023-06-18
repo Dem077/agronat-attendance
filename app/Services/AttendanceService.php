@@ -242,7 +242,7 @@ class AttendanceService{
                             ->whereHas('department',function($q){
                                 $q->where('work_on_saturday',1);
                             })->exists() && $date->format('D')=='Sat';
-        $schedule=[...$this->schedule];
+        $schedule=$this->schedule+[];
         if($work_saturday){
             $schedule=[
                 "in"=>date('H:i:s',strtotime(env('SC_SAT_IN','09:00'))),
