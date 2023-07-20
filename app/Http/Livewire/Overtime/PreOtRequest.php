@@ -49,9 +49,10 @@ class PreOtRequest extends Component
         }
     }
 
-    public function getOtRequestsProperty(){
+    function getOts() {
         $ot_requests=ModelsPreOTRequest::addSelect([
             'employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1),
+            'nid' => User::select('nid')->whereColumn('user_id', 'users.id')->limit(1),
             'requested_by' => User::select('name')->whereColumn('requested_user_id', 'users.id')->limit(1),
             'approved_by' => User::select('name')->whereColumn('approved_user_id', 'users.id')->limit(1),
         ]);
@@ -74,8 +75,32 @@ class PreOtRequest extends Component
         }else{
             $ot_requests=$ot_requests->where('user_id',$this->user_id);
         }
+        return $ot_requests;
+    }
+    public function getOtRequestsProperty(){
+        return $this->getOts()->orderBy('ot_date','desc')->paginate(10);
+    }
 
-        return $ot_requests->orderBy('ot_date','desc')->paginate(10);
+    public function exportRecord(){
+        $report=$this->getOts()->get()->map(function($ot){
+            $ot['starttime']=$ot->start_time->format('H:i');
+            $ot['endtime']=$ot->end_time->format('H:i');
+            return $ot;
+        })->toArray();
+        $filename = sprintf('%1$s-%2$s-%3$s', str_replace(' ', '', 'pre ots'), date('Ymd'), date('His'));
+        $header=[
+            'employee'=>'employee',
+            'nid'=>'nid',
+            'ot_date'=>'ot_date',
+            'starttime'=>'starttime',
+            'endtime'=>'endtime',
+            'mins'=>'mins',
+            'purpose'=>'purpose',
+            'status'=>'status',
+            'requested_by'=>'requested_by',
+            'approved_by'=>'approved_by'
+        ];
+        return export_csv($header, $report, $filename);
     }
 
     public function userSelected($user_id)

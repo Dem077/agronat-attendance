@@ -34,7 +34,7 @@
                                     <a class="btn btn-primary" href="{{route('overtime.pre-ot-request.create')}}">
                                         Add
                                     </a>
-                                  {{-- <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button> --}}
+                                  <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
                                 </div>
                               </div>
                             </form>
