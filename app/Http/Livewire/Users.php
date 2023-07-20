@@ -17,7 +17,7 @@ class Users extends Component
     protected $paginationTheme = 'bootstrap';
     public $department;
     public $employee;
-    public $name, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active,$external_id;
+    public $name,$nid, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active,$external_id;
     public $updateMode = false;
     public $locations=[];
 
@@ -50,6 +50,7 @@ class Users extends Component
      */
     private function resetInputFields(){
         $this->name = '';
+        $this->nid = '';
         $this->email = '';
         $this->emp_no = '';
         $this->designation = '';
@@ -72,6 +73,7 @@ class Users extends Component
     {
         $validatedData = $this->validate([
             'name' => 'required',
+            'nid' => 'required',
             'email' => 'required',
             'emp_no' => 'required',
             'external_id' => 'sometimes',
@@ -108,6 +110,8 @@ class Users extends Component
         $user = User::findOrFail($id);
         $this->user_id = $id;
         $this->name = $user->name;
+        $this->nid = $user->nid;
+
         $this->email = $user->email;
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
@@ -130,6 +134,7 @@ class Users extends Component
         $user = User::findOrFail($id);
         $this->user_id = $id;
         $this->name = $user->name;
+        $this->nid = $user->nid;
         $this->email = $user->email;
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
@@ -161,6 +166,8 @@ class Users extends Component
     {
         $validatedData = $this->validate([
             'name' => 'required',
+            'nid' => 'required',
+
             'email' => 'required',
             'designation' => 'required',
             'emp_no' => 'required',
@@ -175,6 +182,7 @@ class Users extends Component
 
         $update=[
             "name"=>$this->name,
+            "nid"=>$this->nid,
             "email"=>$this->email,
             "designation"=>$this->designation,
             "emp_no"=>$this->emp_no,

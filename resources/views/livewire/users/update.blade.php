@@ -24,6 +24,11 @@
                         @error('name') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
+                        <label for="nid">National ID:</label>
+                        <input type="text" class="form-control" id="nid" wire:model="nid" placeholder="National ID"/>
+                        @error('nid') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
                         <label for="department_id">department:</label>
                         <select name="department_id" id="department_id" class="form-control" wire:model="department_id">
                             <option value="">Select department</option>

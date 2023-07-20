@@ -51,6 +51,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Fullname</th>
+                                <th>National ID</th>
                                 <th>Email</th>
                                 <th>Designation</th>
                                 <th>Mobile</th>
@@ -65,6 +66,7 @@
                             <tr class="{{$user->active?'':'text-danger'}}">
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
+                                <td>{{ $user->nid }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->designation }}</td>
                                 <td>{{ $user->mobile }}</td>

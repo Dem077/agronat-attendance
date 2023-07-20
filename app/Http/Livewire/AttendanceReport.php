@@ -140,12 +140,21 @@ class AttendanceReport extends Component
     }
     public function exportRecord(){
         $attendances=Attendance::select(DB::raw("user_id,status,count(1) as count, sum(late_min) as late_min"))->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
+        $users=[];
         if($this->user_id){
             $attendances=$attendances->where('user_id','=',$this->user_id);
+            $users=[User::find($this->user_id)];
         }else{
-            $limit_users=User::active()->whereNotIn('department_id',[17])->get()->pluck('id');
-            $attendances=$attendances->whereIn('user_id',$limit_users);
+            $users=User::with('department')
+            ->active()
+            ->get();
+            $attendances=$attendances->whereIn('user_id',$users->pluck('id'));
+
         }
+        // }else{
+        //     $limit_users=User::active()->whereNotIn('department_id',[17])->get()->pluck('id');
+        //     $attendances=$attendances->whereIn('user_id',$limit_users);
+        // }
 
         if($this->start_date){
             $attendances=$attendances->where('ck_date','>=',$this->start_date);
@@ -157,8 +166,10 @@ class AttendanceReport extends Component
         $attendances=$attendances->groupBy(['user_id','status'])
                     ->get();
         
+
+        
         $report=[];
-        $header=['name'=>'employee','late min'=>'late_min','Normal'=>'Present','Na'=>'Na'];
+        $header=['name'=>'employee','nid'=>'nid','department'=>'department','late min'=>'late_min','Normal'=>'Present','Na'=>'Na'];
 
         foreach($attendances as $att){
             if($att->status=='Holiday'){
@@ -171,7 +182,10 @@ class AttendanceReport extends Component
                 $header[$att->status]=$att->status;
             }
             if(!isset($report[$att->user_id])){
+                $user=$users->find($att->user_id);
                 $report[$att->user_id]=Arr::only($att->toArray(),['user_id','employee']);
+                $report[$att->user_id]['nid']=$user->nid??"";
+                $report[$att->user_id]['department']=$user->department->name??"";
                 $report[$att->user_id]['late_min']=0;
             }
             $report[$att->user_id][$att->status]=$att->count;
