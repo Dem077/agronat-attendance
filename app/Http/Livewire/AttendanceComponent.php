@@ -55,7 +55,13 @@ class AttendanceComponent extends Component
 
 
     public function getAttendances(){
-        $attendances=Attendance::addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
+        $attendances=Attendance::addSelect([
+            'employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1),
+            'nid' => User::select('nid')->whereColumn('user_id', 'users.id')->limit(1)
+        ])
+        ->whereHas('user',function($q){
+            $q->active();
+        });
 
         if($this->start_date){
             $attendances=$attendances->where('ck_date','>=',$this->start_date);
@@ -87,6 +93,7 @@ class AttendanceComponent extends Component
 
         $header = array(
             'Employee'=>'employee',
+            'ID'=>'nid',
             'Date'=>'ck_date',
             'Duty Start'=>'sc_in',
             'Duty End'=>'sc_out',
