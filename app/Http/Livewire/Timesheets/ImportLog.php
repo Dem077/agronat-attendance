@@ -142,6 +142,10 @@ class ImportLog extends Component
             $this->headerValidate($data);
             while (($data = fgetcsv($open, 1000, ",")) !== FALSE) {
                 $punch=$this->parsePunchTime($data[$this->headers[self::PUNCH_TIME]]);
+                if($punch===false){
+                    Log::error(["message"=>"invalid punch","data"=>$data,'punch'=>$data[$this->headers[self::PUNCH_TIME]]]);
+                    throw ValidationException::withMessages(['message'=>'Invalid punch time '.$data[$this->headers[self::PUNCH_TIME]]]);
+                }
                 $user_id=$this->getUserId($data[$this->headers[self::NUMBER]]);
                 if(!$user_id){
                     if(!in_array($data[$this->headers[self::NUMBER]],$id_errors)){
@@ -173,6 +177,9 @@ class ImportLog extends Component
         $d=DateTime::createFromFormat('d-M-Y h:i:s A',$date_time);
         if($d===false){
             $d=DateTime::createFromFormat('l-d-M-y h:i:s A',$date_time);
+        }
+        if($d===false){
+            $d=DateTime::createFromFormat('Y-m-d H:i:s',$date_time);
         }
         return $d;
     }

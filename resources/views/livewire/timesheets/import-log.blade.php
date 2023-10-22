@@ -34,6 +34,10 @@
         <input type="file" class="form-control" wire:model="sheet">
     </div>
 
+    <div class="form-group">
+        <label>Columns: Name, Number, Punch Time</label>
+    </div>
+
     <button type="button" wire:click="logImport"  id="logImport-button" class="btn btn-primary" wire:loading.attr="disabled" wire:target="sheet">
     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>Import</button>
             </div>
