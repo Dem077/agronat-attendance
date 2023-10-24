@@ -65,8 +65,8 @@
                                     <td>{{$item->purpose}}</td>
                                     <td>{{$item->status}}{!!$item->status=='approved'?"<br/><small>[ {$item->approved_by} ]</small>":""!!}
                                         @if($item->status=='pending' && $can_approve)
-                                                <button class="btn btn-outline text-success" onclick="decision({{$item->id}},'approved')">✔</button>
-                                                <button class="btn btn-outline text-danger" onclick="decision({{$item->id}},'rejected')">❌</button>
+                                                <button class="btn btn-success mx-2" onclick="decision({{$item->id}},'approved')">Approve</button>
+                                                <button class="btn btn-danger" onclick="decision({{$item->id}},'rejected')">Reject</button>
                                         @endif
                                         
                                     </td>
@@ -94,7 +94,7 @@
       };
 
     function decision(id,status){
-      if (confirm('Are you sure?')) {
+      if (confirm('Confirm to '+status+'?')) {
           Livewire.emit('updateStatus',id,status);
       }
     }
