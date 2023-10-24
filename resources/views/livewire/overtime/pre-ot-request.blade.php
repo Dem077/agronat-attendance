@@ -64,9 +64,11 @@
                                     <td>{{$item->mins}}</td>
                                     <td>{{$item->purpose}}</td>
                                     <td>{{$item->status}}{!!$item->status=='approved'?"<br/><small>[ {$item->approved_by} ]</small>":""!!}
-                                        @if($item->status=='pending' && $can_approve)
+                                        @if(($item->status=='pending' || auth()->user()->hasRole('Super Admin')) && $can_approve)
+                                                <div>
                                                 <button class="btn btn-success mx-2" onclick="decision({{$item->id}},'approved')">Approve</button>
                                                 <button class="btn btn-danger" onclick="decision({{$item->id}},'rejected')">Reject</button>
+                                                </div>
                                         @endif
                                         
                                     </td>
