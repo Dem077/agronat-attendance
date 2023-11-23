@@ -181,6 +181,10 @@ class ImportLog extends Component
         if($d===false){
             $d=DateTime::createFromFormat('Y-m-d H:i:s',$date_time);
         }
+
+        if($d===false){
+            $d=DateTime::createFromFormat('Y-m-d H:i',$date_time);
+        }
         return $d;
     }
 
