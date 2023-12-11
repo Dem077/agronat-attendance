@@ -40,7 +40,8 @@ class User extends Authenticatable
         'password',
         'active',
         'external_id',
-        'location_id'
+        'location_id',
+        'supervisor_id'
     ];
 
     /**
@@ -77,6 +78,12 @@ class User extends Authenticatable
     public function department(){
         return $this->belongsTo(Department::class);
     }
+
+
+    public function supervisor(){
+        return $this->belongsTo(User::class,'supervisor_id');
+    }
+
 
     public function leaves(){
         return $this->hasMany(Leave::class);
