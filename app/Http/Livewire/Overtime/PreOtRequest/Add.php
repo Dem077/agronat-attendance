@@ -90,8 +90,10 @@ class Add extends Component
                 'ot.end_time'=>'End time must be greater than Start Time'
             ]);
         }
+        
         $attendance=Attendance::where('user_id',$this->user_id)->where('ck_date',$this->ot->ot_date)->first();
-        if(!in_array($attendance?->status,['Present','Late','Holiday'])){
+
+        if(!in_array($attendance?->status,['Normal','Late','Holiday'])){
             throw ValidationException::withMessages(['ot.ot_date'=>'No valid attendance found']);
         }
 
