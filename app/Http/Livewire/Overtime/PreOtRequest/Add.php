@@ -84,6 +84,12 @@ class Add extends Component
         $ot_start=DateTime::createFromFormat('Y-m-d H:i:s',"{$this->ot->ot_date} {$st[1]}");
         $ot_end=DateTime::createFromFormat('Y-m-d H:i:s',"{$this->ot->ot_date} {$et[1]}");
 
+        if($ot_start>$ot_end){
+            throw ValidationException::withMessages([
+                'ot.start_time'=>'Start time must be less than End Time',
+                'ot.end_time'=>'End time must be greater than Start Time'
+            ]);
+        }
         $attendance=Attendance::where('user_id',$this->user_id)->where('ck_date',$this->ot->ot_date)->first();
         if(!in_array($attendance?->status,['Present','Late','Holiday'])){
             throw ValidationException::withMessages(['ot.ot_date'=>'No valid attendance found']);
