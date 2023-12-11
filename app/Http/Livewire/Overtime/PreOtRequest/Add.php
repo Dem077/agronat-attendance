@@ -2,8 +2,11 @@
 
 namespace App\Http\Livewire\Overtime\PreOtRequest;
 
+use App\Models\Attendance;
 use App\Models\PreOTRequest;
+use App\Models\TimeSheet;
 use App\Traits\UserTrait;
+use DateTime;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
@@ -40,6 +43,12 @@ class Add extends Component
 
         $this->validate();
         
+        if(!auth()->user()->can('reporting-manager')){
+            $this->gracePeriodValidate();
+        }
+        
+        $this->afterShiftValidate();
+        
         $this->ot->user_id=$this->user_id;
         $this->ot->requested_user_id=auth()->id();
         $this->ot->mins=$this->otmins($this->ot->start_time,$this->ot->end_time);
@@ -56,6 +65,78 @@ class Add extends Component
 
         session()->flash('message', 'Requested Successfully');
         return redirect()->route('overtime.pre-ot-request.create');
+    }
+
+    public function gracePeriodValidate(){
+        $lh=config('hr.late_ot_request_hours');
+        $st=explode(" ",$this->ot->start_time);
+        $ot_start_datetime=DateTime::createFromFormat('Y-m-d H:i:s',"{$this->ot->ot_date} {$st[1]}");
+        $grace_period=now()->add("-{$lh} hours");
+        if($ot_start_datetime<$grace_period){
+            throw ValidationException::withMessages(['ot.ot_date'=>'Must be less than 48 hours']);
+        }
+    }
+
+    public function afterShiftValidate(){
+        $st=explode(" ",$this->ot->start_time);
+        $et=explode(" ",$this->ot->end_time);
+
+        $ot_start=DateTime::createFromFormat('Y-m-d H:i:s',"{$this->ot->ot_date} {$st[1]}");
+        $ot_end=DateTime::createFromFormat('Y-m-d H:i:s',"{$this->ot->ot_date} {$et[1]}");
+
+        $attendance=Attendance::where('user_id',$this->user_id)->where('ck_date',$this->ot->ot_date)->first();
+        if(!in_array($attendance?->status,['Present','Late','Holiday'])){
+            throw ValidationException::withMessages(['ot.ot_date'=>'No valid attendance found']);
+        }
+
+
+        if($attendance?->status!='Holiday'){
+            $shift_in=DateTime::createFromFormat('Y-m-d H:i:s',"{$attendance->ck_date} {$attendance->sc_in}");
+            $shift_out=DateTime::createFromFormat('Y-m-d H:i:s',"{$attendance->ck_date} {$attendance->sc_out}");
+    
+            if(($ot_start>$shift_in && $ot_start <$shift_out) || ($ot_end>$shift_in && $ot_end <$shift_out)){
+                    throw ValidationException::withMessages([
+                        'ot.start_time'=>'Cannot request ot in Shift time',
+                        'ot.end_time'=>'Cannot request ot in Shift time'
+                    ]);
+            }
+        }
+
+        $logs=TimeSheet::where('user_id',$this->user_id)
+                    ->whereRaw("date_format(punch,'%Y-%m-%d') = '{$this->ot->ot_date}'")
+                    ->orderBy('punch','desc')
+                    ->get()
+                    ->toArray();
+        
+        if(count($logs)<2){
+            throw ValidationException::withMessages([
+                'ot.start_time'=>'No valid checkin log (0)',
+                'ot.end_time'=>'No valid checkin log (0)'
+            ]);
+        }
+
+        for($i=0;$i<count($logs)-1;$i+=2){
+            $out=$logs[$i];
+            $in=isset($logs[$i+1])?$logs[$i+1]:null;
+
+
+            if(!$out){
+                continue;
+            }
+
+            $in=DateTime::createFromFormat('Y-m-d H:i:s',$in['punch'])->modify("-1 mins");
+            $out=DateTime::createFromFormat('Y-m-d H:i:s',$out['punch'])->modify("+1 mins");
+
+            if($in<=$ot_start && $out>=$ot_end){
+                return true;
+            }
+        }
+        
+        throw ValidationException::withMessages([
+            'ot.start_time'=>'No valid checkin log',
+            'ot.end_time'=>'No valid checkin log'
+        ]);
+
     }
 
     public function checkDuplicateEnrtry(PreOTRequest $preOTRequest)
