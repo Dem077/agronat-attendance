@@ -38,7 +38,7 @@ class ZKTSync implements ShouldQueue
                 $this->from='2020-01-01';
             }
         }
-        $this->to=isset($data['to'])?$data['to']." 23:59:59":null;
+        $this->to=isset($data['to'])?$data['to']." 23:59:59":$data['from']." 23:59:59";
         $this->user_id=isset($data['user_id'])?$data['user_id']:null;
         $this->attendanceService=new AttendanceService();
     }
@@ -50,7 +50,7 @@ class ZKTSync implements ShouldQueue
      */
     public function handle()
     {
-        Log::info("Syncing.....");
+        Log::info("Syncing.....",today()->format('Y-m-d'));
         $employee_ids=[];
         if($this->user_id){
             $emp_no=User::find($this->user_id)?->emp_no;

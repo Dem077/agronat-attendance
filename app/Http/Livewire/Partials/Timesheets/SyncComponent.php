@@ -24,7 +24,7 @@ class SyncComponent extends Component
             'to' => 'required'
         ]);
 
-        ZKTSync::dispatchNow($validatedDate);
+        ZKTSync::dispatchSync($validatedDate);
         $this->emit('.Synced'); // Close model to using to jquery
 
         session()->flash('message', 'Sync Successfully.');
