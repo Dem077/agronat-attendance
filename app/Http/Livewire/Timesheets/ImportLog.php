@@ -19,23 +19,17 @@ class ImportLog extends Component
 
     private $attendanceService;
     private $date_range=[];
-    public $sheet,$location;
-    public $locations=[];
+    public $sheet;
     public $users=[];
     protected $rules=[
-        'location'=>'required',
         'sheet' => 'required|mimes:csv,txt|max:1024'
     ];
-    const PUNCH_TIME='Punch Time';
-    const NUMBER='Number';
-    const NAME='Name';
+    const PUNCH_TIME='time';
+    const NUMBER='empno';
+    const PUNCH_DATE='date';
 
-    private $headers=[self::NUMBER=>0,self::NAME=>0,self::PUNCH_TIME=>0];
+    private $headers=[self::NUMBER=>0,self::PUNCH_DATE=>0,self::PUNCH_TIME=>0];
 
-    public function mount()
-    {
-        $this->locations=Location::all();
-    }
     public function render()
     {
         return view('livewire.timesheets.import-log');
@@ -141,10 +135,11 @@ class ImportLog extends Component
             $data = fgetcsv($open, 1000, ",");
             $this->headerValidate($data);
             while (($data = fgetcsv($open, 1000, ",")) !== FALSE) {
-                $punch=$this->parsePunchTime($data[$this->headers[self::PUNCH_TIME]]);
+                $date_time=$data[$this->headers[self::PUNCH_DATE]]." ".$data[$this->headers[self::PUNCH_TIME]];
+                $punch=$this->parsePunchTime($date_time);
                 if($punch===false){
-                    Log::error(["message"=>"invalid punch","data"=>$data,'punch'=>$data[$this->headers[self::PUNCH_TIME]]]);
-                    throw ValidationException::withMessages(['message'=>'Invalid punch time '.$data[$this->headers[self::PUNCH_TIME]]]);
+                    Log::error(["message"=>"invalid punch","data"=>$data,'punch'=>$date_time]);
+                    throw ValidationException::withMessages(["message'=>'Invalid punch time {$date_time}"]);
                 }
                 $user_id=$this->getUserId($data[$this->headers[self::NUMBER]]);
                 if(!$user_id){
@@ -174,31 +169,34 @@ class ImportLog extends Component
 
     public function parsePunchTime($date_time)
     {
-        $d=DateTime::createFromFormat('d-M-Y h:i:s A',$date_time);
-        if($d===false){
-            $d=DateTime::createFromFormat('l-d-M-y h:i:s A',$date_time);
-        }
-        if($d===false){
-            $d=DateTime::createFromFormat('Y-m-d H:i:s',$date_time);
-        }
+        $d=DateTime::createFromFormat('Y-m-d H:i:s',$date_time);
 
         if($d===false){
             $d=DateTime::createFromFormat('Y-m-d H:i',$date_time);
         }
+
+        if($d===false){
+            $d=DateTime::createFromFormat('d-M-Y h:i:s A',$date_time);
+        }
+
+        if($d===false){
+            $d=DateTime::createFromFormat('l-d-M-y h:i:s A',$date_time);
+        }
+
         return $d;
     }
 
-    public function getUserId($external_id)
+    public function getUserId($emp_no)
     {
-        if(isset($this->users[$external_id])){
-            return $this->users[$external_id];
+        if(isset($this->users[$emp_no])){
+            return $this->users[$emp_no];
         }
-        $user=User::select('id')->where('location_id',$this->location)->where('external_id',$external_id)->first();
+        $user=User::select('id')->where('emp_no',$emp_no)->first();
 
         if(!$user){
             return null;
         }
-        $this->users[$external_id]=$user->id;
+        $this->users[$emp_no]=$user->id;
         return $user->id;
     }
 }

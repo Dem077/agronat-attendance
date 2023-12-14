@@ -18,24 +18,15 @@
             </ul>
         </div>
     @endif
-
-    <div class="form-group">
-        <label for="">Location</label>
-        <select class="form-control" wire:model='location'>
-            <option value="">Select Location</option>
-            @foreach ($locations as $location)
-                <option value="{{$location->id}}">{{$location->name}}</option>
-            @endforeach
-        </select>
-
-    </div>
     <div class="form-group">
         <label for="">Sheet</label>
         <input type="file" class="form-control" wire:model="sheet">
     </div>
 
     <div class="form-group">
-        <label>Columns: Name, Number, Punch Time</label>
+        <label>Columns: empno,date,time</label><br/>
+        <label>format: empno= integer, date=2023-01-31, time=20:00:00</label>
+
     </div>
 
     <button type="button" wire:click="logImport"  id="logImport-button" class="btn btn-primary" wire:loading.attr="disabled" wire:target="sheet">
