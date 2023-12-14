@@ -29,21 +29,14 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->call(function () {
-            ZKTSync::dispatchNow();
-        })->everyThreeMinutes();
-
-        $schedule->call(function () {
-            AddSchedule::dispatchNow([]);
-        })
-        ->everySixHours()
-        ->between('05:00','13:00');
-
-        $schedule->call(function () {
-            UpdateAttendanceStatus::dispatchNow([]);
-        })
-        ->everyThreeHours()
-        ->between('08:00','12:00');
+        $schedule->job(new ZKTSync())
+                        ->everyThreeMinutes();
+        $schedule->job(new AddSchedule([]))
+                        ->everySixHours()
+                        ->between('05:00','13:00');;
+        $schedule->job(new UpdateAttendanceStatus([]))
+                        ->everyThreeHours()
+                        ->between('08:00','12:00');
     }
 
     /**
