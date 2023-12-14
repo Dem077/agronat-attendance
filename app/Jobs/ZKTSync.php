@@ -50,7 +50,6 @@ class ZKTSync implements ShouldQueue
      */
     public function handle()
     {
-        Log::info(["Syncing.....",today()->format('Y-m-d')]);
         $employee_ids=[];
         if($this->user_id){
             $emp_no=User::find($this->user_id)?->emp_no;
@@ -58,6 +57,7 @@ class ZKTSync implements ShouldQueue
                 $employee_ids[]=$emp_no;
             }
         }
+        
         foreach($this->getAttendance($this->from,$this->to,$employee_ids) as $d){
             if(!isset($users[$d['emp_id']])){
                 
