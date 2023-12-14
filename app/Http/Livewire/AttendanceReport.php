@@ -182,7 +182,7 @@ class AttendanceReport extends Component
                 $header[$att->status]=$att->status;
             }
             if(!isset($report[$att->user_id])){
-                $user=$users->find($att->user_id);
+                $user=User::find($att->user_id);
                 $report[$att->user_id]=Arr::only($att->toArray(),['user_id','employee']);
                 $report[$att->user_id]['nid']=$user->nid??"";
                 $report[$att->user_id]['department']=$user->department->name??"";
