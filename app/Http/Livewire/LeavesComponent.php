@@ -79,8 +79,8 @@ class LeavesComponent extends Component
             abort(403);
         }
         $leave=Leave::findOrFail($id);
-        Leave::destroy($id);
-
+        $leave->where('id',$id)->update(['deleted_by_id'=>auth()->id()]);
+        Leave::where('id',$id)->delete();
         $this->updateAttendance($leave);
 
     }
