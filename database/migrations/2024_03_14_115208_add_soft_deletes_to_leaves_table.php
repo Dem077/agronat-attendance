@@ -14,7 +14,7 @@ class AddSoftDeletesToLeavesTable extends Migration
     public function up()
     {
         Schema::table('leaves', function (Blueprint $table) {
-            $table->softDeletes()->after('leave_status');
+            $table->softDeletes();
             $table->string('deleted_by_id')->nullable()->after('deleted_at');
         });
     }
