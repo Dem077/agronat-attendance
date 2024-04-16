@@ -3,7 +3,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h2>Pre OT Request</h2>
+                <h2>OT Request</h2>
             </div>
 
             <div class="card-body">
