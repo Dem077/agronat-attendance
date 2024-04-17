@@ -43,12 +43,15 @@ class Add extends Component
 
         $this->validate();
         
+        $this->ot->start_time="{$this->ot->ot_date} ".date('H:i',strtotime($this->ot->start_time));
+        $this->ot->end_time="{$this->ot->ot_date} ".date('H:i',strtotime($this->ot->end_time));
+
         if(!auth()->user()->can('reporting-manager')){
             $this->gracePeriodValidate();
         }
         
         $this->afterShiftValidate();
-        
+
         $this->ot->user_id=$this->user_id;
         $this->ot->requested_user_id=auth()->id();
         $this->ot->mins=$this->otmins($this->ot->start_time,$this->ot->end_time);
