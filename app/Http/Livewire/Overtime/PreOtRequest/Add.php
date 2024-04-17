@@ -122,8 +122,8 @@ class Add extends Component
         
         if(count($logs)<2){
             throw ValidationException::withMessages([
-                'ot.start_time'=>"No valid checkin log ({$this->ot->ot_date} {$this->ot->start_time})",
-                'ot.end_time'=>"No valid checkin log ({$this->ot->ot_date} {$this->ot->end_time})"
+                'ot.start_time'=>"No valid checkin log. ({$this->ot->start_time})",
+                'ot.end_time'=>"No valid checkin log. ({$this->ot->end_time})"
             ]);
         }
 
@@ -145,8 +145,8 @@ class Add extends Component
         }
         
         throw ValidationException::withMessages([
-            'ot.start_time'=>"No valid checkin log ({$this->ot->ot_date} {$this->ot->start_time})",
-            'ot.end_time'=>"No valid checkin log ({$this->ot->ot_date} {$this->ot->end_time})"
+            'ot.start_time'=>"No valid checkin log ({$this->ot->start_time})",
+            'ot.end_time'=>"No valid checkin log ({$this->ot->end_time})"
         ]);
 
     }
