@@ -42,10 +42,6 @@ class Add extends Component
     {
 
         $this->validate();
-
-        $this->ot->start_time="{$this->ot->ot_date} ".date('H:i',strtotime($this->ot->start_time));
-        $this->ot->end_time="{$this->ot->ot_date} ".date('H:i',strtotime($this->ot->end_time));
-
         
         if(!auth()->user()->can('reporting-manager')){
             $this->gracePeriodValidate();
@@ -116,7 +112,7 @@ class Add extends Component
 
         $logs=TimeSheet::where('user_id',$this->user_id)
                     ->whereRaw("date_format(punch,'%Y-%m-%d') = '{$this->ot->ot_date}'")
-                    ->orderBy('punch','desc')
+                    ->orderBy('punch','asc')
                     ->get()
                     ->toArray();
         
