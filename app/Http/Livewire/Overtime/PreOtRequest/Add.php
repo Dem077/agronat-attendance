@@ -124,8 +124,8 @@ class Add extends Component
         }
 
         for($i=0;$i<count($logs)-1;$i+=2){
-            $out=$logs[$i];
-            $in=isset($logs[$i+1])?$logs[$i+1]:null;
+            $in=$logs[$i];
+            $out=isset($logs[$i+1])?$logs[$i+1]:null;
 
 
             if(!$out){
