@@ -43,8 +43,8 @@ class Add extends Component
 
         $this->validate();
 
-        $this->ot->start_time=date('H:i',strtotime($this->ot->start_time));
-        $this->ot->end_time=date('H:i',strtotime($this->ot->end_time));
+        $this->ot->start_time="{$this->ot->ot_date} ".date('H:i',strtotime($this->ot->start_time));
+        $this->ot->end_time="{$this->ot->ot_date} ".date('H:i',strtotime($this->ot->end_time));
 
         
         if(!auth()->user()->can('reporting-manager')){
