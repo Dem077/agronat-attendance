@@ -122,8 +122,8 @@ class Add extends Component
         
         if(count($logs)<2){
             throw ValidationException::withMessages([
-                'ot.start_time'=>'No valid checkin log (0)',
-                'ot.end_time'=>'No valid checkin log (0)'
+                'ot.start_time'=>"No valid checkin log ({$this->ot->ot_date} {$this->ot->start_time})",
+                'ot.end_time'=>"No valid checkin log ({$this->ot->ot_date} {$this->ot->end_time})"
             ]);
         }
 
