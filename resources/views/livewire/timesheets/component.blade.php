@@ -49,7 +49,9 @@
                                   </div>
                                 </div>
                                 <div class="col-auto my-1">
-                                  <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+                                  <button type="button" class="btn btn-success" wire:loading.class="disabled" wire:loading.attr="disabled"  wire:click.prevent="exportRecord">
+                                    <span class="spinner-border spinner-border-sm collapse" wire:loading.class.remove="collapse" wire:loading wire:target="exportRecord" role="status"></span>
+                                    <i class="fas fa-file-download"></i></button>
                                 </div>
                               </div>
                             </form>
