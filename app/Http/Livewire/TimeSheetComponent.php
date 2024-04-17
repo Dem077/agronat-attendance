@@ -40,6 +40,8 @@ class TimeSheetComponent extends Component
     }
 
     public function getTimeSheet($pagination=null){
+        set_time_limit(1000);
+
         $attendance=Attendance::select('*',DB::raw("date_format(ck_Date,'%a') as day"))
                         ->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
                     // ->whereExists(function($q){
@@ -75,6 +77,10 @@ class TimeSheetComponent extends Component
         $links='';
         if($pagination){
             $attendance=$attendance->paginate($pagination);
+            $q=$timesheet->where("punch",">=",$attendance->min("ck_date"))
+            ->where("punch","<=",$attendance->max("ck_date")." 23:59:59");
+            Log::info($q->toSql());
+            Log::info($q->getBindings());
             $timesheet=$timesheet->where("punch",">=",$attendance->min("ck_date"))
                                 ->where("punch","<=",$attendance->max("ck_date")." 23:59:59")->get();
             $links=$attendance->links();
