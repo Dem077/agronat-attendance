@@ -19,17 +19,17 @@ class CreatePreOtRequestsTable extends Migration
             $table->date('ot_date');
             $table->datetime('start_time');
             $table->datetime('end_time');
-            $table->unsignedDecimal('mins',5,2);
+            $table->unsignedDecimal('mins',8,2);
             $table->text('purpose');
             $table->datetime('approved_start_time')->nullable();
             $table->datetime('approved_end_time')->nullable();
-            $table->unsignedDecimal('approved_mins',5,2)->nullable();
+            $table->unsignedDecimal('approved_mins',8,2)->nullable();
             $table->foreignId('requested_user_id');
             $table->foreignId('approved_user_id')->nullable();
             $table->datetime('approved_date')->nullable();
             $table->datetime('checkin')->nullable();
             $table->datetime('checkout')->nullable();
-            $table->unsignedDecimal('ot_mins',5,2)->nullable();
+            $table->unsignedDecimal('ot_mins',8,2)->nullable();
             $table->string('status')->default('pending');
             $table->timestamps();
 
