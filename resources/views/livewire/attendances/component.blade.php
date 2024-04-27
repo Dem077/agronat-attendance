@@ -61,9 +61,9 @@
                     <table class="table table-bordered mt-5">
                         <thead>
                             <tr>
-                                <th>No.</th>
                                 <th>User</th>
                                 <th>Date</th>
+                                <th>Day</th>
                                 <th>Duty Start</th>
                                 <th>Duty End</th>
                                 <th>Checkin</th>
@@ -80,9 +80,9 @@
                         <tbody>
                             @foreach($attendances as $attendance)
                             <tr class="{{$attendance->late_min>0?'text-danger':''}}">
-                                <td>{{ $attendance->id }}</td>
                                 <td>{{ $attendance->user->name }}</td>
                                 <td>{{ $attendance->ck_date }}</td>
+                                <td>{{ date('D',strtotime($attendance->ck_date)) }}</td>
                                 <td>{{ $attendance->sc_in }}</td>
                                 <td>{{ $attendance->sc_out }}</td>
                                 <td>{{ $attendance->in }}</td>
