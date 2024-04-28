@@ -73,7 +73,7 @@ class Users extends Component
     {
         $validatedData = $this->validate([
             'name' => 'required',
-            'nid' => 'required',
+            'nid' => 'required|unique:users,nid',
             'email' => 'required',
             'emp_no' => 'required',
             'external_id' => 'sometimes',
@@ -166,8 +166,7 @@ class Users extends Component
     {
         $validatedData = $this->validate([
             'name' => 'required',
-            'nid' => 'required',
-
+            'nid' => 'required|unique:users,nid,'.$this->user_id,
             'email' => 'required',
             'designation' => 'required',
             'emp_no' => 'required',
