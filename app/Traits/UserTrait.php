@@ -28,7 +28,7 @@ trait UserTrait {
                                 ->orderBy('name','asc')->get()
                                 ->toArray();
             $this->users=array_merge([['id'=>$user->id,'name'=>$user->name,'emp_no'=>$user->emp_no]],$this->users);
-            if(!$this->users){
+            if(count($this->users)==1){
                 $this->user_id=$user->id;
             }
         }
