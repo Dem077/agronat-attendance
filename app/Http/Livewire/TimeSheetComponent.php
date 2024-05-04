@@ -81,7 +81,8 @@ class TimeSheetComponent extends Component
             $max_date=$attendance->max("ck_date");
 
             $timesheet=$timesheet->when($min_date,fn($q,$min_date)=>$q->where("punch",">=",$min_date))
-                                ->when($max_date,fn($q,$max_date)=>$q->where("punch","<=",$max_date." 23:59:59"));
+                                ->when($max_date,fn($q,$max_date)=>$q->where("punch","<=",$max_date." 23:59:59"))
+                                ->get();
 
             $links=$attendance->links();
 
