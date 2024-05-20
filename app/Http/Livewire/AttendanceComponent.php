@@ -32,10 +32,11 @@ class AttendanceComponent extends Component
 
     public function render()
     {
+        
         $this->setUser();
 
         $attendances=$this->getAttendances()->paginate(31);
-
+       
         /**
          * manage all
          * manage departments
