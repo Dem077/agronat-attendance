@@ -25,16 +25,16 @@
                      </select>
                     @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
+                <div class="form-group">
+                    <label for="reason">Reason</label>
+                    <textarea class="form-control" id="reason" placeholder="Reason for ammendment" wire:model="reason"></textarea>
+                    @error('reason') <span class="text-danger">{{ $message }}</span>@enderror
+                </div>
                 <div class="form-inline">
                     <label for="punch">DateTime</label>
                     <input type="text" class="form-control mx-1" id="punchdate" placeholder="YYYY-MM-DD" wire:model="punchdate" autocomplete="off">
                     <input type="time" class="form-control" wire:model="punchtime" autocomplete="off">
                     @error('start_date') <span class="text-danger">{{ $message }}</span>@enderror
-                </div>
-                <div class="form-group">
-                    <label for="reason">Reason</label>
-                    <textarea class="form-control" id="reason" placeholder="Reason for time log" wire:model="reason"></textarea>
-                    @error('reason') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
             </form>
             </div>

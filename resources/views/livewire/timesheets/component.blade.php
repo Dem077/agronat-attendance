@@ -9,6 +9,9 @@
               <div>
                   @can('timelog-create')
                   @include('livewire.timesheets.create')
+                  @include('livewire.timesheets.changes')
+                  <input type="hidden" id="changeData" wire:model="changeData">
+
                   <livewire:partials.timesheets.sync-component :users="$users"/>
 
                   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">Add</button>
@@ -69,9 +72,20 @@
                       </thead>
                       <tbody>
                           @foreach($logs['data'] as $log)
+                          @if($log->changes)
+                          @endif
                           <tr>
                               <td>{{ $log->id }}</td>
-                              <td>{{ $log->employee }}</td>
+                              <td>{{ $log->employee }}
+                                @if($log->changes)
+                                  @can('timelog-create')
+                                    <button class="btn btn-warning btn-sm ml-2" title="Change Alert" type="button" data-toggle="modal" data-target="#changeModal" onclick="setChangesData({{ json_encode($log->id) }})">
+                                      <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                    </button>
+                                  @endcan
+                                @endif
+                            
+                              </td>
                               <td>{{ $log->ck_date }}</td>
                               <td>{{ $log->day }}</td>
                               <td>{{ $log->status }}</td>
@@ -122,6 +136,11 @@
     @this.set('start_date', period['start']);
     @this.set('end_date', period['end']);
   });
+
+  function setChangesData(changes) {
+      document.getElementById('changeData').value = JSON.stringify(changes);
+      Livewire.emit('setChangesData', changes);
+  }
 
   function deleteLog(id , rowid) {
         let reason = prompt('Please provide a reason for deletion:');

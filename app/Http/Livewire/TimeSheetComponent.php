@@ -20,11 +20,12 @@ class TimeSheetComponent extends Component
     use WithPagination,UserTrait;
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
+    public $changeData;
     private $attendanceService;
 
     public $punchdate,$punchtime,$start_date,$end_date,$sync_data=['user_id'=>'','from'=>'','to'=>''],$reason;
 
-    protected $listeners = ['deleteLog' => 'delete'];
+    protected $listeners = ['deleteLog' => 'delete','setChangesData'];
     public function __construct()
     {
         $this->attendanceService=new AttendanceService();
@@ -34,9 +35,28 @@ class TimeSheetComponent extends Component
     public function render()
     {
         $this->setUser();
-        $logs=$this->getTimeSheet(10);
+        $logs = $this->getTimeSheet(10);
         $this->resetPage();
-        return view('livewire.timesheets.component',['logs'=>$logs]);
+    // dd($logs);
+        // dd($logs);
+        return view('livewire.timesheets.component', [
+            'logs' => $logs,
+        ]);
+    }
+    
+    public function setChangesData($attendances_id)
+    {
+        $all=[];
+        $logdata = TimeChangeLog::where('attendances_id', $attendances_id)->get()->all();
+        foreach($logdata as $row){
+            $editedTime = DB::select('SELECT punch FROM time_sheets WHERE id = ?', [$row->time_sheet_id]);
+            $punch=$editedTime[0]->punch;
+            list($date, $time) = explode(' ', $punch);
+            $all[]=['list'=>$row,'time'=>$time,'date'=>$date];
+            
+        }
+        // dd($all);
+        $this->changeData = $all;
     }
 
     public function getTimeSheet($pagination=null){
@@ -50,6 +70,7 @@ class TimeSheetComponent extends Component
                     //     ->whereRaw("date_format(time_sheets.punch,'%Y-%m-%d') = attendances.ck_date")
                     //     ->whereRaw("time_sheets.user_id = attendances.user_id");
                     // });
+                    
         $timesheet=TimeSheet::select('*');
         if($this->start_date){
             $attendance=$attendance->where('ck_date','>=',$this->start_date);
@@ -92,15 +113,23 @@ class TimeSheetComponent extends Component
         }
 
         $data=[];
-
+        $isedited = [];
 
         foreach($attendance as $att){
+            
+            $exitsintable = TimeChangeLog::where('attendances_id', $att->id)->get();
+            if ($exitsintable->first()) {
+                $isedited[$att->id] = [
+                    'changes_made' => $exitsintable->first(),
+                ];
+            }
             $p=[];
             $punches=$timesheet->where('user_id',$att->user_id)->where("punch",">=",$att->ck_date)->where("punch","<=",$att->ck_date." 23:59:59");
             $timesheet=$timesheet->whereNotIn('id',$punches->pluck('id'));
             foreach($punches as $punch){
                 $p[]=['time'=>date('G:i',strtotime($punch->punch)),'id'=>$punch->id];
             }
+            $att->changes=$isedited;
             $att->punch=$p;
             $data[]=$att;
         }
