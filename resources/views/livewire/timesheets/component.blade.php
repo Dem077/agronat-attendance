@@ -77,7 +77,7 @@
                           <tr>
                               <td>{{ $log->id }}</td>
                               <td>{{ $log->employee }}
-                                @if($log->changes)
+                                @if($log->changes['changes_made'])
                                   @can('timelog-create')
                                     <button class="btn btn-warning btn-sm ml-2" title="Change Alert" type="button" data-toggle="modal" data-target="#changeModal" onclick="setChangesData({{ json_encode($log->id) }})">
                                       <i class="fa fa-exclamation-circle" aria-hidden="true"></i>

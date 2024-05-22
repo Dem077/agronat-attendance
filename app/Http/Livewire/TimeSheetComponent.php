@@ -114,15 +114,15 @@ class TimeSheetComponent extends Component
 
         $data=[];
         $isedited = [];
-
         foreach($attendance as $att){
             
             $exitsintable = TimeChangeLog::where('attendances_id', $att->id)->get();
-            if ($exitsintable->first()) {
-                $isedited[$att->id] = [
+            if ($exitsintable) {
+                $isedited = [
                     'changes_made' => $exitsintable->first(),
                 ];
             }
+
             $p=[];
             $punches=$timesheet->where('user_id',$att->user_id)->where("punch",">=",$att->ck_date)->where("punch","<=",$att->ck_date." 23:59:59");
             $timesheet=$timesheet->whereNotIn('id',$punches->pluck('id'));
