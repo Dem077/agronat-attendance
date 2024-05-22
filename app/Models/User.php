@@ -41,6 +41,7 @@ class User extends Authenticatable
         'active',
         'external_id',
         'location_id',
+        'joined_date',
         'supervisor_id'
     ];
 

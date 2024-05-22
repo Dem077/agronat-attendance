@@ -10,8 +10,8 @@ use App\Services\AttendanceService;
 use App\Traits\UserTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use App\Models\TimeChangeLog;
 use Livewire\WithPagination;
 
 class TimeSheetComponent extends Component
@@ -22,7 +22,7 @@ class TimeSheetComponent extends Component
     public $updateMode = false;
     private $attendanceService;
 
-    public $punchdate,$punchtime,$start_date,$end_date,$sync_data=['user_id'=>'','from'=>'','to'=>''];
+    public $punchdate,$punchtime,$start_date,$end_date,$sync_data=['user_id'=>'','from'=>'','to'=>''],$reason;
 
     protected $listeners = ['deleteLog' => 'delete'];
     public function __construct()
@@ -167,18 +167,27 @@ class TimeSheetComponent extends Component
         $validatedDate = $this->validate([
             'user_id' => 'required',
             'punchdate' => 'required',
-            'punchtime' => 'required'
+            'punchtime' => 'required',
+            'reason' => 'required' // Validate reason
         ]);
 
         $validatedDate['punch']="{$validatedDate['punchdate']} {$validatedDate['punchtime']}";
+        $date=$validatedDate['punchdate'];
         unset($validatedDate['punchdate']);
         unset($validatedDate['punchtime']);
         // TimeSheet::add($validatedDate);
 
+        $userName = auth()->user()->name;
+        
+
         $validatedDate['logged_by']=Auth::id();
         $validatedDate['sync']=0;
 
-        $this->attendanceService->addLog($validatedDate);
+        $record = $this->attendanceService->addLog($validatedDate);
+
+        $attendanceid = Attendance::where('user_id',  $validatedDate['user_id'])->where('ck_date', $date)->first();
+       
+        (new TimeChangeLog)->logaudit($attendanceid->id, $record->id, $userName, $validatedDate['reason'] , "INSERT");
 
         $this->resetInputFields();
 
@@ -187,12 +196,21 @@ class TimeSheetComponent extends Component
 
     }
 
-    public function delete($id)
+    public function delete($id, $attendanceid , $reason)
     {
-        if(!auth()->user()->can('timelog-create')){
+        if (!auth()->user()->can('timelog-create')) {
             abort(403);
         }
+
+        $userName = auth()->user()->name;
+        
+       
+       (new TimeChangeLog)->logaudit($attendanceid, $id, $userName, $reason , "DELETE");
+
+        // Delete the time log
         TimeSheet::destroy($id);
+
         session()->flash('message', 'Time Deleted Successfully.');
     }
+    
 }

@@ -17,7 +17,7 @@ class Users extends Component
     protected $paginationTheme = 'bootstrap';
     public $department;
     public $employee;
-    public $name,$nid, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active,$external_id;
+    public $name,$nid, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active,$external_id,$joined_date;
     public $updateMode = false;
     public $locations=[];
 
@@ -57,6 +57,7 @@ class Users extends Component
         $this->department_id = '';
         $this->external_id = '';
         $this->location_id = '';
+        $this->joined_date = '';
         $this->mobile = '';
         $this->phone = '';
         $this->password='';
@@ -78,6 +79,7 @@ class Users extends Component
             'emp_no' => 'required',
             'external_id' => 'sometimes',
             'designation' => 'required',
+            'joined_date' => 'required',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
             'password' => 'required|confirmed'
@@ -85,6 +87,7 @@ class Users extends Component
 
         $validatedData['department_id']=$this->department_id;
         $validatedData['location_id']=$this->location_id;
+        $validatedData['joined_date']=$this->joined_date;
         $validatedData['active']=true;
         $validatedData['password']=Hash::make($validatedData['password']);
         $user=User::create($validatedData);
@@ -118,6 +121,7 @@ class Users extends Component
         $this->external_id = $user->external_id;
         $this->department_id = $user->department_id;
         $this->location_id = $user->location_id;
+        $this->joined_date = $user->joined_date;
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
@@ -141,6 +145,7 @@ class Users extends Component
         $this->external_id = $user->external_id;
         $this->department_id = $user->department_id;
         $this->location_id = $user->location_id;
+        $this->joined_date = $user->joined_date;
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
@@ -173,6 +178,7 @@ class Users extends Component
             'external_id' => 'sometimes',
             'department_id' => 'required',
             'location_id' => 'required',
+            'joined_date' => 'required',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
             'password' => 'sometimes|confirmed',
@@ -188,6 +194,7 @@ class Users extends Component
             "external_id"=>$this->external_id??null,
             "department_id"=>$this->department_id,
             "location_id"=>$this->location_id,
+            'joined_date' =>$this->joined_date,
             "mobile"=>$this->mobile,
             "phone"=>$this->phone,
             "active"=>$this->active
