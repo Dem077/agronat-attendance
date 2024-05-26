@@ -99,4 +99,9 @@ class User extends Authenticatable
         return Department::where('id',$this->department_id)
                             ->where('work_on_saturday',1)->exists();
     }
+
+    public function leaveTypes()
+    {
+        return $this->hasManyThrough(LeaveType::class, Leave::class, 'user_id', 'id', 'id', 'leave_type_id');
+    }
 }

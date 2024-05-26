@@ -103,6 +103,7 @@
                 <h6 class="collapse-header">Leave Management:</h6>
                 <a class="collapse-item" href="{{route('leaves')}}">Employee Leaves</a>
                 <a class="collapse-item" href="{{route('leave-types')}}">Leave Types</a>
+                <a class="collapse-item" href="{{route('leave-balance')}}">Leave Balances</a>
             </div>
         </div>
     </li>
