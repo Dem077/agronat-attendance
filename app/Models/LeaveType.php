@@ -15,6 +15,6 @@ class LeaveType extends Model
      * @var array
      */
     protected $fillable = [
-        'title'
+        'title', 'allocated_days'
     ];
 }
