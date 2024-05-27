@@ -34,6 +34,16 @@
 
                 </div>
                 <div class="form-group">
+                    <label for="supervisor_id">Supervisor:</label>
+                        <select name="supervisor_id" id="supervisor_id" class="form-control" wire:model="supervisor_id">
+                            <option value="">Select Supervisor</option>
+                            @foreach ($active_employees as $auser)
+                                <option value="{{$auser->id}}" >{{$auser->name}} ({{$auser->emp_no}})</option>
+                            @endforeach
+                        </select>
+                        @error('supervisor_id') <span class="text-danger">{{ $message }}</span>@enderror
+                </div>
+                <div class="form-group">
                     <label for="location_id">location:</label>
                         <select name="location_id" id="location_id" class="form-control" wire:model="location_id">
                             <option value="">Select location</option>
@@ -97,3 +107,4 @@
         </div>
     </div>
 </div>
+
