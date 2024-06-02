@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Department;
 use App\Models\Location;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -17,9 +18,12 @@ class Users extends Component
     protected $paginationTheme = 'bootstrap';
     public $department;
     public $employee;
-    public $name,$nid, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$gender,$department_id,$location_id,$mobile,$phone, $active,$external_id,$joined_date;
+    public $name,$nid,$supervisor_id, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$gender,$department_id,$location_id,$mobile,$phone, $active,$external_id,$joined_date;
     public $updateMode = false;
     public $locations=[];
+    public $employees=[];
+    public $departments=[];
+    public $active_employees=[];
 
 
     public function mount()
@@ -27,6 +31,9 @@ class Users extends Component
         $this->department=request()->department??'';
         $this->employee=request()->employee??'';
         $this->locations=Location::all();
+        $this->employees=User::select(DB::raw("id,concat(name,' (',emp_no,')') as name"))->orderBy('name','asc')->get()->pluck('name','id')->toArray();
+        $this->active_employees=User::select(DB::raw("id,name,emp_no"))->active()->orderBy('name','asc')->get();
+        $this->departments=Department::orderBy('name','asc')->get();
     }
 
     public function render()
@@ -42,7 +49,7 @@ class Users extends Component
                             $q->where('id',$this->employee);
                         })->orderBy('id','asc')->paginate(10)->withQueryString();
         $this->resetPage();
-        return view('livewire.users.component',['employees'=>$employees,'departments'=>$departments,'user_list'=>$user_list]);
+        return view('livewire.users.component',['user_list'=>$user_list]);
     }
 
     /**
@@ -64,6 +71,7 @@ class Users extends Component
         $this->mobile = '';
         $this->phone = '';
         $this->password='';
+        $this->supervisor_id='';
         $this->password_confirmation='';
         $this->active='';
     }
@@ -78,7 +86,7 @@ class Users extends Component
         $validatedData = $this->validate([
             'name' => 'required',
             'nid' => 'required|unique:users,nid',
-            'email' => 'required',
+            'email' => 'required|email',
             'emp_no' => 'required',
             'gender' => 'required',
             'external_id' => 'sometimes',
@@ -86,6 +94,7 @@ class Users extends Component
             'joined_date' => 'required',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
+            "supervisor_id"=>'sometimes',
             'password' => 'required|confirmed'
         ]);
 
@@ -129,6 +138,7 @@ class Users extends Component
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
+        $this->supervisor_id = $user->supervisor_id;
         $this->updateMode = true;
     }
 
@@ -154,6 +164,7 @@ class Users extends Component
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
+        $this->supervisor_id = $user->supervisor_id;
         $this->updateMode = true;
     }
 
@@ -177,7 +188,7 @@ class Users extends Component
         $validatedData = $this->validate([
             'name' => 'required',
             'nid' => 'required|unique:users,nid,'.$this->user_id,
-            'email' => 'required',
+            'email' => 'required|email',
             'designation' => 'required',
             'emp_no' => 'required',
             'gender' => 'required',
@@ -187,6 +198,7 @@ class Users extends Component
             'joined_date' => 'required',
             'mobile' => 'sometimes',
             'phone' => 'sometimes',
+            'supervisor_id' => 'sometimes',
             'password' => 'sometimes|confirmed',
             'active'=>'sometimes'
         ]);
@@ -199,6 +211,7 @@ class Users extends Component
             "emp_no"=>$this->emp_no,
             "gender"=>$this->gender,
             "external_id"=>$this->external_id??null,
+            "supervisor_id"=>$this->supervisor_id,
             "department_id"=>$this->department_id,
             "location_id"=>$this->location_id,
             'joined_date' =>$this->joined_date,
