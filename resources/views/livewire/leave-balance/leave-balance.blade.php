@@ -20,7 +20,7 @@
                     Loading leave balances...
                 </div>
             
-                @if($leaveBalances)
+                @if($leaveBalances )
                 <div class="card">
                     <div class="mt-3 card-body">
                         <h4 class="text-center mb-3">Leave Details</h4>
@@ -35,26 +35,35 @@
                             </thead>
                             <tbody>
                                 @foreach($leaveBalances as $balance)
-                                    @if($balance['user_gender']=== 'M' && $balance['leave_type_id'] == 7)
-                                        @continue
-                                    @endif 
-                                    @if($balance['user_gender']=== 'F' && $balance['leave_type_id'] == 6)
-                                        @continue 
-                                    @endif
-                                    @if($balance['leave_type_id'] == 3 && !$balance['is_annual_applicable'])
-                                        <tr>
-                                            <td>{{ $balance['leave_type'] }}</td>
-                                            <td><strong style="color: red">NA</strong></td>
-                                            <td><strong style="color: red">NA</strong></td>
-                                            <td><strong style="color: red">NA</strong></td>
-                                        </tr>
+                                    @if($balance['joined_date_added']== Null)
+                                    <tr>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                    </tr>
                                     @else
-                                        <tr>
-                                            <td>{{ $balance['leave_type'] }}</td>
-                                            <td>{{ $balance['allocated_days'] }}</td>
-                                            <td>{{ $balance['leave_taken'] }}</td>
-                                            <td>{{ $balance['leave_balance'] }}</td>
-                                        </tr>
+                                        @if($balance['user_gender']=== 'M' && $balance['leave_type_id'] == 7)
+                                            @continue
+                                        @endif 
+                                        @if($balance['user_gender']=== 'F' && $balance['leave_type_id'] == 6)
+                                            @continue 
+                                        @endif
+                                        @if($balance['leave_type_id'] == 3 && !$balance['is_annual_applicable'])
+                                            <tr>
+                                                <td>{{ $balance['leave_type'] }}</td>
+                                                <td><strong style="color: red">NA</strong></td>
+                                                <td><strong style="color: red">NA</strong></td>
+                                                <td><strong style="color: red">NA</strong></td>
+                                            </tr>
+                                        @else
+                                            <tr>
+                                                <td>{{ $balance['leave_type'] }}</td>
+                                                <td>{{ $balance['allocated_days'] }}</td>
+                                                <td>{{ $balance['leave_taken'] }}</td>
+                                                <td>{{ $balance['leave_balance'] }}</td>
+                                            </tr>
+                                        @endif
                                     @endif
                                 @endforeach
                             </tbody>

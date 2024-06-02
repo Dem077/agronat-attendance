@@ -134,6 +134,7 @@ class LeaveBalanceComponent extends Component
                     'allocated_days' => $balance->allocated_days,
                     'leave_taken' => $balance->leave_taken,
                     'leave_balance' => $balance->leave_balance,
+                    'joined_date_added' => $balance->user->joined_date,
                     'is_annual_applicable' => $balance->isannual_applicable,
                 ];
             })
