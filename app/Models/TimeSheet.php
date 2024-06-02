@@ -20,12 +20,15 @@ class TimeSheet extends Model
      *
      * @var array
      */
+ 
     protected $fillable = [
         'user_id',
         'punch',
         'status',
         'sync',
-        'logged_by'
+        'logged_by',
+        'deleted_by',
+        'deletion_reason'
     ];
 
     public function user(){

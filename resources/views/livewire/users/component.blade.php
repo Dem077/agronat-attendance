@@ -56,6 +56,7 @@
                                 <th>Designation</th>
                                 <th>Mobile</th>
                                 <th>Emp No.</th>
+                                <th>Joined Date</th>
                                 @can('user-create')
                                 <th width="200px">Action</th>
                                 @endcan
@@ -71,6 +72,7 @@
                                 <td>{{ $user->designation }}</td>
                                 <td>{{ $user->mobile }}</td>
                                 <td>{{ $user->emp_no }}</td>
+                                <td>{{ $user->joined_date }}</td>
                                 @can('user-create')
                                 <td>
                                     <button data-toggle="modal" data-target="#viewModal" wire:click="show({{ $user->id }})" class="btn btn-primary btn-sm">View</button>

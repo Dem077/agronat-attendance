@@ -10,8 +10,8 @@ use App\Services\AttendanceService;
 use App\Traits\UserTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use App\Models\TimeChangeLog;
 use Livewire\WithPagination;
 
 class TimeSheetComponent extends Component
@@ -20,11 +20,12 @@ class TimeSheetComponent extends Component
     use WithPagination,UserTrait;
     protected $paginationTheme = 'bootstrap';
     public $updateMode = false;
+    public $changeData;
     private $attendanceService;
 
-    public $punchdate,$punchtime,$start_date,$end_date,$sync_data=['user_id'=>'','from'=>'','to'=>''];
+    public $punchdate,$punchtime,$start_date,$end_date,$sync_data=['user_id'=>'','from'=>'','to'=>''],$reason;
 
-    protected $listeners = ['deleteLog' => 'delete'];
+    protected $listeners = ['deleteLog' => 'delete','setChangesData'];
     public function __construct()
     {
         $this->attendanceService=new AttendanceService();
@@ -34,9 +35,28 @@ class TimeSheetComponent extends Component
     public function render()
     {
         $this->setUser();
-        $logs=$this->getTimeSheet(10);
+        $logs = $this->getTimeSheet(10);
         $this->resetPage();
-        return view('livewire.timesheets.component',['logs'=>$logs]);
+    // dd($logs);
+        // dd($logs);
+        return view('livewire.timesheets.component', [
+            'logs' => $logs,
+        ]);
+    }
+    
+    public function setChangesData($attendances_id)
+    {
+        $all=[];
+        $logdata = TimeChangeLog::where('attendances_id', $attendances_id)->get()->all();
+        foreach($logdata as $row){
+            $editedTime = DB::select('SELECT punch FROM time_sheets WHERE id = ?', [$row->time_sheet_id]);
+            $punch=$editedTime[0]->punch;
+            list($date, $time) = explode(' ', $punch);
+            $all[]=['list'=>$row,'time'=>$time,'date'=>$date];
+            
+        }
+        // dd($all);
+        $this->changeData = $all;
     }
 
     public function getTimeSheet($pagination=null){
@@ -50,6 +70,7 @@ class TimeSheetComponent extends Component
                     //     ->whereRaw("date_format(time_sheets.punch,'%Y-%m-%d') = attendances.ck_date")
                     //     ->whereRaw("time_sheets.user_id = attendances.user_id");
                     // });
+                    
         $timesheet=TimeSheet::select('*');
         if($this->start_date){
             $attendance=$attendance->where('ck_date','>=',$this->start_date);
@@ -92,15 +113,23 @@ class TimeSheetComponent extends Component
         }
 
         $data=[];
-
-
+        $isedited = [];
         foreach($attendance as $att){
+            
+            $exitsintable = TimeChangeLog::where('attendances_id', $att->id)->get();
+            if ($exitsintable) {
+                $isedited = [
+                    'changes_made' => $exitsintable->first(),
+                ];
+            }
+
             $p=[];
             $punches=$timesheet->where('user_id',$att->user_id)->where("punch",">=",$att->ck_date)->where("punch","<=",$att->ck_date." 23:59:59");
             $timesheet=$timesheet->whereNotIn('id',$punches->pluck('id'));
             foreach($punches as $punch){
                 $p[]=['time'=>date('G:i',strtotime($punch->punch)),'id'=>$punch->id];
             }
+            $att->changes=$isedited;
             $att->punch=$p;
             $data[]=$att;
         }
@@ -167,18 +196,27 @@ class TimeSheetComponent extends Component
         $validatedDate = $this->validate([
             'user_id' => 'required',
             'punchdate' => 'required',
-            'punchtime' => 'required'
+            'punchtime' => 'required',
+            'reason' => 'required' // Validate reason
         ]);
 
         $validatedDate['punch']="{$validatedDate['punchdate']} {$validatedDate['punchtime']}";
+        $date=$validatedDate['punchdate'];
         unset($validatedDate['punchdate']);
         unset($validatedDate['punchtime']);
         // TimeSheet::add($validatedDate);
 
+        $userName = auth()->user()->name;
+        
+
         $validatedDate['logged_by']=Auth::id();
         $validatedDate['sync']=0;
 
-        $this->attendanceService->addLog($validatedDate);
+        $record = $this->attendanceService->addLog($validatedDate);
+
+        $attendanceid = Attendance::where('user_id',  $validatedDate['user_id'])->where('ck_date', $date)->first();
+       
+        (new TimeChangeLog)->logaudit($attendanceid->id, $record->id, $userName, $validatedDate['reason'] , "INSERT");
 
         $this->resetInputFields();
 
@@ -187,12 +225,21 @@ class TimeSheetComponent extends Component
 
     }
 
-    public function delete($id)
+    public function delete($id, $attendanceid , $reason)
     {
-        if(!auth()->user()->can('timelog-create')){
+        if (!auth()->user()->can('timelog-create')) {
             abort(403);
         }
+
+        $userName = auth()->user()->name;
+        
+       
+       (new TimeChangeLog)->logaudit($attendanceid, $id, $userName, $reason , "DELETE");
+
+        // Delete the time log
         TimeSheet::destroy($id);
+
         session()->flash('message', 'Time Deleted Successfully.');
     }
+    
 }

@@ -72,6 +72,16 @@
                         @error('emp_no') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <input type="text" class="form-control" id="gender" value="{{ $gender === 'M' ? 'Male' : ($gender === 'F' ? 'Female' : '') }}" readonly="readonly"/>
+                        @error('gender') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="joined_date">Joined Date:</label>
+                        <input type="text" class="form-control" id="joined_date" wire:model="joined_date" placeholder="joined date" readonly="readonly"/>
+                        @error('joined_date') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
                         <label for="external_id">External ID:</label>
                         <input type="text" class="form-control" id="external_id" wire:model="external_id" placeholder="External ID" readonly="readonly"/>
                         @error('external_id') <span class="text-danger">{{ $message }}</span>@enderror

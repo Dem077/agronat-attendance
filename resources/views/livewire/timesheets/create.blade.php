@@ -1,5 +1,3 @@
-
-
 <!-- Modal -->
 <div wire:ignore.self class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -19,7 +17,7 @@
             <form>
                 <div class="form-group">
                     <label for="user_id">Employee</label>
-                    <select type="text" class="form-control" id="user_id" placeholder="Employee" wire:bind="user_id" >
+                    <select type="text" class="form-control" id="user_id" placeholder="Employee" wire:bind="user_id">
                         <option>Select Employee</option>
                         @foreach($users as $user)
                             <option value="{{$user['id']}}" {{$user_id==$user['id']?'SELECTED':''}}>{{$user['name']}}</option>
@@ -27,10 +25,15 @@
                      </select>
                     @error('user_id') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
+                <div class="form-group">
+                    <label for="reason">Reason</label>
+                    <textarea class="form-control" id="reason" placeholder="Reason for ammendment" wire:model="reason"></textarea>
+                    @error('reason') <span class="text-danger">{{ $message }}</span>@enderror
+                </div>
                 <div class="form-inline">
                     <label for="punch">DateTime</label>
                     <input type="text" class="form-control mx-1" id="punchdate" placeholder="YYYY-MM-DD" wire:model="punchdate" autocomplete="off">
-                    <input type="time" class="form-control" placeholder="YYYY-MM-DD" wire:model="punchtime" autocomplete="off">
+                    <input type="time" class="form-control" wire:model="punchtime" autocomplete="off">
                     @error('start_date') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
             </form>
@@ -44,11 +47,11 @@
 </div>
 @push('js-bottom')
 <script type="text/javascript">
-    var options={
+    var options = {
         format: 'yyyy-mm-dd',
         todayHighlight: true,
         autoclose: true,
-      };
+    };
     $('#punchdate').datepicker(options);
 
     $('#user_id').select2();
@@ -58,6 +61,9 @@
     });
     $('#user_id').on('change', function (e) {
        @this.set('user_id', e.target.value);
+    });
+    $('#reason').on('change', function (e) {
+       @this.set('reason', e.target.value);
     });
 </script>
 @endpush

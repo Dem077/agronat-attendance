@@ -2,7 +2,7 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('dashboard')}}}">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('dashboard')}}">
         <div class="sidebar-brand-icon rotate-n-15">
             {{-- <i class="fas fa-laugh-wink"></i> --}}
         </div>
@@ -103,6 +103,7 @@
                 <h6 class="collapse-header">Leave Management:</h6>
                 <a class="collapse-item" href="{{route('leaves')}}">Employee Leaves</a>
                 <a class="collapse-item" href="{{route('leave-types')}}">Leave Types</a>
+                <a class="collapse-item" href="{{route('leave-balance')}}">Leave Balances</a>
             </div>
         </div>
     </li>

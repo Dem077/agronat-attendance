@@ -20,6 +20,7 @@ class Leave extends Model
         'from',
         'to'
     ];
+    protected $dates = ['from', 'to'];
 
     public function type(){
         return $this->belongsTo(LeaveType::class,'leave_type_id');
@@ -27,5 +28,9 @@ class Leave extends Model
 
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function allocated_days(){
+        return $this->belongsTo(LeaveType::class,'allocated_days');
     }
 }

@@ -37,10 +37,12 @@ class User extends Authenticatable
         'mobile',
         'phone',
         'emp_no',
+        'gender',
         'password',
         'active',
         'external_id',
         'location_id',
+        'joined_date',
         'supervisor_id'
     ];
 
@@ -97,5 +99,10 @@ class User extends Authenticatable
     public function workOnSaturday() {
         return Department::where('id',$this->department_id)
                             ->where('work_on_saturday',1)->exists();
+    }
+
+    public function leaveTypes()
+    {
+        return $this->hasManyThrough(LeaveType::class, Leave::class, 'user_id', 'id', 'id', 'leave_type_id');
     }
 }

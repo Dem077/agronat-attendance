@@ -20,6 +20,7 @@ use App\Http\Livewire\Overtime\PreOtRequest\Add as OvertimePreOtRequestAdd;
 use App\Http\Livewire\Reports\LeaveReport;
 use App\Http\Livewire\Timesheets\ImportLog;
 use App\Http\Livewire\Users as UsersComponent;
+use App\Http\Livewire\LeaveBalanceComponent;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,6 +62,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('leaves-types',LeaveTypeComponent::class)->name('leave-types');
     Route::get('departments',DepartmentComponent::class)->name('departments');
     Route::get('holidays',ListHolidays::class)->name('holidays.list');
-
+    Route::get('leave-balance',LeaveBalanceComponent::class)->name('leave-balance');
     Route::get('recompute',LogRecompute::class)->name('recompute');
 });
