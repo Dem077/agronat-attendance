@@ -35,6 +35,12 @@
                             </thead>
                             <tbody>
                                 @foreach($leaveBalances as $balance)
+                                    @if($balance['user_gender']=== 'M' && $balance['leave_type_id'] == 7)
+                                        @continue
+                                    @endif 
+                                    @if($balance['user_gender']=== 'F' && $balance['leave_type_id'] == 6)
+                                        @continue 
+                                    @endif
                                     @if($balance['leave_type_id'] == 3 && !$balance['is_annual_applicable'])
                                         <tr>
                                             <td>{{ $balance['leave_type'] }}</td>
@@ -42,10 +48,6 @@
                                             <td><strong style="color: red">NA</strong></td>
                                             <td><strong style="color: red">NA</strong></td>
                                         </tr>
-                                    @elseif($balance['user_gender']=== 'M' && $balance['leave_type_id'] == 7)
-                                        @continue 
-                                    @elseif($balance['user_gender']=== 'F' && $balance['leave_type_id'] == 6)
-                                        @continue 
                                     @else
                                         <tr>
                                             <td>{{ $balance['leave_type'] }}</td>
