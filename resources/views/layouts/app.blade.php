@@ -26,7 +26,15 @@
     @stack('js-top')
     @livewireStyles
 </head>
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
 
+    .select2-selection {
+        height: 38px; /* Adjust based on your needs */
+    }
+</style>
 <body id="page-top">
 
     <!-- Page Wrapper -->

@@ -59,6 +59,15 @@
                     <input type="text" class="form-control" id="emp_no" wire:model="emp_no" placeholder="emp no"/>
                     @error('emp_no') <span class="text-danger">{{ $message }}</span>@enderror
                 </div>
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select class="form-control" id="gender" wire:model="gender">
+                        <option value="">Select Gender</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                    @error('gender') <span class="text-danger">{{ $message }}</span>@enderror
+                </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="mobile">mobile:</label>

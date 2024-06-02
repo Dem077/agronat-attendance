@@ -130,6 +130,7 @@ class LeaveBalanceComponent extends Component
                 return [
                     'leave_type' => $balance->leaveType->title,
                     'leave_type_id' => $balance->leaveType->id,
+                    'user_gender' => $balance->user->gender,
                     'allocated_days' => $balance->allocated_days,
                     'leave_taken' => $balance->leave_taken,
                     'leave_balance' => $balance->leave_balance,

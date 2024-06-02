@@ -37,6 +37,7 @@ class User extends Authenticatable
         'mobile',
         'phone',
         'emp_no',
+        'gender',
         'password',
         'active',
         'external_id',

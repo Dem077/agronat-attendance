@@ -17,7 +17,7 @@ class Users extends Component
     protected $paginationTheme = 'bootstrap';
     public $department;
     public $employee;
-    public $name,$nid, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$department_id,$location_id,$mobile,$phone, $active,$external_id,$joined_date;
+    public $name,$nid, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$gender,$department_id,$location_id,$mobile,$phone, $active,$external_id,$joined_date;
     public $updateMode = false;
     public $locations=[];
 
@@ -31,7 +31,9 @@ class Users extends Component
 
     public function render()
     {
-        $employees=User::orderBy('name','asc')->pluck('name','id')->toArray();
+        $employees = User::orderBy('name', 'asc')->get()->mapWithKeys(function ($user) {
+            return [$user->id => $user->name.' ( ' . $user->emp_no . ' ) ' ];
+        })->toArray();
         $departments=Department::orderBy('name','asc')->get();
         $user_list=User::when($this->department,function($q){
                                 $q->where('department_id',$this->department);
@@ -53,6 +55,7 @@ class Users extends Component
         $this->nid = '';
         $this->email = '';
         $this->emp_no = '';
+        $this->gender = '';
         $this->designation = '';
         $this->department_id = '';
         $this->external_id = '';
@@ -77,6 +80,7 @@ class Users extends Component
             'nid' => 'required|unique:users,nid',
             'email' => 'required',
             'emp_no' => 'required',
+            'gender' => 'required',
             'external_id' => 'sometimes',
             'designation' => 'required',
             'joined_date' => 'required',
@@ -114,10 +118,10 @@ class Users extends Component
         $this->user_id = $id;
         $this->name = $user->name;
         $this->nid = $user->nid;
-
         $this->email = $user->email;
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
+        $this->gender = $user->gender;
         $this->external_id = $user->external_id;
         $this->department_id = $user->department_id;
         $this->location_id = $user->location_id;
@@ -142,6 +146,7 @@ class Users extends Component
         $this->email = $user->email;
         $this->designation = $user->designation;
         $this->emp_no = $user->emp_no;
+        $this->gender = $user->gender;
         $this->external_id = $user->external_id;
         $this->department_id = $user->department_id;
         $this->location_id = $user->location_id;
@@ -175,6 +180,7 @@ class Users extends Component
             'email' => 'required',
             'designation' => 'required',
             'emp_no' => 'required',
+            'gender' => 'required',
             'external_id' => 'sometimes',
             'department_id' => 'required',
             'location_id' => 'required',
@@ -191,6 +197,7 @@ class Users extends Component
             "email"=>$this->email,
             "designation"=>$this->designation,
             "emp_no"=>$this->emp_no,
+            "gender"=>$this->gender,
             "external_id"=>$this->external_id??null,
             "department_id"=>$this->department_id,
             "location_id"=>$this->location_id,

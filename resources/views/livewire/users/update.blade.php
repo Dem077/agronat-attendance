@@ -64,6 +64,15 @@
                         @error('emp_no') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select class="form-control" id="gender" wire:model="gender">
+                            <option value="">Select Gender</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                        @error('gender') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
                         <label for="joined_date">Joined Date:</label>
                         <input type="date" class="form-control" id="joined_date" wire:model="joined_date" placeholder="Joined Date"/>
                         @error('joined_date') <span class="text-danger">{{ $message }}</span>@enderror
