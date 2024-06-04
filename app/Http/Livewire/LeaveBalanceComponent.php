@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Leave;
+use Illuminate\Support\Facades\DB;
 use App\Traits\UserTrait;
 use Livewire\WithPagination;
 use App\Models\LeaveType;
@@ -16,7 +17,9 @@ class LeaveBalanceComponent extends Component
     use WithPagination, UserTrait;
 
     public $selectedUser;
-    public $leaveBalances = [];
+    public $leaveBalances;
+    public $dateRanges = [];
+    public $selectedDateRange;
 
     public function mount()
     {
@@ -28,6 +31,7 @@ class LeaveBalanceComponent extends Component
     {
         return view('livewire.leave-balance.leave-balance', [
             'users' => $this->users,
+            'dateRanges' => $this->dateRanges,
         ]);
     }
 
@@ -37,6 +41,11 @@ class LeaveBalanceComponent extends Component
         $this->getLeaveBalance($userId);
     }
 
+    public function updatedSelectedDateRange($dateRangeKey)
+    {
+        $this->getLeaveBalance($this->selectedUser);
+    }
+
     public function syncLeaveBalances($userId)
     {
         $user = User::with('leaves')->find($userId);
@@ -44,69 +53,69 @@ class LeaveBalanceComponent extends Component
             return;
         }
 
+        $leaveData = [];
         $joinDate = Carbon::parse($user->joined_date);
-        
         $currentDate = Carbon::now();
-        $endDate = $joinDate->copy()->addYear();
         $leaveTypes = LeaveType::all();
-        $isannual_applicable = $currentDate->greaterThan($endDate) ? true : false;
-        // dd($isannual_applicable);
-        if ($currentDate->greaterThan($endDate)) {
-            // Reset the leave balance if the current date exceeds 12 months from the joining date
+
+        $leaveYearStart = $joinDate->copy();
+        $isannual_applicable = false;
+        while ($leaveYearStart->lessThanOrEqualTo($currentDate)) {
+            $leaveYearEnd = $leaveYearStart->copy()->addYear()->subDay();
+            
+            $dateRangeKey = $leaveYearStart->format('Y_m_d') . '-' . $leaveYearEnd->format('Y_m_d');
+            $this->dateRanges[] = $dateRangeKey;
+
             foreach ($leaveTypes as $leaveType) {
+                $allocated_days_per_year = $leaveType->allocated_days ?? 0;
+
+                $leave_taken = $user->leaves()
+                    ->where('leave_type_id', $leaveType->id)
+                    ->get()
+                    ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd) {
+                        $leaveStart = Carbon::parse($leave->from);
+                        $leaveEnd = Carbon::parse($leave->to);
+
+                        if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
+                            return 0;
+                        }
+
+                        $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
+                        $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+
+                        return $leaveStart->diffInDays($leaveEnd) + 1;
+                    });
+
+                $leave_balance = $allocated_days_per_year - $leave_taken;
+
+                $leaveData[$dateRangeKey][] = [
+                    'leave_type_id' => $leaveType->id,
+                    'allocated_days' => $allocated_days_per_year,
+                    'leave_taken' => $leave_taken,
+                    'leave_balance' => $leave_balance,
+                    'isannual_applicable' => $isannual_applicable,
+                ];
+
                 LeaveBalance::updateOrCreate(
                     [
                         'user_id' => $user->id,
                         'leave_type_id' => $leaveType->id,
+                        'year' => $dateRangeKey,
                     ],
                     [
-                        'allocated_days' => $leaveType->allocated_days ?? 0,
-                        'leave_taken' => 0,
-                        'leave_balance' => $leaveType->allocated_days ?? 0,
+                        'allocated_days' => $allocated_days_per_year,
+                        'leave_taken' => $leave_taken,
+                        'leave_balance' => $leave_balance,
                         'isannual_applicable' => $isannual_applicable,
                     ]
                 );
             }
-        } else {
-            for ($year = $joinDate->year; $year <= $currentDate->year; $year++) {
-                $leaveYearStart = $joinDate->copy()->year($year);
-                $leaveYearEnd = $leaveYearStart->copy()->addYear()->subDay();
 
-                if ($leaveYearStart->greaterThan($currentDate)) {
-                    break;
-                }
-
-                $isannual_applicable = $currentDate->greaterThan($endDate) ? true : false;
-
-                foreach ($leaveTypes as $leaveType) {
-                    $allocated_days_per_year = $leaveType->allocated_days ?? 0; // Ensure it's not null
-                  
-                    $leave_taken = $user->leaves()
-                        ->where('leave_type_id', $leaveType->id)
-                        ->whereBetween('from', [$leaveYearStart->toDateString(), $leaveYearEnd->toDateString()])
-                        ->get()
-                        ->sum(function ($leave) {
-                            return $leave->from->diffInDays($leave->to) + 1;
-                        });
-                        
-                    $leave_balance = $allocated_days_per_year - $leave_taken;
-                    
-                    LeaveBalance::updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                            'leave_type_id' => $leaveType->id,
-                            'year' => $year,
-                            'isannual_applicable' => $isannual_applicable,
-                        ],
-                        [
-                            'allocated_days' => $allocated_days_per_year,
-                            'leave_taken' => $leave_taken,
-                            'leave_balance' => $leave_balance,
-                        ]
-                    );
-                }
-            }
+            $leaveYearStart->addYear();
+            $isannual_applicable = true;
         }
+
+        return $leaveData;
     }
 
     public function getLeaveBalance($userId)
@@ -115,18 +124,12 @@ class LeaveBalanceComponent extends Component
         if (!$user) {
             return;
         }
-        
-        $joinDate = Carbon::parse($user->join_date);
-        $currentLeaveYearStart = $joinDate->copy()->year(Carbon::now()->year);
-        if ($currentLeaveYearStart->greaterThan(Carbon::now())) {
-            $currentLeaveYearStart->subYear();
-        }
-        
+
         $this->leaveBalances = LeaveBalance::where('user_id', $userId)
+            ->where('year', $this->selectedDateRange)
             ->with('leaveType')
             ->get()
             ->map(function ($balance) {
-               
                 return [
                     'leave_type' => $balance->leaveType->title,
                     'leave_type_id' => $balance->leaveType->id,
