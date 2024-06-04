@@ -3,12 +3,17 @@
         <div class="card">
             <div class="card-header">
                 <h2>Leave Balance</h2>
+                <div class="text-right mt-3">
+                    <button class="btn btn-primary mr-2" wire:click="exportleave">Export All to CSV</button>
+                </div>
             </div>
+
             
             <div class="card-body">
                 <div class="form-group">
                     <label for="user-select">Select Staff</label>
                     <select id="user-select" class="form-control" wire:model="selectedUser" wire:ignore>
+                        <option value="">Select a employee</option>
                         @foreach($users as $user)
                             <option value="{{ $user['id'] }}">{{ $user['name'] }} ( {{ $user['emp_no'] }} )</option>
                         @endforeach
@@ -77,9 +82,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        {{-- <div class="text-right mt-3">
-                            <button class="btn btn-primary" wire:click="exportleave">Export to CSV</button>
-                        </div> --}}
+
                     </div>
                 </div>
                 @endif
@@ -96,9 +99,10 @@
         $('#user-select').on('change', function (e) {
             var data = $(this).val();
             @this.set('selectedUser', data);
+            $('#date-range-select').val(null).trigger('change');
         });
 
-        $('#date-range-select').select2();
+        
 
         $('#date-range-select').on('change', function (e) {
             var data = $(this).val();
@@ -108,7 +112,6 @@
 
     document.addEventListener('livewire:update', function () {
         $('#user-select').select2();
-        $('#date-range-select').select2();
     });
 </script>
 @endpush

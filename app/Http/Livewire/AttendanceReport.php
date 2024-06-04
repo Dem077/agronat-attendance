@@ -135,7 +135,7 @@ class AttendanceReport extends Component
         }
 
         $filename = sprintf('%1$s-%2$s-%3$s', str_replace(' ', '', 'attendances'), date('Ymd'), date('His'));
-
+        dd($report);
         return export_csv2($header, array_values($report), $filename);
     }
     public function exportRecord()

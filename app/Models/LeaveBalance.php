@@ -16,6 +16,7 @@ class LeaveBalance extends Model
         'allocated_days',
         'leave_taken',
         'leave_balance',
+        'currunt_year',
         'isannual_applicable'
     ];
 
