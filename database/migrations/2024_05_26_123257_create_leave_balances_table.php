@@ -17,7 +17,7 @@ class CreateLeaveBalancesTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('leave_type_id')->constrained()->onDelete('cascade');
-            $table->integer('year');
+            $table->string('year', 100);
             $table->boolean('isannual_applicable')->default(false);
             $table->integer('allocated_days')->default(0);
             $table->integer('leave_taken')->default(0);
