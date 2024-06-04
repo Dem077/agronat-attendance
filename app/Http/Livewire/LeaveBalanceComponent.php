@@ -60,6 +60,7 @@ class LeaveBalanceComponent extends Component
 
         $leaveYearStart = $joinDate->copy();
         $isannual_applicable = false;
+        $this->dateRanges = [];
         while ($leaveYearStart->lessThanOrEqualTo($currentDate)) {
             $leaveYearEnd = $leaveYearStart->copy()->addYear()->subDay();
             
@@ -95,26 +96,55 @@ class LeaveBalanceComponent extends Component
                     'leave_balance' => $leave_balance,
                     'isannual_applicable' => $isannual_applicable,
                 ];
-
-                LeaveBalance::updateOrCreate(
-                    [
+                
+                $isdaterangecurr = ($leaveYearStart->copy())->addYear()->lessThanOrEqualTo($currentDate) ? False  : true;
+                $isdataexist = LeaveBalance::where('user_id', $user->id)
+                ->where('year', $dateRangeKey)
+                ->where('leave_type_id', $leaveType->id)
+                ->exists();
+            
+                if (!$isdataexist) {
+                    LeaveBalance::create([
                         'user_id' => $user->id,
                         'leave_type_id' => $leaveType->id,
                         'year' => $dateRangeKey,
-                    ],
-                    [
                         'allocated_days' => $allocated_days_per_year,
                         'leave_taken' => $leave_taken,
                         'leave_balance' => $leave_balance,
                         'isannual_applicable' => $isannual_applicable,
-                    ]
-                );
+                    ]);
+                }
+                if($isdaterangecurr == true){
+                    LeaveBalance::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'leave_type_id' => $leaveType->id,
+                            'year' => $dateRangeKey,
+                        ],
+                        [
+                            'allocated_days' => $allocated_days_per_year,
+                            'leave_taken' => $leave_taken,
+                            'leave_balance' => $leave_balance,
+                            'isannual_applicable' => $isannual_applicable,
+                        ]
+                    );
+                }
+                
+                if ($isdaterangecurr == true) {
+                    LeaveBalance::where([
+                        'user_id' => $user->id,
+                        'leave_type_id' => $leaveType->id,
+                        'year' => $dateRangeKey,
+                    ])->update([
+                        'currunt_year' => true
+                    ]);
+                }
             }
 
             $leaveYearStart->addYear();
             $isannual_applicable = true;
         }
-
+        // dd($leaveData);
         return $leaveData;
     }
 
@@ -125,6 +155,7 @@ class LeaveBalanceComponent extends Component
             return;
         }
 
+       
         $this->leaveBalances = LeaveBalance::where('user_id', $userId)
             ->where('year', $this->selectedDateRange)
             ->with('leaveType')
@@ -142,5 +173,81 @@ class LeaveBalanceComponent extends Component
                 ];
             })
             ->toArray();
+            
     }
+
+
+    public function exportleave()
+    {
+        $header = ['staff id', 'employee','Department','daterange' ,'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave','Sick Leave w Certificate'];
+        $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))->active()->orderBy('emp_no', 'asc')->get();
+    
+        $leavebalance = [];
+        $userBalance =[];
+        foreach ($users as $user) {
+            $userId = $user->id;
+    
+            // Check if leave balance already exists
+            if (LeaveBalance::where('user_id', $userId)->exists()) {
+       
+                $allbalance = LeaveBalance::where('user_id', $userId)
+                    ->where('currunt_year',True)  
+                    ->with('leaveType')
+                    ->get()
+                    ->map(function ($balance) {
+                        return [
+                            'leave_type' => $balance->leaveType->title,
+                            'leave_type_id' => $balance->leaveType->id,
+                            'user_gender' => $balance->user->gender,
+                            'allocated_days' => $balance->allocated_days,
+                            'leave_taken' => $balance->leave_taken,
+                            'leave_balance' => $balance->leave_balance,
+                            'joined_date_added' => $balance->user->joined_date,
+                            'year'=>$balance->year,
+                        ];
+                    })
+                    ->toArray();
+            } else {
+                $this->syncLeaveBalances($userId);
+          
+                $allbalance = LeaveBalance::where('user_id', $userId)
+                    ->where('currunt_year',True)   
+                    ->with('leaveType')
+                    ->get()
+                    ->map(function ($balance) {
+                        return [
+                            'leave_type' => $balance->leaveType->title,
+                            'leave_type_id' => $balance->leaveType->id,
+                            'user_gender' => $balance->user->gender,
+                            'allocated_days' => $balance->allocated_days,
+                            'year'=>$balance->year,
+                            'leave_taken' => $balance->leave_taken,
+                            'leave_balance' => $balance->leave_balance,
+                        ];
+                    })
+                    ->toArray();
+                    
+            }
+    
+            $userBalance = [
+                'staff id' => $user->id,
+                'employee' => $user->name,
+                'department' => $user->department->name
+                
+            ];
+
+            foreach ($allbalance as $bal) {
+                $userBalance['daterange'] = $bal['year'];
+                $userBalance[$bal['leave_type']] = $bal['leave_taken'];
+                
+            }
+    
+            $leavebalance[] = $userBalance;
+        }
+    
+        $filename = sprintf('%1$s-%2$s-%3$s', str_replace(' ', '', 'leaves_balance'), date('Ymd'), date('His'));
+    
+        return export_csv2($header, $leavebalance, $filename);
+    }
+    
 }
