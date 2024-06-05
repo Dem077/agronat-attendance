@@ -239,42 +239,51 @@ class LeaveBalanceComponent extends Component
                     ->toArray();
                     
                     foreach ($leaveTypes as $leaveType) {
+                        if (!isset($allbalance[$leaveType->id])) {
+                            continue;
+                        }
+                    
+                        if (!isset($allbalance[$leaveType->id]['start_date']) || !isset($allbalance[$leaveType->id]['selected_date'])) {
+                            continue;
+                        }
+                    
                         $leaveYearStart = $allbalance[$leaveType->id]['start_date'];
                         $leaveYearEnd = $allbalance[$leaveType->id]['selected_date'];
-                        
+                    
                         $leave_taken = $user->leaves()
                             ->where('leave_type_id', $leaveType->id)
                             ->get()
                             ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
                                 $leaveStart = Carbon::parse($leave->from);
                                 $leaveEnd = Carbon::parse($leave->to);
-            
+                    
                                 if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
                                     return 0;
                                 }
-            
+                    
                                 $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
                                 $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
-            
+                    
                                 $totalDays = 0;
-            
+                    
                                 for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
                                     $is_holiday = Holiday::where('h_date', $date)->exists();
                                     $work_saturday = User::where('id', $user->id)
                                         ->whereHas('department', function($q) {
                                             $q->where('work_on_saturday', 1);
                                         })->exists() && $date->isSaturday();
-            
+                    
                                     if (!($is_holiday && !$work_saturday)) {
                                         $totalDays++;
                                     }
                                 }
-            
+                    
                                 return $totalDays;
                             });
-            
-                            $allbalance[$leaveType->id]['leave_balance'] = $allbalance[$leaveType->id]['allocated_days']-$leave_taken;
+                    
+                        $allbalance[$leaveType->id]['leave_balance'] = $allbalance[$leaveType->id]['allocated_days'] - $leave_taken;
                     }
+                    
             } else {
                 $this->syncLeaveBalances($userId);
 
@@ -305,47 +314,56 @@ class LeaveBalanceComponent extends Component
                     ->keyBy('leave_type_id')
                     ->toArray();
 
-                foreach ($leaveTypes as $leaveType) {
-                    $leaveYearStart = $allbalance[$leaveType->id]['start_date'];
-                    $leaveYearEnd = $allbalance[$leaveType->id]['selected_date'];
+                    foreach ($leaveTypes as $leaveType) {
+                        if (!isset($allbalance[$leaveType->id])) {
+                            continue;
+                        }
                     
-                    $leave_taken = $user->leaves()
-                        ->where('leave_type_id', $leaveType->id)
-                        ->get()
-                        ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
-                            $leaveStart = Carbon::parse($leave->from);
-                            $leaveEnd = Carbon::parse($leave->to);
-        
-                            if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
-                                return 0;
-                            }
-        
-                            $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
-                            $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
-        
-                            $totalDays = 0;
-        
-                            for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
-                                $is_holiday = Holiday::where('h_date', $date)->exists();
-                                $work_saturday = User::where('id', $user->id)
-                                    ->whereHas('department', function($q) {
-                                        $q->where('work_on_saturday', 1);
-                                    })->exists() && $date->isSaturday();
-        
-                                if (!($is_holiday && !$work_saturday)) {
-                                    $totalDays++;
+                        if (!isset($allbalance[$leaveType->id]['start_date']) || !isset($allbalance[$leaveType->id]['selected_date'])) {
+                            continue;
+                        }
+                    
+                        $leaveYearStart = $allbalance[$leaveType->id]['start_date'];
+                        $leaveYearEnd = $allbalance[$leaveType->id]['selected_date'];
+                    
+                        $leave_taken = $user->leaves()
+                            ->where('leave_type_id', $leaveType->id)
+                            ->get()
+                            ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
+                                $leaveStart = Carbon::parse($leave->from);
+                                $leaveEnd = Carbon::parse($leave->to);
+                    
+                                if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
+                                    return 0;
                                 }
-                            }
-        
-                            return $totalDays;
-                        });
-        
-                        $allbalance[$leaveType->id]['leave_balance'] = $allbalance[$leaveType->id]['allocated_days']-$leave_taken;
-                }
+                    
+                                $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
+                                $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+                    
+                                $totalDays = 0;
+                    
+                                for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
+                                    $is_holiday = Holiday::where('h_date', $date)->exists();
+                                    $work_saturday = User::where('id', $user->id)
+                                        ->whereHas('department', function($q) {
+                                            $q->where('work_on_saturday', 1);
+                                        })->exists() && $date->isSaturday();
+                    
+                                    if (!($is_holiday && !$work_saturday)) {
+                                        $totalDays++;
+                                    }
+                                }
+                    
+                                return $totalDays;
+                            });
+                    
+                        $allbalance[$leaveType->id]['leave_balance'] = $allbalance[$leaveType->id]['allocated_days'] - $leave_taken;
+                    }
+                    
             }
-            if (empty($allbalance)) {
-                continue; 
-            }
+            // if (empty($allbalance)) {
+            //     continue; 
+            // }
 
             $userBalance = [
                 'staff id' => $user->emp_no,
