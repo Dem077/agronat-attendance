@@ -9,7 +9,10 @@ use App\Models\Leave;
 use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use App\Models\LeaveBalance;
+use App\Models\LeaveType;
 use DateTime;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class LeaveReport extends Component
@@ -98,5 +101,62 @@ class LeaveReport extends Component
 
         return export_csv2($header, $leaves, $filename);
     }
+
+    public function exportleave()
+    {
+        $header = ['staff id','National ID', 'employee','Department','Joined Date','daterange' ,'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave','Sick Leave w Certificate'];
+        $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))->active()->orderBy('emp_no', 'asc')->get();
+        $leaveTypes = LeaveType::all();
+        $allleaves=[];
+        $leavebalance = [];
+        $userBalance =[];
+        foreach ($users as $user) {
+            foreach ($leaveTypes as $leaveType) {
+                $startDate = Carbon::parse($this->start_date);
+                $endDate = Carbon::parse($this->end_date);
+                
+                $leaveYearStart= $startDate;
+                $leaveYearEnd = $endDate;
+                $leave_taken = $user->leaves()
+                    ->where('leave_type_id', $leaveType->id)
+                    ->get()
+                    ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd) {
+                        $leaveStart = Carbon::parse($leave->from);
+                        $leaveEnd = Carbon::parse($leave->to);
+
+                        if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
+                            return 0;
+                        }
+
+                        $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
+                        $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+
+                        return $leaveStart->diffInDays($leaveEnd) + 1;
+                    });
+                $allleaves[$user->emp_no][]=$leave_taken;
+            }
+            $userBalance = [
+                'staff id' => $user->emp_no,
+                'nid' => $user->nid,
+                'employee' => $user->name,
+                'department' => $user->department->name,
+                'Joined Date' => $user->joined_date
+                
+            ];
+            foreach ($allleaves as $empNo => $leaveBalances) {
+                foreach ($leaveBalances as $leaveTypeId => $leaveBalance) {
+                    $userBalance['daterange'] = $this->start_date . '_' . $this->end_date;
+                    $userBalance[$leaveTypeId] = $leaveBalance;
+                }
+            }
+    
+            $leavebalance[] = $userBalance;
+        }
+        
+        $filename = sprintf('%1$s-%2$s-%3$s', str_replace(' ', '', 'leaves_balance'), date('Ymd'), date('His'));
+    
+        return export_csv2($header, $leavebalance, $filename);
+    }
+    
 
 }
