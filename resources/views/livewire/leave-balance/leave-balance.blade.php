@@ -4,16 +4,15 @@
             <div class="card-header">
                 <h2>Leave Balance</h2>
                 <div class="text-right mt-3">
-                    <button class="btn btn-primary mr-2" wire:click="exportleave">Export All to CSV</button>
+                    <button class="btn btn-primary mr-2" data-toggle="modal" data-target="#exportModal">Export All to CSV</button>
                 </div>
             </div>
 
-            
             <div class="card-body">
                 <div class="form-group">
                     <label for="user-select">Select Staff</label>
                     <select id="user-select" class="form-control" wire:model="selectedUser" wire:ignore>
-                        <option value="">Select a employee</option>
+                        <option value="">Select an employee</option>
                         @foreach($users as $user)
                             <option value="{{ $user['id'] }}">{{ $user['name'] }} ( {{ $user['emp_no'] }} )</option>
                         @endforeach
@@ -82,13 +81,36 @@
                                 @endforeach
                             </tbody>
                         </table>
-
                     </div>
                 </div>
                 @endif
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exportModalLabel">Select Date for Export</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="date-select">Select End Date</label>
+            <input type="date" id="date-select" class="form-control" wire:model="dateselected">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" wire:click="exportleave">Export</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 @push('js-bottom')
@@ -101,8 +123,6 @@
             @this.set('selectedUser', data);
             $('#date-range-select').val(null).trigger('change');
         });
-
-        
 
         $('#date-range-select').on('change', function (e) {
             var data = $(this).val();
