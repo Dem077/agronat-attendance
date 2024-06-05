@@ -4,7 +4,13 @@
             <div class="card-header">
                 <h2>Leave Balance</h2>
                 <div class="text-right mt-3">
-                    <button class="btn btn-primary mr-2" data-toggle="modal" data-target="#exportModal">Export All to CSV</button>
+                    <button class="btn btn-primary mr-2" wire:click="exportleave">Export All to CSV</button>
+                </div>
+                
+                <!-- Add the date selection input field -->
+                <div class="form-group">
+                    <label for="date-select">Select Date</label>
+                    <input type="date" id="date-select" class="form-control" wire:model="dateselected">
                 </div>
             </div>
 
@@ -28,6 +34,7 @@
                         @endforeach
                     </select>
                 </div>
+
 
                 <div wire:loading>
                     Loading leave balances...
@@ -87,30 +94,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exportModalLabel">Select Date for Export</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-            <label for="date-select">Select End Date</label>
-            <input type="date" id="date-select" class="form-control" wire:model="dateselected">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" wire:click="exportleave">Export</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 @push('js-bottom')
