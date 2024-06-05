@@ -126,17 +126,18 @@ class LeaveBalanceComponent extends Component
                             'leave_taken' => $leave_taken,
                             'leave_balance' => $leave_balance,
                             'isannual_applicable' => $isannual_applicable,
+                            'currunt_year' => true
                         ]
                     );
                 }
                 
-                if ($isdaterangecurr == true) {
+                if ($isdaterangecurr == false) {
                     LeaveBalance::where([
                         'user_id' => $user->id,
                         'leave_type_id' => $leaveType->id,
                         'year' => $dateRangeKey,
                     ])->update([
-                        'currunt_year' => true
+                        'currunt_year' => false
                     ]);
                 }
             }
@@ -179,7 +180,7 @@ class LeaveBalanceComponent extends Component
 
     public function exportleave()
     {
-        $header = ['staff id', 'employee','Department','daterange' ,'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave','Sick Leave w Certificate'];
+        $header = ['staff id','National ID', 'employee','Department','Joined Date','daterange' ,'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave','Sick Leave w Certificate'];
         $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))->active()->orderBy('emp_no', 'asc')->get();
     
         $leavebalance = [];
@@ -230,15 +231,16 @@ class LeaveBalanceComponent extends Component
             }
     
             $userBalance = [
-                'staff id' => $user->id,
+                'staff id' => $user->emp_no,
+                'employee' => $user->nid,
                 'employee' => $user->name,
-                'department' => $user->department->name
+                'department' => $user->department->name,
+                'Joined Date' => $user->joined_date
                 
             ];
-
             foreach ($allbalance as $bal) {
                 $userBalance['daterange'] = $bal['year'];
-                $userBalance[$bal['leave_type']] = $bal['leave_taken'];
+                $userBalance[$bal['leave_type']] = $bal['leave_balance'];
                 
             }
     

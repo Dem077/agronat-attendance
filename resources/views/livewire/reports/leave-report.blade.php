@@ -26,7 +26,9 @@
                         </div>
                       </div>
                     <div class="col-auto my-1">
-                      <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()"><i class="fas fa-file-download"></i></button>
+                      <button type="button" class="btn btn-success" wire:click.prevent="exportRecord()">Export Leaves Details</button>
+                    
+                      <button type="button" class="btn btn-success" wire:click.prevent="exportleave()">Export Leave Count</button>
                     </div>
                   </div>
             </div>
