@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Leave;
+use App\Models\Holiday;
 use Illuminate\Support\Facades\DB;
 use App\Traits\UserTrait;
 use Livewire\WithPagination;
@@ -71,23 +72,37 @@ class LeaveBalanceComponent extends Component
                 $allocated_days_per_year = $leaveType->allocated_days ?? 0;
 
                 $leave_taken = $user->leaves()
-                    ->where('leave_type_id', $leaveType->id)
-                    ->get()
-                    ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd) {
-                        $leaveStart = Carbon::parse($leave->from);
-                        $leaveEnd = Carbon::parse($leave->to);
+                ->where('leave_type_id', $leaveType->id)
+                ->get()
+                ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
+                    $leaveStart = Carbon::parse($leave->from);
+                    $leaveEnd = Carbon::parse($leave->to);
 
-                        if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
-                            return 0;
+                    if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
+                        return 0;
+                    }
+
+                    $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
+                    $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+
+                    $totalDays = 0;
+
+                    for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
+                        $is_holiday = Holiday::where('h_date', $date)->exists();
+                        $work_saturday = User::where('id', $user->id)
+                            ->whereHas('department', function($q) {
+                                $q->where('work_on_saturday', 1);
+                            })->exists() && $date->isSaturday();
+
+                        if (!($is_holiday && !$work_saturday)) {
+                            $totalDays++;
                         }
+                    }
 
-                        $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
-                        $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+                    return $totalDays;
+                });
 
-                        return $leaveStart->diffInDays($leaveEnd) + 1;
-                    });
-
-                $leave_balance = $allocated_days_per_year - $leave_taken;
+             $leave_balance = $allocated_days_per_year - $leave_taken;
 
                 $leaveData[$dateRangeKey][] = [
                     'leave_type_id' => $leaveType->id,

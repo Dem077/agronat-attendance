@@ -104,50 +104,74 @@ class LeaveReport extends Component
 
     public function exportleave()
     {
-        $header = ['staff id','National ID', 'employee','Department','Joined Date','daterange' ,'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave','Sick Leave w Certificate'];
-        $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))->active()->orderBy('emp_no', 'asc')->get();
+        $header = [
+            'staff id', 'National ID', 'employee', 'Department', 'Joined Date', 'daterange',
+            'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 
+            'Virtual Day', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 
+            'Circumcision Leave', 'Umra Leave', 'Sick Leave w Certificate'
+        ];
+        
+        $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))
+            ->active()
+            ->orderBy('emp_no', 'asc')
+            ->get();
+        
         $leaveTypes = LeaveType::all();
-        $allleaves=[];
+        $allleaves = [];
         $leavebalance = [];
-        $userBalance =[];
+        
         foreach ($users as $user) {
             foreach ($leaveTypes as $leaveType) {
                 $startDate = Carbon::parse($this->start_date);
                 $endDate = Carbon::parse($this->end_date);
-                
-                $leaveYearStart= $startDate;
+                $leaveYearStart = $startDate;
                 $leaveYearEnd = $endDate;
+                
                 $leave_taken = $user->leaves()
                     ->where('leave_type_id', $leaveType->id)
                     ->get()
-                    ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd) {
+                    ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
                         $leaveStart = Carbon::parse($leave->from);
                         $leaveEnd = Carbon::parse($leave->to);
-
+    
                         if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
                             return 0;
                         }
-
+    
                         $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
                         $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
-
-                        return $leaveStart->diffInDays($leaveEnd) + 1;
+    
+                        $totalDays = 0;
+    
+                        for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
+                            $is_holiday = Holiday::where('h_date', $date)->exists();
+                            $work_saturday = User::where('id', $user->id)
+                                ->whereHas('department', function($q) {
+                                    $q->where('work_on_saturday', 1);
+                                })->exists() && $date->isSaturday();
+    
+                            if (!($is_holiday && !$work_saturday)) {
+                                $totalDays++;
+                            }
+                        }
+    
+                        return $totalDays;
                     });
-                $allleaves[$user->emp_no][]=$leave_taken;
+    
+                $allleaves[$user->emp_no][$leaveType->id] = $leave_taken;
             }
+    
             $userBalance = [
                 'staff id' => $user->emp_no,
                 'nid' => $user->nid,
                 'employee' => $user->name,
                 'department' => $user->department->name,
-                'Joined Date' => $user->joined_date
-                
+                'Joined Date' => $user->joined_date,
+                'daterange' => $this->start_date . '_' . $this->end_date
             ];
-            foreach ($allleaves as $empNo => $leaveBalances) {
-                foreach ($leaveBalances as $leaveTypeId => $leaveBalance) {
-                    $userBalance['daterange'] = $this->start_date . '_' . $this->end_date;
-                    $userBalance[$leaveTypeId] = $leaveBalance;
-                }
+    
+            foreach ($leaveTypes as $leaveType) {
+                $userBalance[$leaveType->id] = $allleaves[$user->emp_no][$leaveType->id] ?? 0;
             }
     
             $leavebalance[] = $userBalance;
@@ -157,6 +181,7 @@ class LeaveReport extends Component
     
         return export_csv2($header, $leavebalance, $filename);
     }
+    
     
 
 }
