@@ -195,7 +195,7 @@ class LeaveBalanceComponent extends Component
 
     public function exportleave()
     {
-        $header = ['staff id', 'National ID', 'employee', 'Department', 'Joined Date', 'daterange', 'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave', 'Sick Leave w Certificate'];
+        $header = ['staff id', 'National ID', 'employee','gender', 'Department', 'Joined Date', 'daterange', 'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave', 'Sick Leave w Certificate'];
         $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))
                     ->active()
                     ->where('joined_date', '<=', $this->dateselected)
@@ -369,13 +369,22 @@ class LeaveBalanceComponent extends Component
                 'staff id' => $user->emp_no,
                 'nid' => $user->nid,
                 'employee' => $user->name,
+                'gender' => $user->gender,
                 'department' => $user->department->name,
                 'Joined Date' => $user->joined_date
             ];
 
             foreach ($allbalance as $bal) {
                 $userBalance['daterange'] = $bal['year'];
-                $userBalance[$bal['leave_type']] = $bal['leave_balance'];
+                if($bal['user_gender'] === 'M' && $bal['leave_type_id'] == 7){
+                    $userBalance[$bal['leave_type']]="NA";
+                }
+                else if($bal['user_gender'] === 'F' && $bal['leave_type_id'] == 6){
+                    $userBalance[$bal['leave_type']]="NA";
+                }else{
+                    $userBalance[$bal['leave_type']] = $bal['leave_balance'];
+                }
+                
             }
 
             $leavebalance[] = $userBalance;
