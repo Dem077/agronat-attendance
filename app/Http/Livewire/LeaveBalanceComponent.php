@@ -83,8 +83,8 @@ class LeaveBalanceComponent extends Component
                         return 0;
                     }
 
-                    $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
-                    $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+                    $leaveStart = $leaveStart->lessThanOrEqualTo($leaveYearStart) ? $leaveYearStart : $leaveStart;
+                    $leaveEnd = $leaveEnd->greaterThanOrEqualTo($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
 
                     $totalDays = 0;
 
