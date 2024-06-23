@@ -42,7 +42,16 @@
                             @endforeach
                         </select>
                         @error('form.leave_type_id') <span class="text-danger">{{ $message }}</span>@enderror
-
+                    </div>
+                    <div class="form-group">
+                        <label for="remark">Remark</label>
+                        <textarea wire:model="remark" id="remark" class="form-control" rows="3"></textarea>
+                        @error('remark') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="attachment">Attachment</label>
+                        <input type="file" class="form-control-file" id="attachment" wire:model="attachment">
+                        @error('attachment') <span class="text-danger">{{ $message }}</span>@enderror
                     </div>
                     <button type="button" wire:click="store" id="leave-create-button" class="btn btn-primary">
                         Save</button>
@@ -57,31 +66,31 @@
 
 @push('js-bottom')
 <script type="text/javascript">
-    var options={
+    var options = {
         format: 'yyyy-mm-dd',
         todayHighlight: true,
         autoclose: true,
-      };
-      $('#leave-create-button').on('click',()=>{
-        $('#leave-create-button').attr('disabled','disabled');
+    };
+    $('#leave-create-button').on('click', () => {
+        $('#leave-create-button').attr('disabled', 'disabled');
         $('#leave-create-button span').show();
-      });
-      window.livewire.on('leaveCreated', () => {
+    });
+    window.livewire.on('leaveCreated', () => {
         $('#leave-create-button').removeAttr('disabled');
         $('#leave-create-button span').hide();
     });
     $('#leave-create-from').datepicker(options);
     $('#leave-create-to').datepicker(options);
     $('#leave-create-user_id').on('change', function (e) {
-       @this.set('user_id', e.target.value);
+        @this.set('user_id', e.target.value);
     });
 
     $('#leave-create-from').on('change', function (e) {
-       @this.set('form.from', e.target.value);
+        @this.set('form.from', e.target.value);
     });
 
     $('#leave-create-to').on('change', function (e) {
-       @this.set('form.to', e.target.value);
+        @this.set('form.to', e.target.value);
     });
 
 </script>

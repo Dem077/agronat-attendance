@@ -18,7 +18,9 @@ class Leave extends Model
         'user_id',
         'leave_type_id',
         'from',
-        'to'
+        'to',
+        'remark',
+        'attachment'
     ];
     protected $dates = ['from', 'to'];
 
