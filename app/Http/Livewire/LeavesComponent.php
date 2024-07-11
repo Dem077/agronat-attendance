@@ -78,7 +78,12 @@ class LeavesComponent extends Component
         ];
 
         if ($this->attachment) {
-            $data['attachment'] = $this->attachment->store('public');
+            $filePath = $this->attachment->store('public');
+            if (!$filePath) {
+                session()->flash('error', 'Failed to upload file.');
+                return;
+            }
+            $data['attachment'] = $filePath;
         }
     
         $leave = Leave::create($data);
