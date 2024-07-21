@@ -66,8 +66,12 @@
                                     <td>{{$item->status}}{!!$item->status=='approved'?"<br/><small>[ {$item->approved_by} ]</small>":""!!}
                                         @if(($item->status=='pending' || auth()->user()->can('ot-requests.manage')) && $can_approve && $item->requested_user_id !== auth()->id())
                                                 <div>
-                                                <button class="btn btn-success mx-2" onclick="decision({{$item->id}},'approved')">Approve</button>
-                                                <button class="btn btn-danger" onclick="decision({{$item->id}},'rejected')">Reject</button>
+                                                    @if($item->status!=='approved')
+                                                        <button class="btn btn-success mx-2" onclick="decision({{$item->id}},'approved')">Approve</button>
+                                                    @endif
+                                                    @if($item->status!=='rejected')
+                                                        <button class="btn btn-danger" onclick="decision({{$item->id}},'rejected')">Reject</button>
+                                                    @endif
                                                 </div>
                                         @endif
                                         
