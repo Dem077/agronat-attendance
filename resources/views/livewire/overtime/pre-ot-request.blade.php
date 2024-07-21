@@ -53,6 +53,7 @@
                                 <th>OT Minutes</th>
                                 <th>Purpose</th>
                                 <th>status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,18 +64,23 @@
                                     <td>{{date('H:i',strtotime($item->start_time))}} - {{date('H:i',strtotime($item->end_time))}}</td>
                                     <td>{{$item->mins}}</td>
                                     <td>{{$item->purpose}}</td>
-                                    <td>{{$item->status}}{!!$item->status=='approved'?"<br/><small>[ {$item->approved_by} ]</small>":""!!}
+                                    <td ><div class="badge 
+                                            {{ $item->status == 'approved' ? 'badge-success' : ($item->status == 'pending' ? 'badge-warning' : 'badge-danger') }}">
+                                            {{ strtoupper($item->status) }}
+                                        </div>
+                                        </div>{!!$item->status=='approved'?"<br/><small>[ {$item->approved_by} ]</small>":""!!}  
+                                    </td>
+                                    <td>
                                         @if(($item->status=='pending' || auth()->user()->can('ot-requests.manage')) && $can_approve && $item->requested_user_id !== auth()->id())
-                                                <div>
+                                                <div class="d-flex">
                                                     @if($item->status!=='approved')
-                                                        <button class="btn btn-success mx-2" onclick="decision({{$item->id}},'approved')">Approve</button>
+                                                        <button class="btn btn-success mx-1 ms-1" onclick="decision({{$item->id}},'approved')">Approve</button>
                                                     @endif
                                                     @if($item->status!=='rejected')
-                                                        <button class="btn btn-danger" onclick="decision({{$item->id}},'rejected')">Reject</button>
+                                                        <button class="btn btn-danger mx-1 ms-1" onclick="decision({{$item->id}},'rejected')">Reject</button>
                                                     @endif
                                                 </div>
                                         @endif
-                                        
                                     </td>
                                 </tr>
                             @endforeach
