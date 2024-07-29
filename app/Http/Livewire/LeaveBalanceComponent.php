@@ -146,6 +146,10 @@ class LeaveBalanceComponent extends Component
                         'leave_type_id' => $leaveType->id,
                         'year' => $dateRangeKey,
                     ])->update([
+                        'allocated_days' => $allocated_days_per_year,
+                        'leave_taken' => $leave_taken,
+                        'leave_balance' => $leave_balance,
+                        'isannual_applicable' => $isannual_applicable,
                         'currunt_year' => false
                     ]);
                 }
