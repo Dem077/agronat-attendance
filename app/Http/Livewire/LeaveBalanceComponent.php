@@ -76,29 +76,22 @@ class LeaveBalanceComponent extends Component
                 ->where('leave_type_id', $leaveType->id)
                 ->get()
                 ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
+
                     $leaveStart = Carbon::parse($leave->from);
                     $leaveEnd = Carbon::parse($leave->to);
+                    $leaves_count=$leave->day_count;
 
-                    if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
+                    if ($leaveStart->greaterThan($leaveYearEnd) ) {
                         return 0;
                     }
 
-                    $leaveStart = $leaveStart->lessThanOrEqualTo($leaveYearStart) ? $leaveYearStart : $leaveStart;
                     $leaveEnd = $leaveEnd->greaterThanOrEqualTo($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
 
                     $totalDays = 0;
 
-                    for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
-                        $is_holiday = Holiday::where('h_date', $date)->exists();
-                        $work_saturday = User::where('id', $user->id)
-                            ->whereHas('department', function($q) {
-                                $q->where('work_on_saturday', 1);
-                            })->exists() && $date->isSaturday();
-
-                        if (!($is_holiday && !$work_saturday)) {
-                            $totalDays++;
-                        }
-                    }
+                  if($leaveStart->lessThanOrEqualTo($leaveYearEnd) && $leaveStart->greaterThanOrEqualTo($leaveYearStart)){
+                    $totalDays=$totalDays+ $leaves_count;
+                  }
 
                     return $totalDays;
                 });

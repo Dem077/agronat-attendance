@@ -6,7 +6,10 @@ use App\Jobs\UpdateAttendanceStatus;
 use Livewire\Component;
 use App\Models\Leave;
 use App\Models\LeaveType;
+use App\Models\User;
+use App\Models\Holiday;
 use App\Traits\UserTrait;
+use Carbon\Carbon;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 
@@ -15,7 +18,7 @@ class LeavesComponent extends Component
     use WithPagination, UserTrait, WithFileUploads;
     protected $paginationTheme = 'bootstrap';
 
-    public $start_date, $end_date, $remark, $attachment;
+    public $start_date, $end_date, $remark, $attachment, $days_count;
     public $form = ['from' => '', 'to' => '', 'leave_type_id'];
     protected $listeners = ['deleteLeave' => 'delete', 'leaveCreated' => '$refresh'];
 
@@ -59,7 +62,7 @@ class LeavesComponent extends Component
         if (!auth()->user()->can('leave-list')) {
             abort(403);
         }
-
+    
         $validated = $this->validate([
             'user_id' => 'required',
             'form.from' => 'required|date',
@@ -68,15 +71,39 @@ class LeavesComponent extends Component
             'remark' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:jpg,png,pdf,doc,docx|max:2048',
         ]);
-
+    
+        $days_count = 0;
+        $fromDate = Carbon::parse($validated['form']['from']);
+        $toDate = Carbon::parse($validated['form']['to']);
+    
+        $currentDate = $fromDate->copy();
+        while ($currentDate <= $toDate) {
+            $is_holiday = Holiday::where('h_date', $currentDate->format('Y-m-d'))->exists();
+            $work_saturday = User::where('id', $validated['user_id'])
+                ->whereHas('department', function ($q) {
+                    $q->where('work_on_saturday', 1);
+                })->exists() && $currentDate->isSaturday();
+    
+            if (!$is_holiday) {
+                $days_count++;
+            }
+            if ($work_saturday && $currentDate->isSaturday()) {
+                $days_count++;
+            }
+    
+            $currentDate->addDay();
+        }
+        $this->days_count = $days_count;
+    
         $data = [
             'user_id' => $validated['user_id'],
             'from' => $validated['form']['from'],
             'to' => $validated['form']['to'],
             'leave_type_id' => $validated['form']['leave_type_id'],
             'remark' => $this->remark,
+            'day_count' => $this->days_count
         ];
-
+    
         if ($this->attachment) {
             $filePath = $this->attachment->store('public');
             if (!$filePath) {
@@ -108,3 +135,4 @@ class LeavesComponent extends Component
         UpdateAttendanceStatus::dispatchNow($leave->toArray());
     }
 }
+

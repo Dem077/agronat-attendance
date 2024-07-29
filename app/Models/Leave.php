@@ -20,7 +20,8 @@ class Leave extends Model
         'from',
         'to',
         'remark',
-        'attachment'
+        'attachment',
+        'day_count'
     ];
     protected $dates = ['from', 'to'];
 
