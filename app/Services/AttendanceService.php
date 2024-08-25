@@ -134,7 +134,7 @@ class AttendanceService{
             if($log->status==0){
                 if(!$attendance->in){
                     $attendance->in=$time;
-                    $attendance->late_min=$this->lateFine($time,$schedule['in']);
+                    $attendance->late_min=$this->lateFine($time,$schedule['in'])>480?480:$this->lateFine($time,$this->schedule['in']);
                     $attendance->status=$attendance->late_min>0?'Late':'Normal';
                     $attendance->save();
                 }
@@ -147,7 +147,7 @@ class AttendanceService{
             UpdateAttendanceStatus::dispatchNow(['from'=>$date,'user_id'=>$user_id]);
 
         }else{
-            $late_min=$this->lateFine($time,$this->schedule['in']);
+            $late_min=$this->lateFine($time,$this->schedule['in'])>480?480:$this->lateFine($time,$this->schedule['in']);
             $status=$late_min>0?'Late':'Normal';
             $work_saturday=User::where('id',$user_id)
                                 ->whereHas('department',function($q){

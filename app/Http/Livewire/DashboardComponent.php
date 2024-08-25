@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\User;
 use App\Traits\UserTrait;
 use DateInterval;
+use App\Models\LeaveBalance;
 use DatePeriod;
 use DateTime;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ use Livewire\Component;
 class DashboardComponent extends Component
 {
     use UserTrait;
-    public $attendance,$period,$from_date,$to_date,$month;
+    public $attendance,$period,$from_date,$to_date,$month,$balance;
 
     public function render()
     {
@@ -43,11 +44,42 @@ class DashboardComponent extends Component
         return view('livewire.admin-dashboard');
     }
 
-    public function getDashboard(){
-        
+    public function getDashboard()
+    {
         $this->getMonthlyAttendance(auth()->id());
-        return view('livewire.dashboard');
+        $this->balance = $this->getLeaveBalance(auth()->id());
+        return view('livewire.dashboard', ['balance' => $this->balance]);
     }
+    
+
+    public function getLeaveBalance($userId)
+    {
+        $user = User::find($userId);
+        if (!$user) {
+            return;
+        }
+
+        $leaveBalances = LeaveBalance::where('user_id', $userId)
+            ->where('currunt_year', 1) 
+            ->with('leaveType')
+            ->get()
+            ->mapWithKeys(function ($balance) {
+                return [
+                    $balance->leaveType->title => $balance->leave_balance,
+                ];
+            })
+            ->toArray();
+            $leavedata = LeaveBalance::where('user_id', $userId)
+            ->where('currunt_year', 1)
+            ->get();
+            if($leavedata[0]['isannual_applicable']==0){
+                $leaveBalances['Annual Leave']=0;
+            }
+            
+
+        return $leaveBalances;
+    }
+
 
     public function getDailyAttendance(){
         $this->attendance=[];
