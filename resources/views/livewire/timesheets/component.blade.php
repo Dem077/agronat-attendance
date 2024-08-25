@@ -72,8 +72,6 @@
                       </thead>
                       <tbody>
                           @foreach($logs['data'] as $log)
-                          @if($log->changes)
-                          @endif
                           <tr>
                               <td>{{ $log->id }}</td>
                               <td>{{ $log->employee }}
