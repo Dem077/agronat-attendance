@@ -192,7 +192,7 @@ class LeaveBalanceComponent extends Component
 
     public function exportleave()
     {
-        $header = ['staff id', 'National ID', 'employee', 'Department', 'Joined Date', 'daterange','gender', 'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave', 'Sick Leave w Certificate'];
+        $header = ['staff id', 'National ID', 'employee', 'Department', 'Joined Date', 'daterange','gender', 'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave', 'Sick Leave w Certificate','External Training / Workshops','Government Holiday','No Pay'];
         $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))
                     ->active()
                     ->where('joined_date', '<=', $this->dateselected)
@@ -253,28 +253,20 @@ class LeaveBalanceComponent extends Component
                             ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
                                 $leaveStart = Carbon::parse($leave->from);
                                 $leaveEnd = Carbon::parse($leave->to);
-                    
-                                if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
+                                $leaves_count=$leave->day_count;
+
+                                if ($leaveStart->greaterThan($leaveYearEnd) ) {
                                     return 0;
                                 }
-                    
-                                $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
-                                $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
-                    
+            
+                                $leaveEnd = $leaveEnd->greaterThanOrEqualTo($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+            
                                 $totalDays = 0;
-                    
-                                for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
-                                    $is_holiday = Holiday::where('h_date', $date)->exists();
-                                    $work_saturday = User::where('id', $user->id)
-                                        ->whereHas('department', function($q) {
-                                            $q->where('work_on_saturday', 1);
-                                        })->exists() && $date->isSaturday();
-                    
-                                    if (!($is_holiday && !$work_saturday)) {
-                                        $totalDays++;
-                                    }
-                                }
-                    
+            
+                              if($leaveStart->lessThanOrEqualTo($leaveYearEnd) && $leaveStart->greaterThanOrEqualTo($leaveYearStart)){
+                                $totalDays=$totalDays+ $leaves_count;
+                              }
+            
                                 return $totalDays;
                             });
                     
@@ -336,21 +328,20 @@ class LeaveBalanceComponent extends Component
                     
                                 $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
                                 $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
-                    
-                                $totalDays = 0;
-                    
-                                for ($date = $leaveStart; $date <= $leaveEnd; $date->addDay()) {
-                                    $is_holiday = Holiday::where('h_date', $date)->exists();
-                                    $work_saturday = User::where('id', $user->id)
-                                        ->whereHas('department', function($q) {
-                                            $q->where('work_on_saturday', 1);
-                                        })->exists() && $date->isSaturday();
-                    
-                                    if (!($is_holiday && !$work_saturday)) {
-                                        $totalDays++;
-                                    }
+                                $leaves_count=$leave->day_count;
+
+                                if ($leaveStart->greaterThan($leaveYearEnd) ) {
+                                    return 0;
                                 }
-                    
+            
+                                $leaveEnd = $leaveEnd->greaterThanOrEqualTo($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
+            
+                                $totalDays = 0;
+            
+                              if($leaveStart->lessThanOrEqualTo($leaveYearEnd) && $leaveStart->greaterThanOrEqualTo($leaveYearStart)){
+                                $totalDays=$totalDays+ $leaves_count;
+                              }
+            
                                 return $totalDays;
                             });
                     
