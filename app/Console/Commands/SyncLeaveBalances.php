@@ -24,7 +24,7 @@ class SyncLeaveBalances extends Command
     {
         try {
             // Get all users
-            $users = User::all();
+            $users = User::all()->where('active', 1);
             $totalUsers = $users->count(); // Get the total number of users
             $leaveBalanceComponent = new LeaveBalanceComponent();
 
