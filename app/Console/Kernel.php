@@ -33,10 +33,13 @@ class Kernel extends ConsoleKernel
                         ->everyThreeMinutes();
         $schedule->job(new AddSchedule([]))
                         ->everySixHours()
-                        ->between('05:00','13:00');;
+                        ->between('05:00','13:00');
         $schedule->job(new UpdateAttendanceStatus([]))
                         ->everyThreeHours()
                         ->between('08:00','12:00');
+        $schedule->command('sync:leave-balances')->dailyAt('23:00');
+        $schedule->command('attendance:recompute')->dailyAt('01:00');
+                        
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Jobs\UpdateAttendanceStatus;
 use Livewire\Component;
+use App\Http\Livewire\LeaveBalanceComponent;
 use App\Models\Leave;
 use App\Models\LeaveType;
 use App\Models\User;
@@ -62,7 +63,7 @@ class LeavesComponent extends Component
         if (!auth()->user()->can('leave-list')) {
             abort(403);
         }
-    
+        $leaveBalanceComponent = new LeaveBalanceComponent();
         $validated = $this->validate([
             'user_id' => 'required',
             'form.from' => 'required|date',
@@ -114,6 +115,7 @@ class LeavesComponent extends Component
         }
     
         $leave = Leave::create($data);
+        $leaveBalanceComponent->syncLeaveBalances($data['user_id']);
         $this->updateAttendance($leave);
         $this->resetInput();
         $this->emit('leaveCreated');
