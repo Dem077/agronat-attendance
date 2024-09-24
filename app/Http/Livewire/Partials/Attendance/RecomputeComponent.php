@@ -21,7 +21,7 @@ class RecomputeComponent extends Component
     }
 
     public function recompute(){
-        set_time_limit(1000);
+        set_time_limit(1500);
 
         if(!auth()->user()->can('timelog-create')){
             abort(403);
@@ -42,7 +42,7 @@ class RecomputeComponent extends Component
         if($this->user_id){
             $users=[$this->user_id];
         }else{
-            $users=User::pluck('id')->toArray();
+            $users=User::where('active', 1)->pluck('id')->toArray();
         }
         foreach($users as $user_id){
             $attendanceService->recompute($this->from,$this->to,$user_id);

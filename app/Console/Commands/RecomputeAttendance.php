@@ -33,7 +33,7 @@ class RecomputeAttendance extends Command
         $to = Carbon::yesterday();
 
         // Get all users
-        $users = User::all();
+        $users = User::all()->where('active', 1);
         $totalUsers = $users->count();
 
         if ($totalUsers == 0) {
