@@ -55,7 +55,7 @@ class SyncLeaveBalances extends Command
                     $this->info("LeaveBalanceSync Progress: {$progress}% ({$processedUsers}/{$totalUsers} users synced)");
 
                     // Edit the Telegram message to show progress
-                    $this->telegramService->editMessage($messageId, "📊 Progress: {$progress}% ({$processedUsers}/{$totalUsers} users synced)");
+                    $this->telegramService->editMessage($messageId, "📊 LeaveBalanceSync Progress: {$progress}% ({$processedUsers}/{$totalUsers} users synced)");
 
                     $lastProgressSent = $progress;
                 }
