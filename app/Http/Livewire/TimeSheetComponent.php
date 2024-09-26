@@ -36,18 +36,18 @@ class TimeSheetComponent extends Component
     {
         $this->setUser();
         $logs = $this->getTimeSheet(10);
-        $this->resetPage();
-    // dd($logs);
+        // $this->resetPage();
+
         // dd($logs);
         return view('livewire.timesheets.component', [
             'logs' => $logs,
         ]);
     }
     
-    public function setChangesData($attendances_id)
+    public function setChangesData($id)
     {
         $all=[];
-        $logdata = TimeChangeLog::where('attendances_id', $attendances_id)->get()->all();
+        $logdata = TimeChangeLog::where('attendances_id', $id)->get()->all();
         foreach($logdata as $row){
             $editedTime = DB::select('SELECT punch FROM time_sheets WHERE id = ?', [$row->time_sheet_id]);
             $punch=$editedTime[0]->punch;
@@ -64,12 +64,6 @@ class TimeSheetComponent extends Component
 
         $attendance=Attendance::select('*',DB::raw("date_format(ck_Date,'%a') as day"))
                         ->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
-                    // ->whereExists(function($q){
-                    //     $q->select(DB::raw(1))
-                    //     ->from('time_sheets')
-                    //     ->whereRaw("date_format(time_sheets.punch,'%Y-%m-%d') = attendances.ck_date")
-                    //     ->whereRaw("time_sheets.user_id = attendances.user_id");
-                    // });
                     
         $timesheet=TimeSheet::select('*');
         if($this->start_date){
@@ -113,21 +107,30 @@ class TimeSheetComponent extends Component
         }
 
         $data=[];
-        $isedited = [];
+        
+        
         foreach($attendance as $att){
-            
-            $exitsintable = TimeChangeLog::where('attendances_id', $att->id)->get();
-            if ($exitsintable) {
-                $isedited = [
-                    'changes_made' => $exitsintable->first(),
-                ];
-            }
-
+            $isedited = null;
             $p=[];
+            $editedids = [];
             $punches=$timesheet->where('user_id',$att->user_id)->where("punch",">=",$att->ck_date)->where("punch","<=",$att->ck_date." 23:59:59");
+            $deletedpunches = TimeSheet::withTrashed()->where('user_id', $att->user_id)->where('punch', '>=', $att->ck_date)->where('punch', '<=', $att->ck_date . ' 23:59:59')->whereIn('id', TimeChangeLog::pluck('time_sheet_id'))->pluck('id')->all();
             $timesheet=$timesheet->whereNotIn('id',$punches->pluck('id'));
             foreach($punches as $punch){
                 $p[]=['time'=>date('G:i',strtotime($punch->punch)),'id'=>$punch->id];
+                $editedids[]=$punch->id;
+            }
+            $dataedit =[];
+            foreach($deletedpunches as $id){
+                $exitsintable = TimeChangeLog::where('time_sheet_id', $id)->first();
+              
+                if ($exitsintable) {
+                    
+                    $dataedit []= $id;
+                    $isedited[] = [
+                        'changes_made' => $exitsintable->getAttributes(),
+                    ];
+                }
             }
             $att->changes=$isedited;
             $att->punch=$p;

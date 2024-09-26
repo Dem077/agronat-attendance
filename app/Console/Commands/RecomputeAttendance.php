@@ -40,7 +40,7 @@ class RecomputeAttendance extends Command
             $this->warn('No users found to process.');
             return;
         }
-
+        $this->info("Starting attendance recompute for {$totalUsers} users for the date: {$from->format('Y-m-d')}.");
         // Send initial message to Telegram
         $messageId = $this->telegramService->sendMessage("🚀 Starting attendance recompute for {$totalUsers} users for the date: {$from->format('Y-m-d')}.");
 
@@ -60,13 +60,15 @@ class RecomputeAttendance extends Command
                 // Only send update for every 10% progress
                 if ($progress % 1 === 0 && $progress !== $lastProgressSent) {
                     // Edit the Telegram message to show progress
+                    $this->info("Recompute Progress: {$progress}% ({$processedUsers}/{$totalUsers} users processed)");
                     $this->telegramService->editMessage($messageId, "📊Recompute Progress: {$progress}% ({$processedUsers}/{$totalUsers} users processed)");
                     $lastProgressSent = $progress;
                 }
             }
 
             // Send success message to Telegram once done
-            $this->telegramService->editMessage($messageId, "✅ Recompute task completed successfully for all {$totalUsers} users for the date: {$from->format('Y-m-d')} to {$to->format('Y-m-d')}");
+            $this->info("Recompute task completed successfully for all {$totalUsers} users for the date: {$from->format('Y-m-d')} ");
+            $this->telegramService->editMessage($messageId, "✅ Recompute task completed successfully for all {$totalUsers} users for the date: {$from->format('Y-m-d')}");
 
         } catch (\Exception $e) {
             // Send failure message to Telegram with error

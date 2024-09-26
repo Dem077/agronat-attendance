@@ -31,6 +31,11 @@ class TimeChangeLog extends Model
             return 'Failed to create TimeChangeLog: ' . $e->getMessage();
         }
     }
+
+    public function timeSheet()
+    {
+        return $this->belongsTo(TimeSheet::class, 'time_sheet_id', 'id');
+    }
     
 }
 

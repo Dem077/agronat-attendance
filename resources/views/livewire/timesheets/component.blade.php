@@ -76,9 +76,9 @@
                               <td>{{ $log->id }}</td>
                               <td>{{ $log->employee }}
                               @can('timelog-create')
-                                @if($log->changes['changes_made'])
-                                    <button class="btn btn-warning btn-sm ml-2" title="Change Alert" type="button" data-toggle="modal" data-target="#changeModal" onclick="setChangesData({{ json_encode($log->id) }})">
-                                      <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                @if(isset($log->changes) && $log->changes)
+                                    <button class="btn btn-warning btn-sm ml-2" title="Change Alert" type="button" data-toggle="modal" data-target="#changeModal" onclick="setChangesData({{ json_encode($log->changes[0]['changes_made']['attendances_id']) }})">
+                                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
                                     </button>
                                 @endif
                               @endcan
@@ -137,6 +137,7 @@
 
   function setChangesData(changes) {
       document.getElementById('changeData').value = JSON.stringify(changes);
+      console.log(changes);
       Livewire.emit('setChangesData', changes);
   }
 

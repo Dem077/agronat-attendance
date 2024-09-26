@@ -76,4 +76,9 @@ class TimeSheet extends Model
 
         return $log;
     }
+    
+    public function timeChangeLogs()
+    {
+        return $this->hasMany(TimeChangeLog::class, 'time_sheet_id', 'id');
+    }
 }
