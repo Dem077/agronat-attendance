@@ -32,17 +32,28 @@ class TimeSheetComponent extends Component
         parent::__construct();
     }
 
+    public function mount()
+    {
+        // Reset pagination when the component is first loaded
+        $this->resetPage();
+    }
+
+    public function updatedUserId($value)
+    {
+        // Reset pagination when the user is changed
+        $this->resetPage();
+    }
+
     public function render()
     {
-        $this->setUser();
-        $logs = $this->getTimeSheet(10);
-        // $this->resetPage();
-
-        // dd($logs);
+        // Fetch your data for the view
+        $logs = $this->getTimeSheet(10); // Example data fetching logic
+        
         return view('livewire.timesheets.component', [
             'logs' => $logs,
         ]);
     }
+
     
     public function setChangesData($id)
     {
@@ -62,6 +73,7 @@ class TimeSheetComponent extends Component
     public function getTimeSheet($pagination=null){
         set_time_limit(1000);
 
+        
         $attendance=Attendance::select('*',DB::raw("date_format(ck_Date,'%a') as day"))
                         ->addSelect(['employee' => User::select('name')->whereColumn('user_id', 'users.id')->limit(1)]);
                     
