@@ -34,6 +34,7 @@ class TimeSheetComponent extends Component
 
     public function mount()
     {
+        $this->setUser();
         // Reset pagination when the component is first loaded
         $this->resetPage();
     }
