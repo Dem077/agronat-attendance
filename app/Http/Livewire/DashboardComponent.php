@@ -15,7 +15,7 @@ use Livewire\Component;
 class DashboardComponent extends Component
 {
     use UserTrait;
-    public $attendance,$period,$from_date,$to_date,$month,$balance;
+    public $attendance,$period,$from_date,$to_date,$month,$balance,$joined_date;
 
     public function render()
     {
@@ -48,7 +48,7 @@ class DashboardComponent extends Component
     {
         $this->getMonthlyAttendance(auth()->id());
         $this->balance = $this->getLeaveBalance(auth()->id());
-        return view('livewire.dashboard', ['balance' => $this->balance]);
+        return view('livewire.dashboard', ['balance' => $this->balance , 'joined_date'=> $this->joined_date]);
     }
     
 
@@ -58,7 +58,7 @@ class DashboardComponent extends Component
         if (!$user) {
             return;
         }
-
+        $this->joined_date = $user->joined_date;
         $leaveBalances = LeaveBalance::where('user_id', $userId)
             ->where('currunt_year', 1) 
             ->with('leaveType')

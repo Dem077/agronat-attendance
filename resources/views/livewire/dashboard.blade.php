@@ -109,6 +109,7 @@
                 <div class="card-body">
                     <div class="alert alert-info">
                         <h6><strong>Leave Balance</strong></h6>
+                        <div style="font-size: 15px"><strong>Joined Date : </strong>{{$joined_date}}</div>
                     </div>
             
                     <div class="table-responsive">
