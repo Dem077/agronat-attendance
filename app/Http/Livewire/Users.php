@@ -18,7 +18,7 @@ class Users extends Component
     protected $paginationTheme = 'bootstrap';
     public $department;
     public $employee;
-    public $name,$nid,$supervisor_id, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$gender,$department_id,$location_id,$mobile,$phone, $active,$external_id,$joined_date;
+    public $name,$nid,$supervisor_id, $user_id, $email, $designation,$password,$password_confirmation,$emp_no,$gender,$department_id,$location_id,$mobile,$phone, $active,$external_id,$joined_date,$is_annual_applicable;
     public $updateMode = false;
     public $locations=[];
     public $employees=[];
@@ -68,6 +68,7 @@ class Users extends Component
         $this->external_id = '';
         $this->location_id = '';
         $this->joined_date = '';
+        $this->is_annual_applicable = '';
         $this->mobile = '';
         $this->phone = '';
         $this->password='';
@@ -101,6 +102,7 @@ class Users extends Component
         $validatedData['department_id']=$this->department_id;
         $validatedData['location_id']=$this->location_id;
         $validatedData['joined_date']=$this->joined_date;
+        $validatedData['is_annual_applicable']=false;
         $validatedData['active']=true;
         $validatedData['password']=Hash::make($validatedData['password']);
         $user=User::create($validatedData);
@@ -138,6 +140,7 @@ class Users extends Component
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
+        $this->is_annual_applicable = $user->is_annual_applicable;
         $this->supervisor_id = $user->supervisor_id;
         $this->updateMode = true;
     }
@@ -164,6 +167,7 @@ class Users extends Component
         $this->mobile = $user->mobile;
         $this->phone = $user->phone;
         $this->active = $user->active;
+        $this->is_annual_applicable = $user->is_annual_applicable;
         $this->supervisor_id = $user->supervisor_id;
         $this->updateMode = true;
     }
@@ -200,7 +204,8 @@ class Users extends Component
             'phone' => 'sometimes',
             'supervisor_id' => 'sometimes',
             'password' => 'sometimes|confirmed',
-            'active'=>'sometimes'
+            'active'=>'sometimes',
+            'is_annual_applicable'=>'sometimes'
         ]);
 
         $update=[
@@ -217,7 +222,8 @@ class Users extends Component
             'joined_date' =>$this->joined_date,
             "mobile"=>$this->mobile,
             "phone"=>$this->phone,
-            "active"=>$this->active
+            "active"=>$this->active,
+            "is_annual_applicable"=>$this->is_annual_applicable
         ];
 
         if($this->password){

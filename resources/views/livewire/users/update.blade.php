@@ -125,8 +125,19 @@
                           <input class="form-check-input" type="checkbox" id="activeCheck"  wire:model="active">
 
                         </div>
-                      </div>
 
+                    </div>
+                    <div class="form-group">
+                    
+                        <label class="form-check-label" for="activeCheck">
+                            Annual Applicable:
+                          </label>
+                        <div class="form-check">
+
+                          <input class="form-check-input" type="checkbox" id="activeCheck"  wire:model="is_annual_applicable">
+
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

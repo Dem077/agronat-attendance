@@ -43,7 +43,8 @@ class User extends Authenticatable
         'external_id',
         'location_id',
         'joined_date',
-        'supervisor_id'
+        'supervisor_id',
+        'is_annual_applicable'
     ];
 
     /**
