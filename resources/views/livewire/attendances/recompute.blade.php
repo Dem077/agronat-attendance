@@ -56,6 +56,20 @@
 
                         Recompute</button>
                 </form>
+                
+                @if ($progressKey)
+                    <div wire:poll.2000ms="getProgress" class="mt-3">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: {{ $progress['percent'] }}%;" aria-valuenow="{{ $progress['percent'] }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ $progress['percent'] }}%
+                            </div>
+                        </div>
+                        <small>{{ $progress['completed'] }} / {{ $progress['total'] }} completed</small>
+                        <div class="mt-2">
+                            <button wire:click="stopAndClearQueue" class="btn btn-danger btn-sm">Stop & Clear Queue</button>
+                        </div>
+                    </div>
+                @endif
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary close-btn" data-dismiss="modal">Close</button>
@@ -93,6 +107,8 @@
     $('#recompute-to').on('change', function (e) {
        @this.set('to', e.target.value);
     });
-
+    $('#recomputeModal').on('hidden.bs.modal', function () {
+        window.livewire.emit('stopAndClearQueue');
+    });
 </script>
 @endpush
