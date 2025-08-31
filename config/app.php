@@ -180,6 +180,7 @@ return [
 
     ],
 
+    'api_key' => env('API_KEY'),
     /*
     |--------------------------------------------------------------------------
     | Class Aliases
@@ -231,5 +232,6 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
     ],
+
 
 ];
