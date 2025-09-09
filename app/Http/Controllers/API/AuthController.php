@@ -89,6 +89,17 @@ class AuthController extends Controller
         return response()->json($user->department);
     }
 
+    public function bydepartment(Request $request)
+    {
+        $request->validate([
+            'dep_id' => 'required',
+        ]);
+
+        $department = \App\Models\Department::findOrFail($request->dep_id);
+
+        return response()->json($department);
+    }
+
     public function active()
     {
         $users = \App\Models\User::active()->get();

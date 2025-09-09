@@ -22,6 +22,7 @@ Route::apiResource('users',UserController::class)->only(['index']);
 //     return $request->user();
 // });
 Route::middleware(ApiKeyMiddleware::class)->group(function () {
+    Route::get('/department', [AuthController::class, 'bydepartment']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::get('/user/roles', [AuthController::class, 'roles']);
     Route::get('/users/supervisor', [AuthController::class, 'supervisor']);
