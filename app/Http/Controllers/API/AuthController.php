@@ -94,4 +94,20 @@ class AuthController extends Controller
         $users = \App\Models\User::active()->get();
         return response()->json($users);
     }
+
+    public function roles(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+        ]);
+
+        $user = \App\Models\User::findOrFail($request->id);
+
+        // Assuming roles() returns a collection of Role models with a 'name' attribute
+        $roleNames = $user->roles->pluck('name');
+
+        return response()->json($roleNames);
+    }
+
+
 }

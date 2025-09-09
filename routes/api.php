@@ -23,6 +23,7 @@ Route::apiResource('users',UserController::class)->only(['index']);
 // });
 Route::middleware(ApiKeyMiddleware::class)->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/user/roles', [AuthController::class, 'roles']);
     Route::get('/users/supervisor', [AuthController::class, 'supervisor']);
     Route::get('/users/staffs', [AuthController::class, 'staffs']);
     Route::get('/users/department', [AuthController::class, 'department']);
