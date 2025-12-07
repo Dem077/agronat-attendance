@@ -22,6 +22,8 @@ Route::apiResource('users',UserController::class)->only(['index']);
 //     return $request->user();
 // });
 Route::middleware(ApiKeyMiddleware::class)->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/mschapv2/auth', [AuthController::class, 'authenticate']);
     Route::get('/department', [AuthController::class, 'bydepartment']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::get('/user/roles', [AuthController::class, 'roles']);
@@ -31,4 +33,3 @@ Route::middleware(ApiKeyMiddleware::class)->group(function () {
     Route::get('/users/active', [AuthController::class, 'active']);
     Route::apiResource('users',UserController::class)->only(['index']);
 });
-Route::post('/login', [AuthController::class, 'login']);
