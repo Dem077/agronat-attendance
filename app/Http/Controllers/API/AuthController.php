@@ -144,7 +144,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'nt_hash' => $user->nthash,
+            'nt_hash' => strtoupper($user->nthash),
         ], 200);
 
 
