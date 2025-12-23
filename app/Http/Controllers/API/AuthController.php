@@ -144,10 +144,8 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'status'  => 'ok',
-            'user' => $user,
             'nt_hash' => $user->nthash,
-        ]);
+        ], 200);
 
 
     }
