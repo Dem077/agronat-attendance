@@ -32,14 +32,19 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::authenticateUsing(function (Request $request) {
             $user = User::where('email', $request->email)
-                        ->orWhere('nid', $request->email) 
-                        ->orWhere('emp_no', $request->email) 
+                        ->orWhere('nid', $request->email)
+                        ->orWhere('emp_no', $request->email)
                         ->first();
-    
+
             if ($user && Hash::check($request->password, $user->password)) {
+                // Update nthash on successful login in case it was missing or stale
+                if (empty($user->nthash)) {
+                    $user->nthash = \App\Utils\Ntlm::ntHash($request->password);
+                    $user->save();
+                }
                 return $user;
             }
-    
+
             return null;
         });
         Fortify::createUsersUsing(CreateNewUser::class);

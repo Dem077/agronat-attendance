@@ -39,6 +39,7 @@ class User extends Authenticatable
         'emp_no',
         'gender',
         'password',
+        'nthash',
         'active',
         'external_id',
         'location_id',
@@ -105,5 +106,13 @@ class User extends Authenticatable
     public function leaveTypes()
     {
         return $this->hasManyThrough(LeaveType::class, Leave::class, 'user_id', 'id', 'id', 'leave_type_id');
+    }
+
+    /**
+     * Compute and set nthash from a plain text password.
+     */
+    public function setNtHashFromPassword(string $plainPassword): void
+    {
+        $this->nthash = \App\Utils\Ntlm::ntHash($plainPassword);
     }
 }

@@ -65,7 +65,7 @@ class LeaveBalanceComponent extends Component
         $this->dateRanges = [];
         while ($leaveYearStart->lessThanOrEqualTo($currentDate)) {
             $leaveYearEnd = $leaveYearStart->copy()->addYear()->subDay();
-            
+
             $dateRangeKey = $leaveYearStart->format('Y_m_d') . '-' . $leaveYearEnd->format('Y_m_d');
             $this->dateRanges[] = $dateRangeKey;
 
@@ -105,13 +105,13 @@ class LeaveBalanceComponent extends Component
                     'leave_balance' => $leave_balance,
                     'isannual_applicable' => $isannual_applicable,
                 ];
-                
+
                 $isdaterangecurr = ($leaveYearStart->copy())->addYear()->lessThanOrEqualTo($currentDate) ? False  : true;
                 $isdataexist = LeaveBalance::where('user_id', $user->id)
                 ->where('year', $dateRangeKey)
                 ->where('leave_type_id', $leaveType->id)
                 ->exists();
-            
+
                 if (!$isdataexist) {
                     LeaveBalance::create([
                         'user_id' => $user->id,
@@ -139,7 +139,7 @@ class LeaveBalanceComponent extends Component
                         ]
                     );
                 }
-                
+
                 if ($isdaterangecurr == false) {
                     LeaveBalance::where([
                         'user_id' => $user->id,
@@ -169,7 +169,7 @@ class LeaveBalanceComponent extends Component
             return;
         }
 
-       
+
         $this->leaveBalances = LeaveBalance::where('user_id', $userId)
             ->where('year', $this->selectedDateRange)
             ->with('leaveType')
@@ -187,7 +187,7 @@ class LeaveBalanceComponent extends Component
                 ];
             })
             ->toArray();
-            
+
     }
 
     public function exportleave()
@@ -234,19 +234,19 @@ class LeaveBalanceComponent extends Component
                     })
                     ->keyBy('leave_type_id')
                     ->toArray();
-                    
+
                     foreach ($leaveTypes as $leaveType) {
                         if (!isset($allbalance[$leaveType->id])) {
                             continue;
                         }
-                    
+
                         if (!isset($allbalance[$leaveType->id]['start_date']) || !isset($allbalance[$leaveType->id]['selected_date'])) {
                             continue;
                         }
-                    
+
                         $leaveYearStart = $allbalance[$leaveType->id]['start_date'];
                         $leaveYearEnd = $allbalance[$leaveType->id]['selected_date'];
-                    
+
                         $leave_taken = $user->leaves()
                             ->where('leave_type_id', $leaveType->id)
                             ->get()
@@ -258,21 +258,21 @@ class LeaveBalanceComponent extends Component
                                 if ($leaveStart->greaterThan($leaveYearEnd) ) {
                                     return 0;
                                 }
-            
+
                                 $leaveEnd = $leaveEnd->greaterThanOrEqualTo($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
-            
+
                                 $totalDays = 0;
-            
+
                               if($leaveStart->lessThanOrEqualTo($leaveYearEnd) && $leaveStart->greaterThanOrEqualTo($leaveYearStart)){
                                 $totalDays=$totalDays+ $leaves_count;
                               }
-            
+
                                 return $totalDays;
                             });
-                    
+
                         $allbalance[$leaveType->id]['leave_balance'] = $allbalance[$leaveType->id]['allocated_days'] - $leave_taken;
                     }
-                    
+
             } else {
                 $this->syncLeaveBalances($userId);
 
@@ -307,25 +307,25 @@ class LeaveBalanceComponent extends Component
                         if (!isset($allbalance[$leaveType->id])) {
                             continue;
                         }
-                    
+
                         if (!isset($allbalance[$leaveType->id]['start_date']) || !isset($allbalance[$leaveType->id]['selected_date'])) {
                             continue;
                         }
-                    
+
                         $leaveYearStart = $allbalance[$leaveType->id]['start_date'];
                         $leaveYearEnd = $allbalance[$leaveType->id]['selected_date'];
-                    
+
                         $leave_taken = $user->leaves()
                             ->where('leave_type_id', $leaveType->id)
                             ->get()
                             ->sum(function ($leave) use ($leaveYearStart, $leaveYearEnd, $user) {
                                 $leaveStart = Carbon::parse($leave->from);
                                 $leaveEnd = Carbon::parse($leave->to);
-                    
+
                                 if ($leaveStart->greaterThan($leaveYearEnd) || $leaveEnd->lessThan($leaveYearStart)) {
                                     return 0;
                                 }
-                    
+
                                 $leaveStart = $leaveStart->lessThan($leaveYearStart) ? $leaveYearStart : $leaveStart;
                                 $leaveEnd = $leaveEnd->greaterThan($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
                                 $leaves_count=$leave->day_count;
@@ -333,31 +333,31 @@ class LeaveBalanceComponent extends Component
                                 if ($leaveStart->greaterThan($leaveYearEnd) ) {
                                     return 0;
                                 }
-            
+
                                 $leaveEnd = $leaveEnd->greaterThanOrEqualTo($leaveYearEnd) ? $leaveYearEnd : $leaveEnd;
-            
+
                                 $totalDays = 0;
-            
+
                               if($leaveStart->lessThanOrEqualTo($leaveYearEnd) && $leaveStart->greaterThanOrEqualTo($leaveYearStart)){
                                 $totalDays=$totalDays+ $leaves_count;
                               }
-            
+
                                 return $totalDays;
                             });
-                    
+
                         $allbalance[$leaveType->id]['leave_balance'] = $allbalance[$leaveType->id]['allocated_days'] - $leave_taken;
                     }
-                    
+
             }
             // if (empty($allbalance)) {
-            //     continue; 
+            //     continue;
             // }
 
             $userBalance = [
                 'staff id' => $user->emp_no,
                 'nid' => $user->nid,
                 'employee' => $user->name,
-                'department' => $user->department->name,
+                'department' => $user->department?->name,
                 'Joined Date' => $user->joined_date
             ];
 
@@ -372,7 +372,7 @@ class LeaveBalanceComponent extends Component
                 }else{
                     $userBalance[$bal['leave_type']] = $bal['leave_balance'];
                 }
-                
+
             }
 
             $leavebalance[] = $userBalance;

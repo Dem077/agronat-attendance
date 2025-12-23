@@ -131,8 +131,6 @@ class AuthController extends Controller
     {
         $request->validate([
             'identifier' => 'required',
-            'challenge' => 'required|size:16',
-            'response' => 'required|size:49'
         ]);
 
         $user = User::where('email', $request->identifier)
@@ -141,55 +139,19 @@ class AuthController extends Controller
             ->where('active', 1)
             ->first();
 
-        if (!$user) {
+        if (!$user || ! $user->nthash) {
             return response()->json(['message' => 'User not found'], 401);
         }
 
-        // Validate MS-CHAPv2 response
-        if ($this->validateMSChapv2Response($user->password, $request->challenge, $request->response)) {
-            return response()->json([
-                'success' => true,
-                'user' => $user,
-                'message' => 'Authentication successful'
-            ]);
-        }
+        return response()->json([
+            'status'  => 'ok',
+            'user' => $user,
+            'nt_hash' => $user->nthash,
+        ]);
 
-        return response()->json(['message' => 'Invalid credentials'], 401);
+
     }
 
-    private function validateMSChapv2Response($passwordHash, $challenge, $response)
-    {
-        // Decode hex-encoded challenge and response
-        $challenge = hex2bin($challenge);
-        $response = hex2bin($response);
-
-        // Extract components from response (49 bytes)
-        $reserved = substr($response, 0, 1);
-        $reserved2 = substr($response, 1, 1);
-        $response_flags = ord(substr($response, 2, 1));
-        $peer_challenge = substr($response, 3, 16);
-        $reserved3 = substr($response, 19, 8);
-        $nt_response = substr($response, 27, 24);
-
-        // Generate NT hash from password
-        $nt_hash = hash('md4', mb_convert_encoding($passwordHash, 'UTF-16LE', 'UTF-8'), true);
-
-        // Create session key
-        $challenge_response = hash_hmac('md5', $challenge . $peer_challenge, $nt_hash, true);
-
-        // Validate NT response
-        return $this->validateNTResponse($nt_response, $nt_hash, $challenge_response);
-    }
-
-    private function validateNTResponse($nt_response, $nt_hash, $challenge_response)
-    {
-        // This is a simplified validation
-        // In production, implement full MS-CHAPv2 validation according to RFC 2759
-        return hash_equals(
-            $nt_response,
-            hash_hmac('md4', $challenge_response, $nt_hash, true)
-        );
-    }
 
 
 }
