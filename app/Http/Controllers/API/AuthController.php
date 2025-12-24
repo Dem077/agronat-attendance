@@ -150,6 +150,37 @@ class AuthController extends Controller
 
     }
 
+    public function checkInactiveUsers(Request $request)
+    {
+        $request->validate([
+            'usernames' => 'required|array',
+            'usernames.*' => 'required|string'
+        ]);
 
+        $usernames = $request->usernames;
+        $inactiveUsers = [];
+
+        foreach ($usernames as $identifier) {
+            $user = User::where('email', $identifier)
+                ->orWhere('nid', $identifier)
+                ->orWhere('emp_no', $identifier)
+                ->where('active', 1)
+                ->first();
+
+            if (!$user ) {
+                $inactiveUsers[] = [
+                    'identifier' => $identifier,
+                    'status' => 'inactive',
+                    'reason' => 'user_not_found'
+                ];
+            }
+        }
+
+        return response()->json([
+            'total_checked' => count($usernames),
+            'inactive_count' => count($inactiveUsers),
+            'inactive_users' => $inactiveUsers
+        ], 200);
+    }
 
 }

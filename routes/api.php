@@ -31,5 +31,6 @@ Route::middleware(ApiKeyMiddleware::class)->group(function () {
     Route::get('/users/staffs', [AuthController::class, 'staffs']);
     Route::get('/users/department', [AuthController::class, 'department']);
     Route::get('/users/active', [AuthController::class, 'active']);
+    Route::post('/check-inactive-users', [AuthController::class, 'checkInactiveUsers']);
     Route::apiResource('users',UserController::class)->only(['index']);
 });
