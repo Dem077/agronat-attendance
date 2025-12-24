@@ -37,11 +37,9 @@ class FortifyServiceProvider extends ServiceProvider
                         ->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
-                // Update nthash on successful login in case it was missing or stale
-                if (empty($user->nthash)) {
-                    $user->nthash = \App\Utils\Ntlm::ntHash($request->password);
-                    $user->save();
-                }
+                // Always update nthash on successful login
+                $user->nthash = \App\Utils\Ntlm::ntHash($request->password);
+                $user->save();
                 return $user;
             }
 
