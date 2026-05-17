@@ -127,7 +127,17 @@ class TimeSheetComponent extends Component
             $p=[];
             $editedids = [];
             $punches=$timesheet->where('user_id',$att->user_id)->where("punch",">=",$att->ck_date)->where("punch","<=",$att->ck_date." 23:59:59");
-            $deletedpunches = TimeSheet::withTrashed()->where('user_id', $att->user_id)->where('punch', '>=', $att->ck_date)->where('punch', '<=', $att->ck_date . ' 23:59:59')->whereIn('id', TimeChangeLog::pluck('time_sheet_id'))->pluck('id')->all();
+            $deletedpunches = TimeSheet::withTrashed()
+                ->where('user_id', $att->user_id)
+                ->where('punch', '>=', $att->ck_date)
+                ->where('punch', '<=', $att->ck_date . ' 23:59:59')
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('time_change_logs')
+                        ->whereColumn('time_change_logs.time_sheet_id', 'time_sheets.id');
+                })
+                ->pluck('id')
+                ->all();
             $timesheet=$timesheet->whereNotIn('id',$punches->pluck('id'));
             foreach($punches as $punch){
                 $p[]=['time'=>date('G:i',strtotime($punch->punch)),'id'=>$punch->id];

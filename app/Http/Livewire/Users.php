@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
-use phpDocumentor\Reflection\Types\Null_;
-
 class Users extends Component
 {
     use WithPagination;
@@ -90,7 +88,7 @@ class Users extends Component
             'email' => 'required|email',
             'emp_no' => 'required',
             'gender' => 'required',
-            'external_id' => 'sometimes',
+            'external_id' => 'nullable|integer',
             'designation' => 'required',
             'joined_date' => 'required',
             'mobile' => 'sometimes',
@@ -100,10 +98,12 @@ class Users extends Component
         ]);
 
         $validatedData['department_id']=$this->department_id;
-        $validatedData['location_id']=$this->location_id;
+        $validatedData['location_id']=$this->location_id !== '' ? $this->location_id : null;
         $validatedData['joined_date']=$this->joined_date;
         $validatedData['is_annual_applicable']=false;
         $validatedData['active']=true;
+        $validatedData['external_id']=$this->external_id !== '' ? $this->external_id : null;
+        $validatedData['supervisor_id']=$this->supervisor_id !== '' ? $this->supervisor_id : null;
         $validatedData['password']=Hash::make($validatedData['password']);
         $user=User::create($validatedData);
         $user->assignRole('Staff');
@@ -215,10 +215,10 @@ class Users extends Component
             "designation"=>$this->designation,
             "emp_no"=>$this->emp_no,
             "gender"=>$this->gender,
-            "external_id"=>$this->external_id??null,
-            "supervisor_id"=>$this->supervisor_id,
+            "external_id"=>$this->external_id !== '' ? $this->external_id : null,
+            "supervisor_id"=>$this->supervisor_id !== '' ? $this->supervisor_id : null,
             "department_id"=>$this->department_id,
-            "location_id"=>$this->location_id,
+            "location_id"=>$this->location_id !== '' ? $this->location_id : null,
             'joined_date' =>$this->joined_date,
             "mobile"=>$this->mobile,
             "phone"=>$this->phone,

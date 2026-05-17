@@ -2,7 +2,9 @@
 
 namespace App\Http\Livewire\Partials\Timesheets;
 
+use App\Models\Attendance;
 use App\Models\Location;
+use App\Models\TimeChangeLog;
 use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\AttendanceService;
@@ -62,6 +64,22 @@ class ImportLog extends Component
 
         foreach($this->date_range as $range){
             $this->attendanceService->recompute($range['start']->format('Y-m-d'),$range['end']->format('Y-m-d'),$range['user_id']);
+        }
+
+        $userName = auth()->user()->name;
+        foreach($logs['imported_records'] as $importedRecord){
+            $attendance = Attendance::where('user_id', $importedRecord['user_id'])
+                                    ->where('ck_date', $importedRecord['date'])
+                                    ->first();
+            if($attendance){
+                (new TimeChangeLog)->logaudit(
+                    $attendance->id,
+                    $importedRecord['time_sheet_id'],
+                    $userName,
+                    'Imported via CSV',
+                    'INSERT'
+                );
+            }
         }
 
         $this->emit('logImported'); // Close model to using to jquery
@@ -132,6 +150,7 @@ class ImportLog extends Component
 
         $logs=[];
         $id_errors=[];
+        $imported_records=[];
         if (($open = fopen($sheet, "r")) !== FALSE) {
             $data = fgetcsv($open, 1000, ",");
             $this->headerValidate($data);
@@ -151,7 +170,14 @@ class ImportLog extends Component
                     ];
                     $logs[]=$log;
                     $this->populateDateRange($log);
-                    $this->addLog($log);
+                    $record = $this->addLog($log);
+                    if($record){
+                        $imported_records[]=[
+                            'time_sheet_id'=>$record->id,
+                            'user_id'=>$user_id,
+                            'date'=>$punch->format('Y-m-d'),
+                        ];
+                    }
 
                 }
 
@@ -160,7 +186,7 @@ class ImportLog extends Component
             fclose($open);
         }
 
-        return ['logs'=>$logs,'user_errors'=>$id_errors];
+        return ['logs'=>$logs,'user_errors'=>$id_errors,'imported_records'=>$imported_records];
     }
 
     public function parsePunchTime($date_time)
