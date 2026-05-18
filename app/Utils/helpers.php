@@ -70,6 +70,13 @@ function export_csv2($header,$data,$filename)
     return response()->stream($callback, 200, $response_headers);
 }
 
+function late_threshold(bool $saturday = false): string
+{
+    $time = $saturday ? config('hr.late_sat_in') : config('hr.late_in');
+
+    return date('H:i:s', strtotime($time));
+}
+
 function date_range($from,$to,$gap="1 day"){
     $interval = DateInterval::createFromDateString($gap);
     if(gettype($from)=='string'){

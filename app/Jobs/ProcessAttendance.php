@@ -64,13 +64,15 @@ class ProcessAttendance implements ShouldQueue
                 if($attendance->in){
                     if($time <= $schedule['in'] && $attendance->in < $time){
                         $attendance->in=$time;
-                        $attendance->late_min=$this->lateFine($time,$schedule['in'])>480?480:$this->lateFine($time,$schedule['in']);
+                        $late_min=$this->lateFine($time,late_threshold($work_saturday));
+                        $attendance->late_min=$late_min>480?480:$late_min;
                         $attendance->status=$attendance->late_min>0?'Late':'Normal';
                         $attendance->save();
                     }
                 }else{
                     $attendance->in=$time;
-                    $attendance->late_min=$this->lateFine($time,$schedule['in'])>480?480:$this->lateFine($time,$schedule['in']);
+                    $late_min=$this->lateFine($time,late_threshold($work_saturday));
+                    $attendance->late_min=$late_min>480?480:$late_min;
                     $attendance->status=$attendance->late_min>0?'Late':'Normal';
                     $attendance->save();
                 }
@@ -105,7 +107,8 @@ class ProcessAttendance implements ShouldQueue
                     "out"=>date('H:i:s',strtotime(env('SC_SAT_OUT','16:00')))
                 ];
             }
-            $late_min=$this->lateFine($time,$schedule['in'])>480?480:$this->lateFine($time,$schedule['in']);
+            $late_min=$this->lateFine($time,late_threshold($work_saturday));
+            $late_min=$late_min>480?480:$late_min;
             $status=$late_min>0?'Late':'Normal';
             Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
         }

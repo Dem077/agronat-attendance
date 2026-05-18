@@ -133,8 +133,13 @@ class AttendanceService{
             ];
             if($log->status==0){
                 if(!$attendance->in){
+                    $work_saturday=User::where('id',$user_id)
+                        ->whereHas('department',function($q){
+                            $q->where('work_on_saturday',1);
+                        })->exists() && date('D',strtotime($date))=='Sat';
                     $attendance->in=$time;
-                    $attendance->late_min=$this->lateFine($time,$schedule['in'])>480?480:$this->lateFine($time,$this->schedule['in']);
+                    $late_min=$this->lateFine($time,late_threshold($work_saturday));
+                    $attendance->late_min=$late_min>480?480:$late_min;
                     $attendance->status=$attendance->late_min>0?'Late':'Normal';
                     $attendance->save();
                 }
@@ -147,12 +152,13 @@ class AttendanceService{
             UpdateAttendanceStatus::dispatchNow(['from'=>$date,'user_id'=>$user_id]);
 
         }else{
-            $late_min=$this->lateFine($time,$this->schedule['in'])>480?480:$this->lateFine($time,$this->schedule['in']);
-            $status=$late_min>0?'Late':'Normal';
             $work_saturday=User::where('id',$user_id)
                                 ->whereHas('department',function($q){
                                     $q->where('work_on_saturday',1);
                                 })->exists() && date('D',strtotime($date))=='Sat';
+            $late_min=$this->lateFine($time,late_threshold($work_saturday));
+            $late_min=$late_min>480?480:$late_min;
+            $status=$late_min>0?'Late':'Normal';
             $schedule=[...$this->schedule];
             if($work_saturday){
                 $schedule=[
