@@ -24,7 +24,10 @@ class AttendanceService{
 
     public $schedule;
 
-    public function __construct($schedule=null)
+    /** @var int|null Override grace minutes for this run (e.g. recompute); null uses config. */
+    public $lateGraceMinutes;
+
+    public function __construct($schedule=null, $lateGraceMinutes=null)
     {
         if($schedule){
             $this->schedule=[
@@ -38,6 +41,18 @@ class AttendanceService{
             ];
         }
 
+        $this->lateGraceMinutes = $lateGraceMinutes !== null && $lateGraceMinutes !== ''
+            ? (int) $lateGraceMinutes
+            : null;
+    }
+
+    public function lateThresholdFor(string $dutyStart, bool $saturday = false): string
+    {
+        $minutes = $this->lateGraceMinutes ?? ($saturday
+            ? config('hr.late_sat_grace_minutes')
+            : config('hr.late_grace_minutes'));
+
+        return late_threshold($dutyStart, (int) $minutes);
     }
 
     public function addLog($data){
@@ -138,7 +153,7 @@ class AttendanceService{
                             $q->where('work_on_saturday',1);
                         })->exists() && date('D',strtotime($date))=='Sat';
                     $attendance->in=$time;
-                    $late_min=$this->lateFine($time,late_threshold($work_saturday));
+                    $late_min=$this->lateFine($time,$this->lateThresholdFor($schedule['in'],$work_saturday));
                     $attendance->late_min=$late_min>480?480:$late_min;
                     $attendance->status=$attendance->late_min>0?'Late':'Normal';
                     $attendance->save();
@@ -156,9 +171,6 @@ class AttendanceService{
                                 ->whereHas('department',function($q){
                                     $q->where('work_on_saturday',1);
                                 })->exists() && date('D',strtotime($date))=='Sat';
-            $late_min=$this->lateFine($time,late_threshold($work_saturday));
-            $late_min=$late_min>480?480:$late_min;
-            $status=$late_min>0?'Late':'Normal';
             $schedule=[...$this->schedule];
             if($work_saturday){
                 $schedule=[
@@ -166,7 +178,10 @@ class AttendanceService{
                     "out"=>date('H:i:s',strtotime(env('SC_SAT_OUT','16:00')))
                 ];
             }
-            
+            $late_min=$this->lateFine($time,$this->lateThresholdFor($schedule['in'],$work_saturday));
+            $late_min=$late_min>480?480:$late_min;
+            $status=$late_min>0?'Late':'Normal';
+
             Attendance::create(['user_id'=>$user_id,'ck_date'=>$date,'sc_in'=>$schedule['in'],'sc_out'=>$schedule['out'],'in'=>$time,'late_min'=>$late_min,'status'=>$status]);
         }
 

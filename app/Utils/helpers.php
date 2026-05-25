@@ -70,11 +70,15 @@ function export_csv2($header,$data,$filename)
     return response()->stream($callback, 200, $response_headers);
 }
 
-function late_threshold(bool $saturday = false): string
+function late_threshold(string $dutyStart, ?int $graceMinutes = null, bool $saturday = false): string
 {
-    $time = $saturday ? config('hr.late_sat_in') : config('hr.late_in');
+    if ($graceMinutes === null) {
+        $graceMinutes = $saturday
+            ? config('hr.late_sat_grace_minutes')
+            : config('hr.late_grace_minutes');
+    }
 
-    return date('H:i:s', strtotime($time));
+    return date('H:i:s', strtotime($dutyStart) + ($graceMinutes * 60));
 }
 
 function date_range($from,$to,$gap="1 day"){

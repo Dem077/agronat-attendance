@@ -51,6 +51,12 @@
                             @error('out') <span class="text-danger">{{ $message }}</span>@enderror
                         </div>
                         </div>
+                    <div class="form-group">
+                        <label for="recompute-late-grace">Late grace (minutes after duty start)</label>
+                        <input type="number" class="form-control mt-1" id="recompute-late-grace" wire:model="late_grace_minutes" min="0" max="480" placeholder="{{ config('hr.late_grace_minutes') }}" autocomplete="off">
+                        <small class="form-text text-muted">Minutes after duty In before an employee is marked late. Leave empty for default ({{ config('hr.late_grace_minutes') }} min).</small>
+                        @error('late_grace_minutes') <span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
                     <button type="button" wire:click="recompute"  id="recompute-button" class="btn btn-primary">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
 

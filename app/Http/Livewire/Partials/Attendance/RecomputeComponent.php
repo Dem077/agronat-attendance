@@ -11,7 +11,7 @@ use Livewire\Component;
 
 class RecomputeComponent extends Component
 {
-    public $user_id,$from,$to,$users,$in,$out;
+    public $user_id,$from,$to,$users,$in,$out,$late_grace_minutes;
     protected $listeners = ['stopAndClearQueue'];
     public $progressKey;
     public $progress = [
@@ -35,15 +35,20 @@ class RecomputeComponent extends Component
         if(!auth()->user()->can('timelog-create')){
             abort(403);
         }
-        $validatedDate = $this->validate([
+        $this->validate([
             'user_id' => 'sometimes',
             'from' => 'required',
             'to' => 'required',
             'in' => 'required',
-            'out' => 'required'
+            'out' => 'required',
+            'late_grace_minutes' => 'nullable|integer|min:0|max:480',
         ]);
 
         $users = $this->user_id ? [$this->user_id] : User::where('active', 1)->pluck('id')->toArray();
+
+        $lateGrace = $this->late_grace_minutes !== '' && $this->late_grace_minutes !== null
+            ? (int) $this->late_grace_minutes
+            : null;
 
         // Progress tracking
         $this->progressKey = 'recompute_progress_' . uniqid();
@@ -51,7 +56,15 @@ class RecomputeComponent extends Component
         cache()->put($this->progressKey . '_total', count($users), 3600);
 
         foreach($users as $user_id){
-            RecomputeAttendanceJob::dispatch($this->from, $this->to, $user_id, $this->in, $this->out, $this->progressKey);
+            RecomputeAttendanceJob::dispatch(
+                $this->from,
+                $this->to,
+                $user_id,
+                $this->in,
+                $this->out,
+                $this->progressKey,
+                $lateGrace
+            );
         }
 
         $this->emit('.Recomputed');

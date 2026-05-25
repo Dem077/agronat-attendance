@@ -14,14 +14,14 @@ class RecomputeAttendanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $from, $to, $user_id, $in, $out , $progressKey;
+    protected $from, $to, $user_id, $in, $out, $progressKey, $lateGraceMinutes;
     /**
      * Create a new job instance.
      *
      * @return void
      */
 
-    public function __construct($from, $to, $user_id, $in, $out, $progressKey = null)
+    public function __construct($from, $to, $user_id, $in, $out, $progressKey = null, $lateGraceMinutes = null)
     {
         $this->from = $from;
         $this->to = $to;
@@ -29,6 +29,7 @@ class RecomputeAttendanceJob implements ShouldQueue
         $this->in = $in;
         $this->out = $out;
         $this->progressKey = $progressKey;
+        $this->lateGraceMinutes = $lateGraceMinutes;
     }
 
     /**
@@ -38,7 +39,10 @@ class RecomputeAttendanceJob implements ShouldQueue
      */
     public function handle()
     {
-        $attendanceService = new AttendanceService(['in' => $this->in, 'out' => $this->out]);
+        $attendanceService = new AttendanceService(
+            ['in' => $this->in, 'out' => $this->out],
+            $this->lateGraceMinutes
+        );
         $attendanceService->recompute($this->from, $this->to, $this->user_id);
 
         // Update progress in cache
