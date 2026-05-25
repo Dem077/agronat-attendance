@@ -189,12 +189,11 @@ class AttendanceService{
 
     }
 
-    public function lateFine($ck_in,$sc_in){
-        Log::info(['ck_in'=>$ck_in,'sc_in'=>$sc_in]);
-        $sc_in=strtotime($sc_in);
-        $ck_in=strtotime($ck_in);
-        $late_min=floor(($ck_in-$sc_in)/60);
-        return $late_min>0?$late_min:0;
+    public function lateFine($ck_in,$lateAt){
+        Log::info(['ck_in'=>$ck_in,'late_at'=>$lateAt]);
+        $late_min=(int) floor((strtotime($ck_in)-strtotime($lateAt))/60);
+
+        return $late_min>0?($late_min>480?480:$late_min):0;
     }
 
     public function resetAttendance($from,$to,$user_id){

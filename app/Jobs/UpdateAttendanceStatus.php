@@ -94,7 +94,24 @@ class UpdateAttendanceStatus implements ShouldQueue
                             $att->status='';
                         }
                         elseif(!$att->in){
+                            $att->late_min=0;
                             $att->status='Absent';
+                        }
+                        elseif($att->sc_in){
+                            $dutyStart=date('H:i:s',strtotime($att->sc_in));
+                            $att->late_min=calculate_late_min(
+                                date('H:i:s',strtotime($att->in)),
+                                $dutyStart,
+                                null,
+                                $work_saturday
+                            );
+                            if($att->late_min>0){
+                                $att->status='Late';
+                            }elseif(new DateTime($att->in)<=new DateTime($att->sc_out)){
+                                $att->status='Normal';
+                            }else{
+                                $att->status='';
+                            }
                         }
                         elseif($att->late_min>0){
                             $att->status='Late';

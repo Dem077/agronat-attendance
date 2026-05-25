@@ -81,6 +81,18 @@ function late_threshold(string $dutyStart, ?int $graceMinutes = null, bool $satu
     return date('H:i:s', strtotime($dutyStart) + ($graceMinutes * 60));
 }
 
+function calculate_late_min(string $ckIn, string $dutyStart, ?int $graceMinutes = null, bool $saturday = false): int
+{
+    $lateAt = late_threshold($dutyStart, $graceMinutes, $saturday);
+    $lateMin = (int) floor((strtotime($ckIn) - strtotime($lateAt)) / 60);
+
+    if ($lateMin <= 0) {
+        return 0;
+    }
+
+    return $lateMin > 480 ? 480 : $lateMin;
+}
+
 function date_range($from,$to,$gap="1 day"){
     $interval = DateInterval::createFromDateString($gap);
     if(gettype($from)=='string'){
