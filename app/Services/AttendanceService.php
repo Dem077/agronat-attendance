@@ -37,7 +37,7 @@ class AttendanceService{
         }else{
             $this->schedule=[
                 "in"=>date('H:i:s',strtotime(env('SC_IN','08:00'))),
-                "out"=>date('H:i:s',strtotime(env('SC_OUT','16:00')))
+                "out"=>date('H:i:s',strtotime(env('SC_OUT','15:00')))
             ];
         }
 

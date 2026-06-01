@@ -7,6 +7,24 @@ define('LARAVEL_START', microtime(true));
 
 /*
 |--------------------------------------------------------------------------
+| PHP 8.4 + Laravel 8: avoid deprecation output in HTTP responses
+|--------------------------------------------------------------------------
+|
+| Herd/PHP may have display_errors enabled; deprecations from older
+| dependencies must not be sent to API clients as HTML.
+|
+*/
+
+if (PHP_SAPI !== 'cli') {
+    ini_set('display_errors', '0');
+}
+
+if (PHP_VERSION_ID >= 80400) {
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+}
+
+/*
+|--------------------------------------------------------------------------
 | Check If Application Is Under Maintenance
 |--------------------------------------------------------------------------
 |

@@ -104,7 +104,8 @@ class AuthController extends Controller
 
     public function active()
     {
-        $users = \App\Models\User::active()->get();
+        $users = \App\Models\User::with('department')->active()->get();
+
         return response()->json($users);
     }
 

@@ -13,6 +13,7 @@
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.8",
         "laravel/framework": "^8.12",
+        "laravel/horizon": "5.7",
         "laravel/jetstream": "^1.6",
         "laravel/sanctum": "^2.6",
         "laravel/tinker": "^2.5",
@@ -64,6 +65,7 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php scripts/patch-portable-ascii.php",
             "@php artisan package:discover --ansi"
         ],
         "post-root-package-install": [
