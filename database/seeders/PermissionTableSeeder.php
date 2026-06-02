@@ -49,7 +49,8 @@ class PermissionTableSeeder extends Seeder
             'setting-create',
             'setting-edit',
             'setting-delete',
-            'report-list'
+            'report-list',
+            'horizon-view',
 
          ];
  

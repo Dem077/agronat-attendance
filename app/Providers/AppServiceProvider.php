@@ -16,7 +16,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        if (config('horizon.enabled')) {
+            $this->app->register(HorizonServiceProvider::class);
+        }
     }
 
     /**

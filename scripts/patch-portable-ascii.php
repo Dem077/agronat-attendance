@@ -7,13 +7,15 @@ if (! is_file($file)) {
 }
 
 $contents = file_get_contents($file);
-$patched = str_replace(
-    'bool $replace_single_chars_only = null',
-    '?bool $replace_single_chars_only = null',
-    $contents,
-    $count
-);
 
-if ($count > 0) {
-    file_put_contents($file, $patched);
+$contents = str_replace('??bool $replace_single_chars_only', '?bool $replace_single_chars_only', $contents);
+
+if (strpos($contents, '?bool $replace_single_chars_only = null') === false) {
+    $contents = str_replace(
+        'bool $replace_single_chars_only = null',
+        '?bool $replace_single_chars_only = null',
+        $contents
+    );
 }
+
+file_put_contents($file, $contents);

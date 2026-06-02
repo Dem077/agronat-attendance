@@ -39,7 +39,10 @@ class Kernel extends ConsoleKernel
                         ->between('08:00','12:00');
         $schedule->command('sync:leave-balances')->dailyAt('23:00');
         $schedule->command('attendance:recompute')->dailyAt('01:00');
-                        
+
+        if (config('horizon.enabled')) {
+            $schedule->command('horizon:snapshot')->everyFiveMinutes();
+        }
     }
 
     /**

@@ -1,0 +1,12 @@
+; Copy to /etc/supervisor/conf.d/attendanceapp-horizon.conf on your Linux server.
+; Update paths and user, then: sudo supervisorctl reread && sudo supervisorctl update
+
+[program:attendanceapp-horizon]
+process_name=%(program_name)s
+command=php /var/www/attendanceapp/artisan horizon
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/attendanceapp/storage/logs/horizon.log
+stopwaitsecs=3600
