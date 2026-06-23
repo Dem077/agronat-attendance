@@ -50,6 +50,7 @@ class PermissionTableSeeder extends Seeder
             'setting-edit',
             'setting-delete',
             'report-list',
+            'leave-balance-list',
             'horizon-view',
 
          ];

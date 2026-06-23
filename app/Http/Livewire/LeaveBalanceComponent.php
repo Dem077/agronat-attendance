@@ -12,6 +12,7 @@ use App\Models\LeaveType;
 use App\Models\User;
 use App\Models\LeaveBalance;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveBalanceComponent extends Component
 {
@@ -31,6 +32,8 @@ class LeaveBalanceComponent extends Component
 
     public function render()
     {
+        $this->setUser();
+
         return view('livewire.leave-balance.leave-balance', [
             'users' => $this->users,
             'dateRanges' => $this->dateRanges,
@@ -192,9 +195,12 @@ class LeaveBalanceComponent extends Component
 
     public function exportleave()
     {
+        abort_unless(Auth::user()->can('report-list'), 403);
+
         $header = ['staff id', 'National ID', 'employee', 'Department', 'Joined Date', 'daterange','gender', 'Sick Leave (Without Certificate)', 'Family Leave', 'Annual Leave', 'Duty Travel', 'Virtual Day ', 'Paternity Leave', 'Maternity Leave', 'Release', 'Quarantine leave', 'Circumcision Leave', 'Umra Leave', 'Sick Leave w Certificate','External Training / Workshops','Government Holiday','No Pay'];
         $users = User::select(DB::raw("id, nid, name, emp_no, joined_date, department_id"))
                     ->active()
+                    ->whereIn('id', $this->accessibleUserIds())
                     ->where('joined_date', '<=', $this->dateselected)
                     ->orderBy('emp_no', 'asc')
                     ->get();

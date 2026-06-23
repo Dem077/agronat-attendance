@@ -3,15 +3,16 @@
         <div class="card">
             <div class="card-header">
                 <h2>Leave Balance</h2>
+                @can('report-list')
                 <div class="text-right mt-3">
                     <button class="btn btn-primary mr-2" wire:click="exportleave">Export All to CSV</button>
                 </div>
-                
-                <!-- Add the date selection input field -->
+
                 <div class="form-group">
                     <label for="date-select">Select Date</label>
                     <input type="date" id="date-select" class="form-control" wire:model="dateselected">
                 </div>
+                @endcan
             </div>
 
             <div class="card-body">

@@ -72,11 +72,18 @@
                 <h6 class="collapse-header">Reports:</h6>
                 <a class="collapse-item" href="{{route('reports.attendance')}}">Attendance</a>
                 <a class="collapse-item" href="{{route('reports.leave')}}">Leaves</a>
-                <a class="collapse-item" href="{{route('leave-balance')}}">Leave Balances</a>
                 <a class="collapse-item" href="{{route('reports.ot')}}">OT</a>
             </div>
         </div>
         
+    </li>
+    @endcan
+
+    @can('leave-balance-list')
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('leave-balance')}}">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Leave Balance</span></a>
     </li>
     @endcan
     @can('leave-list')
