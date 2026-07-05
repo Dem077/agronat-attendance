@@ -103,3 +103,48 @@ function date_range($from,$to,$gap="1 day"){
     }
     return new DatePeriod($from, $interval,$to->modify('+1 day'));
 }
+
+function payroll_period_start_day(): int
+{
+    return (int) config('hr.payroll_period_start_day', 21);
+}
+
+function payroll_period_end_day(): int
+{
+    return (int) config('hr.payroll_period_end_day', 20);
+}
+
+function payroll_period_day(int $day): string
+{
+    return sprintf('%02d', $day);
+}
+
+function payroll_period(?DateTime $reference = null): array
+{
+    $reference = $reference ?? new DateTime();
+    $current = clone $reference;
+
+    if ((int) $current->format('d') > payroll_period_end_day()) {
+        $current->modify('first day of next month');
+    }
+
+    $end = new DateTime($current->format('Y-m-'.payroll_period_day(payroll_period_end_day())));
+    $startMonth = (clone $end)->modify('last month');
+
+    return [
+        'start' => $startMonth->format('Y-m-'.payroll_period_day(payroll_period_start_day())),
+        'end' => $end->format('Y-m-d'),
+    ];
+}
+
+function payroll_period_before(array $period): array
+{
+    $end = new DateTime($period['start']);
+    $end->modify('-1 day');
+    $startMonth = (clone $end)->modify('last month');
+
+    return [
+        'start' => $startMonth->format('Y-m-'.payroll_period_day(payroll_period_start_day())),
+        'end' => $end->format('Y-m-d'),
+    ];
+}

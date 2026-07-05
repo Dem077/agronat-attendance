@@ -20,12 +20,15 @@ class DashboardComponent extends Component
     public function render()
     {
         if(!$this->to_date){
-            $this->to_date=(new DateTime())->format('Y-m-24');
-            $this->month=(new DateTime($this->to_date))->format("F");
+            $period = payroll_period();
+            $this->to_date = $period['end'];
+            $this->month = (new DateTime($this->to_date))->format('F');
         }
 
         if(!$this->from_date){
-            $this->from_date=(new DateTime($this->to_date))->modify('last month')->format('Y-m-25');
+            $end = new DateTime($this->to_date);
+            $startMonth = (clone $end)->modify('last month');
+            $this->from_date = $startMonth->format('Y-m-'.payroll_period_day(payroll_period_start_day()));
         }
 
         if(auth()->user()->can('admin_dashboard-view')){
