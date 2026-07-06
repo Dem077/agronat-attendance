@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div wire:ignore.self class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-labelledby="changeModalLabel" aria-hidden="true">
+<div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-labelledby="changeModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 900px!important" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -20,8 +20,8 @@
                     <tr>
                         <th>#</th>
                         <th>Created At</th>
-                        <th>Adjusted Date</th>
-                        <th>Adjusted Time</th>
+                        <th>Punch Date</th>
+                        <th>Punch Time</th>
                         <th>Changed By</th>
                         <th>Reason</th>
                         <th>Type</th>
@@ -39,8 +39,8 @@
                                     {{ $item['list']['created_at'] }}
                                 @endif
                             </td>
-                            <td>{{ $item['date']}}</td>
-                            <td>{{ $item['time']}}</td>
+                            <td>{{ $item['date'] }}</td>
+                            <td>{{ $item['time'] }}</td>
                             <td>{{ $item['list']['changed_by'] }}</td>
                             <td>{{ $item['list']['reason'] }}</td>
                             <td>{{ $item['list']['type'] }}</td>

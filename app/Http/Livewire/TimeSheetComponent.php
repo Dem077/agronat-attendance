@@ -58,10 +58,27 @@ class TimeSheetComponent extends Component
     
     public function setChangesData($id)
     {
-        $all = [];
-        $logdata = TimeChangeLog::where('attendances_id', $id)
+        $attendance = Attendance::findOrFail($id);
+
+        $timeSheetIds = TimeSheet::withTrashed()
+            ->where('user_id', $attendance->user_id)
+            ->where('punch', '>=', $attendance->ck_date . ' 00:00:00')
+            ->where('punch', '<=', $attendance->ck_date . ' 23:59:59')
+            ->pluck('id');
+
+        $logdata = TimeChangeLog::query()
+            ->where(function ($query) use ($id, $timeSheetIds) {
+                $query->where('attendances_id', $id);
+
+                if ($timeSheetIds->isNotEmpty()) {
+                    $query->orWhereIn('time_sheet_id', $timeSheetIds);
+                }
+            })
             ->orderByDesc('created_at')
-            ->get();
+            ->get()
+            ->unique('id');
+
+        $all = [];
 
         foreach ($logdata as $row) {
             $date = '';
@@ -73,14 +90,23 @@ class TimeSheetComponent extends Component
             }
 
             $all[] = [
-                'list' => $row,
+                'list' => [
+                    'id' => $row->id,
+                    'attendances_id' => $row->attendances_id,
+                    'time_sheet_id' => $row->time_sheet_id,
+                    'changed_by' => $row->changed_by,
+                    'reason' => $row->reason,
+                    'type' => $row->type,
+                    'created_at' => $row->created_at?->format('Y-m-d H:i:s'),
+                ],
                 'time' => $time,
                 'date' => $date,
-                'timesheet_created_at' => $timeSheet?->created_at,
+                'timesheet_created_at' => $timeSheet?->created_at?->format('Y-m-d H:i:s'),
             ];
         }
 
         $this->changeData = $all;
+        $this->dispatchBrowserEvent('open-change-modal');
     }
 
     public function getTimeSheet($pagination=null){
@@ -131,10 +157,19 @@ class TimeSheetComponent extends Component
             $timesheet=$timesheet->get();
         }
 
-        $attendanceIdsWithChanges = TimeChangeLog::whereIn('attendances_id', $attendance->pluck('id'))
-            ->distinct()
-            ->pluck('attendances_id')
-            ->flip();
+        $attendanceIdsWithChanges = $attendance->isNotEmpty()
+            ? TimeChangeLog::whereIn('attendances_id', $attendance->pluck('id'))
+                ->distinct()
+                ->pluck('attendances_id')
+                ->flip()
+            : collect();
+
+        $timeSheetIdsWithChanges = $timesheet->isNotEmpty()
+            ? TimeChangeLog::whereIn('time_sheet_id', $timesheet->pluck('id'))
+                ->distinct()
+                ->pluck('time_sheet_id')
+                ->flip()
+            : collect();
 
         $data = [];
 
@@ -146,11 +181,22 @@ class TimeSheetComponent extends Component
 
             $timesheet = $timesheet->whereNotIn('id', $punches->pluck('id'));
 
+            $hasChangeLog = isset($attendanceIdsWithChanges[$att->id]);
+
             foreach ($punches as $punch) {
-                $p[] = ['time' => date('G:i', strtotime($punch->punch)), 'id' => $punch->id];
+                $punchHasChangeLog = isset($timeSheetIdsWithChanges[$punch->id]);
+                if ($punchHasChangeLog) {
+                    $hasChangeLog = true;
+                }
+
+                $p[] = [
+                    'time' => date('G:i', strtotime($punch->punch)),
+                    'id' => $punch->id,
+                    'has_change_log' => $punchHasChangeLog,
+                ];
             }
 
-            $att->has_change_log = isset($attendanceIdsWithChanges[$att->id]);
+            $att->has_change_log = $hasChangeLog;
             $att->punch = $p;
             $data[] = $att;
         }

@@ -10,7 +10,6 @@
                   @can('timelog-create')
                   @include('livewire.timesheets.create')
                   @include('livewire.timesheets.changes')
-                  <input type="hidden" id="changeData" wire:model="changeData">
 
                   <livewire:partials.timesheets.sync-component :users="$users"/>
 
@@ -77,7 +76,7 @@
                               <td>{{ $log->employee }}
                               @can('timelog-create')
                                 @if(!empty($log->has_change_log))
-                                    <button class="btn btn-warning btn-sm ml-2" title="View change history" type="button" data-toggle="modal" data-target="#changeModal" onclick="setChangesData({{ $log->id }})">
+                                    <button class="btn btn-warning btn-sm ml-2" title="View change history" type="button" wire:click="setChangesData({{ $log->id }})">
                                         <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
                                     </button>
                                 @endif
@@ -89,7 +88,8 @@
                               <td>{{ $log->status }}</td>
                               @for($i=0;$i<6;$i++)
                                 @if($i<count($log->punch))
-                                  <td>{{$log->punch[$i]['time']}}
+                                  <td>
+                                    {{$log->punch[$i]['time']}}
                                     @can('timelog-create')
                                     <span onclick="deleteLog({{$log->punch[$i]['id']}},{{ $log->id }})" class="text-danger">&times;</span>
                                     @endcan
@@ -135,11 +135,9 @@
     @this.set('end_date', period['end']);
   });
 
-  function setChangesData(changes) {
-      document.getElementById('changeData').value = JSON.stringify(changes);
-      console.log(changes);
-      Livewire.emit('setChangesData', changes);
-  }
+  window.addEventListener('open-change-modal', function () {
+      $('#changeModal').modal('show');
+  });
 
   function deleteLog(id , rowid) {
         let reason = prompt('Please provide a reason for deletion:');
