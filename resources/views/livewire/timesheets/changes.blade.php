@@ -32,7 +32,13 @@
                     @foreach($changeData as $item)
                         <tr>
                             <td>{{ $count++ }}</td>
-                            <td>{{ $item['list']['created_at'] }}</td>
+                            <td>
+                                @if (strtoupper($item['list']['type']) === 'INSERT' && ! empty($item['timesheet_created_at']))
+                                    {{ $item['timesheet_created_at'] }}
+                                @else
+                                    {{ $item['list']['created_at'] }}
+                                @endif
+                            </td>
                             <td>{{ $item['date']}}</td>
                             <td>{{ $item['time']}}</td>
                             <td>{{ $item['list']['changed_by'] }}</td>
