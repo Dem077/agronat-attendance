@@ -28,6 +28,7 @@ class ProcessOvertime implements ShouldQueue
      */
     public function __construct($punch_log)
     {
+        $this->onQueue('attendance');
         $this->punch_log=$punch_log;
     }
 

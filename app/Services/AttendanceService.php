@@ -27,6 +27,11 @@ class AttendanceService{
     /** @var int|null Override grace minutes for this run (e.g. recompute); null uses config. */
     public $lateGraceMinutes;
 
+    /** Skip per-punch status updates during bulk recompute (final update runs once at end). */
+    protected bool $deferAttendanceStatusUpdates = false;
+
+    protected array $workSaturdayCache = [];
+
     public function __construct($schedule=null, $lateGraceMinutes=null)
     {
         if($schedule){
@@ -101,26 +106,30 @@ class AttendanceService{
     }
 
     public function recompute($from,$to,$user_id){
-        foreach(date_range($from,$to) as $date){
-            $this->deleteOT($date,$user_id);
-            $this->addSchedule($date,$user_id);
-            $this->fixTimeSheet($date,$user_id);
-            $time_logs=TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00'))
-                ->where('punch','<=',$date->format('Y-m-d 23:59:59'))
-                ->where('user_id',$user_id)
-                ->orderBy('punch','asc')
-                ->get();
+        $this->deferAttendanceStatusUpdates = true;
 
-            foreach($time_logs as $time_log){
-                $this->addAttendance($time_log);
-                $this->addOT($time_log);
+        try {
+            foreach(date_range($from,$to) as $date){
+                $this->deleteOT($date,$user_id);
+                $this->addSchedule($date,$user_id);
+                $this->fixTimeSheet($date,$user_id);
+                $time_logs=TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00'))
+                    ->where('punch','<=',$date->format('Y-m-d 23:59:59'))
+                    ->where('user_id',$user_id)
+                    ->orderBy('punch','asc')
+                    ->get();
+
+                foreach($time_logs as $time_log){
+                    $this->addAttendance($time_log);
+                    $this->addOT($time_log);
+                }
             }
-            //TimeSheet::where('punch','>=',$date->format('Y-m-d 00:00:00'))->where('punch','<=',$date->format('Y-m-d 23:59:59'))->where('sync','1')->where('user_id',$user_id)->delete();
-            //ZKTSync::dispatchNow(['from'=>$date->format('Y-m-d'),'to'=>$date->format('Y-m-d 23:59:59'),'user_id'=>$user_id]);
+
+            UpdateAttendanceStatus::dispatchNow(['from'=>$from,'to'=>$to,'user_id'=>$user_id]);
+        } finally {
+            $this->deferAttendanceStatusUpdates = false;
+            $this->workSaturdayCache = [];
         }
-
-        UpdateAttendanceStatus::dispatchNow(['from'=>$from,'to'=>$to,'user_id'=>$user_id]);
-
     }
 
     public function addAttendance($log){
@@ -148,10 +157,7 @@ class AttendanceService{
             ];
             if($log->status==0){
                 if(!$attendance->in){
-                    $work_saturday=User::where('id',$user_id)
-                        ->whereHas('department',function($q){
-                            $q->where('work_on_saturday',1);
-                        })->exists() && date('D',strtotime($date))=='Sat';
+                    $work_saturday=$this->userWorksSaturday($user_id, $date);
                     $attendance->in=$time;
                     $late_min=$this->lateFine($time,$this->lateThresholdFor($schedule['in'],$work_saturday));
                     $attendance->late_min=$late_min>480?480:$late_min;
@@ -164,13 +170,12 @@ class AttendanceService{
                 $attendance->save();
             }
 
-            UpdateAttendanceStatus::dispatchNow(['from'=>$date,'user_id'=>$user_id]);
+            if (! $this->deferAttendanceStatusUpdates) {
+                UpdateAttendanceStatus::dispatchNow(['from'=>$date,'user_id'=>$user_id]);
+            }
 
         }else{
-            $work_saturday=User::where('id',$user_id)
-                                ->whereHas('department',function($q){
-                                    $q->where('work_on_saturday',1);
-                                })->exists() && date('D',strtotime($date))=='Sat';
+            $work_saturday=$this->userWorksSaturday($user_id, $date);
             $schedule=[...$this->schedule];
             if($work_saturday){
                 $schedule=[
@@ -190,10 +195,24 @@ class AttendanceService{
     }
 
     public function lateFine($ck_in,$lateAt){
-        Log::info(['ck_in'=>$ck_in,'late_at'=>$lateAt]);
         $late_min=(int) floor((strtotime($ck_in)-strtotime($lateAt))/60);
 
         return $late_min>0?($late_min>480?480:$late_min):0;
+    }
+
+    protected function userWorksSaturday(int $user_id, string $date): bool
+    {
+        $key = $user_id.'|'.$date;
+
+        if (! array_key_exists($key, $this->workSaturdayCache)) {
+            $this->workSaturdayCache[$key] = User::where('id', $user_id)
+                ->whereHas('department', function ($q) {
+                    $q->where('work_on_saturday', 1);
+                })
+                ->exists() && date('D', strtotime($date)) === 'Sat';
+        }
+
+        return $this->workSaturdayCache[$key];
     }
 
     public function resetAttendance($from,$to,$user_id){

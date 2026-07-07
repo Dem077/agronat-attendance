@@ -4,35 +4,9 @@ use Illuminate\Support\Str;
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Horizon enabled
-    |--------------------------------------------------------------------------
-    |
-    | Horizon only runs on production when HORIZON_ENABLED=true. Local/dev
-    | should keep this false and use QUEUE_CONNECTION=database with
-    | `php artisan queue:work` when you need to process jobs locally.
-    |
-    */
-
     'enabled' => filter_var(env('HORIZON_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Horizon access permission (Spatie)
-    |--------------------------------------------------------------------------
-    |
-    | Assign this permission to any role via Roles → edit role checkboxes.
-    |
-    */
-
     'permission' => env('HORIZON_PERMISSION', 'horizon-view'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Horizon Domain
-    |--------------------------------------------------------------------------
-    */
 
     'domain' => env('HORIZON_DOMAIN'),
 
@@ -49,6 +23,8 @@ return [
 
     'waits' => [
         'redis:default' => 60,
+        'redis:attendance' => 30,
+        'redis:recompute' => 120,
     ],
 
     'trim' => [
@@ -69,37 +45,86 @@ return [
 
     'fast_termination' => false,
 
-    'memory_limit' => 64,
+    'memory_limit' => (int) env('HORIZON_MEMORY_LIMIT', 128),
 
     'defaults' => [
-        'supervisor-1' => [
+        'supervisor-default' => [
             'connection' => 'redis',
             'queue' => ['default'],
             'balance' => 'auto',
-            'maxProcesses' => 1,
+            'autoScalingStrategy' => 'time',
+            'minProcesses' => 1,
+            'maxProcesses' => 2,
+            'maxTime' => 0,
+            'maxJobs' => 500,
             'memory' => 128,
-            'tries' => 3,
-            'timeout' => 90,
+            'tries' => 1,
+            'timeout' => 120,
+            'sleep' => 1,
+            'nice' => 0,
+        ],
+        'supervisor-attendance' => [
+            'connection' => 'redis',
+            'queue' => ['attendance'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'minProcesses' => 2,
+            'maxProcesses' => 4,
+            'maxTime' => 0,
+            'maxJobs' => 1000,
+            'memory' => 128,
+            'tries' => 1,
+            'timeout' => 60,
+            'sleep' => 1,
+            'nice' => 0,
+        ],
+        'supervisor-recompute' => [
+            'connection' => 'redis',
+            'queue' => ['recompute'],
+            'balance' => 'simple',
+            'minProcesses' => 4,
+            'maxProcesses' => 4,
+            'maxTime' => 0,
+            'maxJobs' => 50,
+            'memory' => 256,
+            'tries' => 1,
+            'timeout' => 600,
+            'sleep' => 1,
             'nice' => 0,
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Production workers only
-    |--------------------------------------------------------------------------
-    |
-    | Do not add a "local" block — Horizon is not run on Windows/dev.
-    | APP_ENV on the live server must be "production".
-    |
-    */
-
     'environments' => [
         'production' => [
-            'supervisor-1' => [
-                'maxProcesses' => (int) env('HORIZON_MAX_PROCESSES', 5),
+            'supervisor-default' => [
+                'minProcesses' => (int) env('HORIZON_DEFAULT_MIN_PROCESSES', 1),
+                'maxProcesses' => (int) env('HORIZON_DEFAULT_MAX_PROCESSES', 2),
                 'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
+                'balanceCooldown' => 1,
+            ],
+            'supervisor-attendance' => [
+                'minProcesses' => (int) env('HORIZON_ATTENDANCE_MIN_PROCESSES', 2),
+                'maxProcesses' => (int) env('HORIZON_ATTENDANCE_MAX_PROCESSES', 4),
+                'balanceMaxShift' => 2,
+                'balanceCooldown' => 1,
+            ],
+            'supervisor-recompute' => [
+                'balance' => 'simple',
+                'minProcesses' => (int) env('HORIZON_RECOMPUTE_MIN_PROCESSES', 4),
+                'maxProcesses' => (int) env('HORIZON_RECOMPUTE_MAX_PROCESSES', 4),
+            ],
+        ],
+        'local' => [
+            'supervisor-default' => [
+                'maxProcesses' => (int) env('HORIZON_DEFAULT_MAX_PROCESSES', 2),
+            ],
+            'supervisor-attendance' => [
+                'minProcesses' => (int) env('HORIZON_ATTENDANCE_MIN_PROCESSES', 2),
+                'maxProcesses' => (int) env('HORIZON_ATTENDANCE_MAX_PROCESSES', 4),
+            ],
+            'supervisor-recompute' => [
+                'minProcesses' => (int) env('HORIZON_RECOMPUTE_MIN_PROCESSES', 2),
+                'maxProcesses' => (int) env('HORIZON_RECOMPUTE_MAX_PROCESSES', 4),
             ],
         ],
     ],

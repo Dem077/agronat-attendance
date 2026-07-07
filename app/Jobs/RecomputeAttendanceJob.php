@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Services\AttendanceService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,40 +13,55 @@ class RecomputeAttendanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $from, $to, $user_id, $in, $out, $progressKey, $lateGraceMinutes;
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
+    public $timeout = 600;
 
-    public function __construct($from, $to, $user_id, $in, $out, $progressKey = null, $lateGraceMinutes = null)
+    protected $from;
+    protected $to;
+    protected $userIds;
+    protected $user_id;
+    protected $in;
+    protected $out;
+    protected $progressKey;
+    protected $lateGraceMinutes;
+
+    public function __construct($from, $to, $userIds, $in, $out, $progressKey = null, $lateGraceMinutes = null)
     {
+        $this->onQueue('recompute');
         $this->from = $from;
         $this->to = $to;
-        $this->user_id = $user_id;
+        $this->userIds = is_array($userIds) ? $userIds : [$userIds];
         $this->in = $in;
         $this->out = $out;
         $this->progressKey = $progressKey;
         $this->lateGraceMinutes = $lateGraceMinutes;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
         $attendanceService = new AttendanceService(
             ['in' => $this->in, 'out' => $this->out],
             $this->lateGraceMinutes
         );
-        $attendanceService->recompute($this->from, $this->to, $this->user_id);
 
-        // Update progress in cache
-        if ($this->progressKey) {
-            cache()->increment($this->progressKey);
+        foreach ($this->userIdsForProcessing() as $userId) {
+            $attendanceService->recompute($this->from, $this->to, $userId);
+
+            if ($this->progressKey) {
+                cache()->increment($this->progressKey);
+            }
         }
+    }
+
+    protected function userIdsForProcessing(): array
+    {
+        if (! empty($this->userIds)) {
+            return $this->userIds;
+        }
+
+        if (! empty($this->user_id)) {
+            return [$this->user_id];
+        }
+
+        return [];
     }
 }

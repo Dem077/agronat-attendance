@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\AttendanceService;
 use DateTime;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Component;
 
 class RecomputeComponent extends Component
@@ -55,11 +56,11 @@ class RecomputeComponent extends Component
         cache()->put($this->progressKey, 0, 3600); // expires in 1 hour
         cache()->put($this->progressKey . '_total', count($users), 3600);
 
-        foreach($users as $user_id){
+        foreach (array_chunk($users, 10) as $userChunk) {
             RecomputeAttendanceJob::dispatch(
                 $this->from,
                 $this->to,
-                $user_id,
+                $userChunk,
                 $this->in,
                 $this->out,
                 $this->progressKey,
@@ -98,8 +99,11 @@ class RecomputeComponent extends Component
             ];
         }
 
-        // Clear all queued jobs (for database queue)
         DB::table('jobs')->delete();
+
+        foreach (['default', 'attendance', 'recompute'] as $queue) {
+            Queue::connection('redis')->clear($queue);
+        }
 
         session()->flash('message', 'Queue and progress cleared.');
     }
