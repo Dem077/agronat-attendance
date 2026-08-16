@@ -23,6 +23,7 @@ class TimeSheet extends Model
  
     protected $fillable = [
         'user_id',
+        'log_id',
         'punch',
         'status',
         'sync',
@@ -36,10 +37,25 @@ class TimeSheet extends Model
     }
 
     public static function add($data){
-        $date1=date('Y-m-d',strtotime($data['punch']));
+        $timestamp = strtotime($data['punch']);
+        if ($timestamp === false) {
+            return null;
+        }
+
+        $data['punch'] = date('Y-m-d H:i:s', $timestamp);
+        $date1=date('Y-m-d', $timestamp);
         $date2=date('Y-m-d',strtotime($data['punch']." +1 day"));
         $user_id=$data['user_id'];
         $log=null;
+
+        $alreadyLogged = TimeSheet::withTrashed()
+            ->where('user_id', $user_id)
+            ->where('punch', $data['punch'])
+            ->exists();
+
+        if ($alreadyLogged) {
+            return null;
+        }
 
         $fix=TimeSheet::where('punch','>',$data['punch'])->where('punch','<',$date2)->where('user_id',$user_id)->count();
         if($fix){

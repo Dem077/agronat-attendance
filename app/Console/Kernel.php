@@ -30,7 +30,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->job(new ZKTSync())
-                        ->everyThreeMinutes();
+                        ->everyThreeMinutes()
+                        ->withoutOverlapping(10);
         $schedule->job(new AddSchedule([]))
                         ->everySixHours()
                         ->between('05:00','13:00');

@@ -97,11 +97,16 @@ class ImportLog extends Component
         $day_end=new DateTime($date." 23:59:59");
         $user_id=$data['user_id'];
 
-        $fix=TimeSheet::withTrashed()->where('punch','>=',$data['punch'])->where('punch','<',$day_end)->where('user_id',$user_id)->pluck('punch')->toArray();
+        $alreadyLogged = TimeSheet::withTrashed()
+            ->where('user_id', $user_id)
+            ->where('punch', $punch)
+            ->exists();
 
-        if(in_array($punch,$fix)){
+        if ($alreadyLogged) {
             return null;
         }
+
+        $data['punch'] = $punch;
 
         return TimeSheet::create($data);
 

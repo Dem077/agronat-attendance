@@ -61,35 +61,68 @@ class AttendanceService{
     }
 
     public function addLog($data){
-        //check user time
-        $punch=date('Y-m-d H:i:s',strtotime($data['punch']));
-        $date=date('Y-m-d',strtotime($data['punch']));
-        $day_start=new DateTime($date);
-        $day_end=new DateTime($date." 23:59:59");
-        $user_id=$data['user_id'];
-        $timeLog=null;
-
-        $fix=TimeSheet::withTrashed()->where('punch','>=',$data['punch'])->where('punch','<',$day_end)->where('user_id',$user_id)->pluck('punch')->toArray();
-
-        if(in_array($punch,$fix)){
-            return;
+        $timestamp = strtotime($data['punch']);
+        if ($timestamp === false) {
+            return null;
         }
-        if($fix){
-            $timeLog=TimeSheet::create($data);
-            $this->fixTimeSheet($day_start,$user_id);
-            $this->resetDailyAttendance($day_start,$user_id);
-            $this->resetDailyOT($day_start,$user_id);
-        }else{
-            $count=TimeSheet::where('punch','>=',$day_start)->where('punch','<=',$data['punch'])->where('user_id',$user_id)->count();
-            $data['status']=$count%2;
-            $timeLog=TimeSheet::create($data);
+
+        $punch = date('Y-m-d H:i:s', $timestamp);
+        $date = date('Y-m-d', $timestamp);
+        $day_start = new DateTime($date);
+        $day_end = new DateTime($date.' 23:59:59');
+        $user_id = $data['user_id'];
+        $data['punch'] = $punch;
+        $logId = $this->normalizeLogId($data['log_id'] ?? null);
+        $data['log_id'] = $logId;
+
+        if ($this->logAlreadyExists($user_id, $punch, $logId)) {
+            return null;
+        }
+
+        $hasLaterPunches = TimeSheet::where('user_id', $user_id)
+            ->where('punch', '>', $punch)
+            ->where('punch', '<=', $day_end)
+            ->exists();
+
+        if ($hasLaterPunches) {
+            $timeLog = TimeSheet::create($data);
+            $this->fixTimeSheet($day_start, $user_id);
+            $this->resetDailyAttendance($day_start, $user_id);
+            $this->resetDailyOT($day_start, $user_id);
+        } else {
+            $count = TimeSheet::where('user_id', $user_id)
+                ->where('punch', '>=', $day_start)
+                ->where('punch', '<=', $punch)
+                ->count();
+            $data['status'] = $count % 2;
+            $timeLog = TimeSheet::create($data);
 
             $this->addAttendance($timeLog);
             $this->addOT($timeLog);
- 
         }
 
         return $timeLog;
+    }
+
+    protected function normalizeLogId($logId): ?string
+    {
+        if ($logId === null || $logId === '') {
+            return null;
+        }
+
+        return (string) $logId;
+    }
+
+    protected function logAlreadyExists($userId, string $punch, ?string $logId): bool
+    {
+        if ($logId !== null) {
+            return TimeSheet::withTrashed()->where('log_id', $logId)->exists();
+        }
+
+        return TimeSheet::withTrashed()
+            ->where('user_id', $userId)
+            ->where('punch', $punch)
+            ->exists();
     }
 
     public function fixTimeSheet($date,$user_id){

@@ -15,11 +15,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
-class ZKTSync implements ShouldQueue
+class ZKTSync implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $from,$to,$user_id,$url,$token,$attendanceService;
+    public $uniqueFor = 180;
+
+    protected $from,$to,$user_id,$url,$token;
     /**
      * Create a new job instance.
      *
@@ -40,7 +42,11 @@ class ZKTSync implements ShouldQueue
         }
         $this->to=isset($data['to'])?$data['to']." 23:59:59":$this->from." 23:59:59";
         $this->user_id=isset($data['user_id'])?$data['user_id']:null;
-        $this->attendanceService=new AttendanceService();
+    }
+
+    public function uniqueId()
+    {
+        return 'zkt-sync-'.$this->from.'-'.$this->to.'-'.($this->user_id ?? 'all');
     }
 
     /**
@@ -50,6 +56,8 @@ class ZKTSync implements ShouldQueue
      */
     public function handle()
     {
+        $attendanceService = new AttendanceService();
+        $users = [];
         $employee_ids=[];
         if($this->user_id){
             $emp_no=User::find($this->user_id)?->emp_no;
@@ -67,8 +75,12 @@ class ZKTSync implements ShouldQueue
                 }
                 $users[$d['emp_id']]=$u->id;
             }
-            $data=["user_id"=>$users[$d['emp_id']],"punch"=>$d['checkin']];
-            $this->attendanceService->addLog($data);
+            $data = [
+                'user_id' => $users[$d['emp_id']],
+                'punch' => $d['checkin'],
+                'log_id' => $d['log_id'] ?? null,
+            ];
+            $attendanceService->addLog($data);
         }
     }
 

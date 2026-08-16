@@ -281,6 +281,11 @@ class TimeSheetComponent extends Component
 
         $record = $this->attendanceService->addLog($validatedDate);
 
+        if (! $record) {
+            session()->flash('message', 'This punch already exists.');
+            return;
+        }
+
         $attendanceid = Attendance::where('user_id',  $validatedDate['user_id'])->where('ck_date', $date)->first();
        
         (new TimeChangeLog)->logaudit($attendanceid->id, $record->id, $userName, $validatedDate['reason'] , "INSERT");
